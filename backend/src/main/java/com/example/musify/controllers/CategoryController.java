@@ -1,7 +1,10 @@
 package com.example.musify.controllers;
 
+import com.example.musify.dto.CategoryInputDto;
+import com.example.musify.dto.CategoryOutputDto;
 import com.example.musify.entities.Categories;
 import com.example.musify.services.CategoryService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,7 +22,12 @@ public class CategoryController {
     }
 
     @GetMapping
-    public List<Categories> getAllCategories() {
+    public List<CategoryOutputDto> getAllCategories() {
         return categoryService.findAllCategories();
+    }
+
+    @PostMapping
+    public CategoryOutputDto createCategory(@Valid @RequestBody CategoryInputDto categoryInputDto){
+        return categoryService.createCategory(categoryInputDto);
     }
 }

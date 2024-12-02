@@ -17,16 +17,16 @@ import java.util.UUID;
 public class Reviews {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID reviewId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false)
-    private Products product;
+    @JoinColumn(name = "reviewed_user_id", nullable = false)
+    private Users reviewedUser;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private Users user;
+    @JoinColumn(name = "reviewer_user_id", nullable = false)
+    private Users reviewer;
 
     @Column(nullable = false)
     private Float rating;

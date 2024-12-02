@@ -4,9 +4,12 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Entity
-@Table(name = "order_items")
+@Table(name = "order_items", uniqueConstraints = {
+        @UniqueConstraint(columnNames = "product_id")
+})
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,19 +19,16 @@ import java.math.BigDecimal;
 public class OrderItems {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long orderItemId;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID orderItemId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
     private Orders order;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false)
+    @JoinColumn(name = "product_id", nullable = false, unique = true)
     private Products product;
-
-    @Column(nullable = false)
-    private Integer quantity;
 
     @Column(nullable = false)
     private BigDecimal price;

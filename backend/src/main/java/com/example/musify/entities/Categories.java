@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "categories")
@@ -16,8 +17,8 @@ import java.util.List;
 public class Categories {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long categoryId;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID categoryId;
 
     @Column(nullable = false, unique = true)
     private String name;

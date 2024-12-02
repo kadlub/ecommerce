@@ -1,7 +1,10 @@
 package com.example.musify.controllers;
 
+import com.example.musify.dto.ProductInputDto;
+import com.example.musify.dto.ProductOutputDto;
 import com.example.musify.entities.Products;
 import com.example.musify.services.ProductService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,25 +24,25 @@ public class ProductController {
     }
 
     @GetMapping
-    public List<Products> getAllProducts() {
+    public List<ProductOutputDto> getAllProducts() {
         return productService.findAllProducts();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Products> getProductById(@PathVariable UUID id) {
+    public ResponseEntity<ProductOutputDto> getProductById(@PathVariable UUID id) {
         return productService.findProductById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public Products createProduct(@RequestBody Products product) {
-        return productService.createProduct(product);
+    public ProductOutputDto createProduct(@Valid @RequestBody ProductInputDto productInputDto) {
+        return productService.createProduct(productInputDto);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Products> updateProduct(@PathVariable UUID id, @RequestBody Products productDetails) {
-        return ResponseEntity.ok(productService.updateProduct(id, productDetails));
+    public ResponseEntity<ProductOutputDto> updateProduct(@PathVariable UUID id, @Valid @RequestBody ProductInputDto productInputDto) {
+        return ResponseEntity.ok(productService.updateProduct(id, productInputDto));
     }
 
     @DeleteMapping("/{id}")

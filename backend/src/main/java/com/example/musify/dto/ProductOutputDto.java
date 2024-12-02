@@ -1,5 +1,6 @@
 package com.example.musify.dto;
 
+import lombok.Builder;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -7,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
+@Builder
 public class ProductOutputDto {
 
     private UUID productId;
@@ -14,8 +16,10 @@ public class ProductOutputDto {
     private BigDecimal price;
     private String description;
     private String condition;
-    private String categoryName;
     private Float rating;
-    private Integer stock;
     private LocalDateTime creationDate;
+    private UUID categoryId;
+    private String categoryName;
+    private UUID sellerId;
+    private String sellerName;
 }

@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Data
 public class ProductInputDto {
@@ -24,8 +25,8 @@ public class ProductInputDto {
     private String condition;
 
     @NotNull(message = "Category ID is required")
-    private Long categoryId;
+    private UUID categoryId;
 
-    @NotNull(message = "Stock is required")
-    private Integer stock;
+    @NotNull(message = "Seller ID is required")
+    private UUID sellerId;
 }

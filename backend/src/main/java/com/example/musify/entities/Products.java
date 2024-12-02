@@ -20,7 +20,7 @@ public class Products {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(nullable = false, unique = true)
-    private UUID id;
+    private UUID productId;
 
     @Column(nullable = false)
     private String name;

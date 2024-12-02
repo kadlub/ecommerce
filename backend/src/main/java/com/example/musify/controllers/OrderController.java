@@ -1,7 +1,10 @@
 package com.example.musify.controllers;
 
+import com.example.musify.dto.OrderInputDto;
+import com.example.musify.dto.OrderOutputDto;
 import com.example.musify.entities.Orders;
 import com.example.musify.services.OrderService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,20 +24,20 @@ public class OrderController {
     }
 
     @GetMapping
-    public List<Orders> getAllOrders() {
+    public List<OrderOutputDto> getAllOrders() {
         return orderService.findAllOrders();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Orders> getOrderById(@PathVariable UUID id) {
+    public ResponseEntity<OrderOutputDto> getOrderById(@PathVariable UUID id) {
         return orderService.findOrderById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public Orders createOrder(@RequestBody Orders order) {
-        return orderService.createOrder(order);
+    public OrderOutputDto createOrder(@Valid @RequestBody OrderInputDto orderInputDto) {
+        return orderService.createOrder(orderInputDto);
     }
 
     @DeleteMapping("/{id}")

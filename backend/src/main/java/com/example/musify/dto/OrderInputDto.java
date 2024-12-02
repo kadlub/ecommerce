@@ -20,8 +20,5 @@ public class OrderInputDto {
     public static class OrderItemInputDto {
         @NotNull(message = "Product ID is required")
         private UUID productId;
-
-        @NotNull(message = "Quantity is required")
-        private Integer quantity;
     }
 }

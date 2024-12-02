@@ -1,11 +1,13 @@
 package com.example.musify.dto;
 
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
+@Builder
 public class UserOutputDto {
 
     private UUID userId;

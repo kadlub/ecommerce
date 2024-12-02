@@ -43,8 +43,11 @@ public class Users {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Orders> orders;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Reviews> reviews;
+    @OneToMany(mappedBy = "reviewedUser", cascade = CascadeType.ALL)
+    private List<Reviews> receivedReviews;
+
+    @OneToMany(mappedBy = "reviewer", cascade = CascadeType.ALL)
+    private List<Reviews> writtenReviews;
 
     @PrePersist
     public void onPrePersist() {
