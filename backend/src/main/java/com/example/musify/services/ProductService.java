@@ -83,7 +83,6 @@ public class ProductService {
                 .price(product.getPrice())
                 .description(product.getDescription())
                 .condition(product.getCondition())
-                .rating(product.getRating())
                 .creationDate(product.getCreationDate())
                 .categoryId(product.getCategory().getCategoryId())
                 .categoryName(product.getCategory().getName())

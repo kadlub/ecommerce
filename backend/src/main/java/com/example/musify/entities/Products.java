@@ -34,9 +34,6 @@ public class Products {
     @Column(nullable = false)
     private String condition;
 
-    @Column
-    private Float rating;
-
     @Column(nullable = false)
     private LocalDateTime creationDate;
 

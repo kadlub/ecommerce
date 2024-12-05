@@ -36,7 +36,7 @@ public class OrderController {
     }
 
     @PostMapping
-    public OrderOutputDto createOrder(@Valid @RequestBody OrderInputDto orderInputDto) {
+    public OrderOutputDto createOrder(@RequestBody @Valid OrderInputDto orderInputDto) {
         return orderService.createOrder(orderInputDto);
     }
 
@@ -45,4 +45,13 @@ public class OrderController {
         orderService.deleteOrder(id);
         return ResponseEntity.noContent().build();
     }
+
+    // zmiana statusu zamówienia
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<OrderOutputDto> updateOrderStatus(
+            @PathVariable UUID id,
+            @RequestParam String status) {
+        return ResponseEntity.ok(orderService.updateOrderStatus(id, status));
+    }
 }
+

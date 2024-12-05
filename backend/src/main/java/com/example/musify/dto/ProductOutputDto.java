@@ -16,7 +16,6 @@ public class ProductOutputDto {
     private BigDecimal price;
     private String description;
     private String condition;
-    private Float rating;
     private LocalDateTime creationDate;
     private UUID categoryId;
     private String categoryName;
