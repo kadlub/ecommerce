@@ -17,6 +17,7 @@ public class ProductOutputDto {
     private String description;
     private String condition;
     private LocalDateTime creationDate;
+    private String imageUrl;
     private UUID categoryId;
     private String categoryName;
     private UUID sellerId;

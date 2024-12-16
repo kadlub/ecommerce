@@ -6,8 +6,12 @@ import com.example.musify.entities.Products;
 import com.example.musify.services.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -21,6 +25,32 @@ public class ProductController {
     @Autowired
     public ProductController(ProductService productService) {
         this.productService = productService;
+    }
+
+    // Upload image for a product
+    @PostMapping("/{productId}/images")
+    public ResponseEntity<String> uploadProductImage(
+            @PathVariable UUID productId,
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "altText", required = false) String altText) {
+        productService.uploadProductImage(productId, file, altText);
+        return ResponseEntity.ok("Image uploaded successfully");
+    }
+
+    // Retrieve all image URLs for a product
+    @GetMapping("/{productId}/images")
+    public ResponseEntity<List<String>> getProductImages(@PathVariable UUID productId) {
+        List<String> imageUrls = productService.getProductImages(productId);
+        return ResponseEntity.ok(imageUrls);
+    }
+
+    // Serve an image file by filename
+    @GetMapping("/images/{fileName}")
+    public ResponseEntity<byte[]> getImageFile(@PathVariable String fileName) {
+        byte[] image = productService.getImageFile(fileName);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.IMAGE_JPEG); // Adjust MIME type if necessary
+        return new ResponseEntity<>(image, headers, HttpStatus.OK);
     }
 
     @GetMapping
@@ -51,3 +81,4 @@ public class ProductController {
         return ResponseEntity.noContent().build();
     }
 }
+
