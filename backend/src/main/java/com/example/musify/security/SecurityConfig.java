@@ -1,14 +1,11 @@
 package com.example.musify.security;
 
-import com.example.musify.security.JwtUtil;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -36,15 +33,15 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // Wyłącz CSRF
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Włącz CORS
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**", "/**").permitAll() // Zezwól na endpointy rejestracji
-                        .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll() // Zezwól na preflight
-                        .anyRequest().authenticated() // Reszta wymaga autoryzacji
+                        .requestMatchers("/api/auth/register", "/api/auth/login").permitAll() // Zezwól na te endpointy bez autoryzacji
+                        .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll() // Zezwól na preflight OPTIONS
+                        .anyRequest().authenticated() // Wszystkie inne żądania wymagają autoryzacji
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthenticationEntryPoint));
 
-        // Dodanie filtra JWT przed filtrem UsernamePasswordAuthenticationFilter
-        http.addFilterBefore(jwtFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class);
+        // Dodanie filtra JWT przed UsernamePasswordAuthenticationFilter
+        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -72,8 +69,7 @@ public class SecurityConfig {
         return new CorsFilter(source);
     }
 
-    @Bean
-    public UrlBasedCorsConfigurationSource corsConfigurationSource() {
+    private UrlBasedCorsConfigurationSource corsConfigurationSource() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOriginPatterns(Arrays.asList("*"));
