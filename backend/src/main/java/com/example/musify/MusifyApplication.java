@@ -17,7 +17,7 @@ public class MusifyApplication {
 		SpringApplication.run(MusifyApplication.class, args);
 	}
 
-	@Bean
+	/*@Bean
 	public CorsFilter corsFilter() {
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		CorsConfiguration config = new CorsConfiguration();
@@ -27,6 +27,6 @@ public class MusifyApplication {
 		config.setExposedHeaders(Arrays.asList("X-Total-Count", "content-range", "Content-Type", "Accept", "X-Requested-With", "remember-me"));
 		source.registerCorsConfiguration("/**", config);
 		return new CorsFilter(source);
-	}
+	}*/
 
 }

@@ -1,0 +1,435 @@
+{
+  "pages": {
+    "shop": {
+      "sections": [
+        {
+          "title": "Categories For Instruments",
+          "data": [
+            {
+              "title": "Guitars",
+              "description": "Explore Now!",
+              "image": ""
+            },
+            {
+              "title": "Keyboards & Pianos",
+              "description": "Explore Now!",
+              "image": ""
+            },
+            {
+              "title": "Drums & Percussion",
+              "description": "Explore Now!",
+              "image": ""
+            },
+            {
+              "title": "Wind Instruments",
+              "description": "Explore Now!",
+              "image": ""
+            },
+            {
+              "title": "String Instruments",
+              "description": "Explore Now!",
+              "image": ""
+            }
+          ]
+        },
+        {
+          "title": "Categories For Equipment",
+          "data": [
+            {
+              "title": "Microphones",
+              "description": "Explore Now!",
+              "image": ""
+            },
+            {
+              "title": "Amplifiers",
+              "description": "Explore Now!",
+              "image": ""
+            },
+            {
+              "title": "Mixers",
+              "description": "Explore Now!",
+              "image": ""
+            },
+            {
+              "title": "Speakers",
+              "description": "Explore Now!",
+              "image": ""
+            },
+            {
+              "title": "Headphones",
+              "description": "Explore Now!",
+              "image": ""
+            }
+          ]
+        },
+        {
+          "title": "Categories For Accessories",
+          "data": [
+            {
+              "title": "Guitar Strings",
+              "description": "Explore Now!",
+              "image": ""
+            },
+            {
+              "title": "Cables & Adapters",
+              "description": "Explore Now!",
+              "image": ""
+            },
+            {
+              "title": "Drum Sticks",
+              "description": "Explore Now!",
+              "image": ""
+            },
+            {
+              "title": "Stands & Mounts",
+              "description": "Explore Now!",
+              "image": ""
+            },
+            {
+              "title": "Cases & Bags",
+              "description": "Explore Now!",
+              "image": ""
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "footer": {
+    "items": [
+      {
+        "title": "Need Help",
+        "list": [
+          {
+            "label": "Contact Us",
+            "path": "/contact-us"
+          },
+          {
+            "label": "Track Order",
+            "path": "/track-order"
+          },
+          {
+            "label": "Returns & Refunds",
+            "path": "/refunds"
+          },
+          {
+            "label": "FAQ's",
+            "path": "/faq"
+          },
+          {
+            "label": "Career",
+            "path": "/career"
+          }
+        ]
+      },
+      {
+        "title": "Company",
+        "list": [
+          {
+            "label": "About Us",
+            "path": "/about"
+          },
+          {
+            "label": "Media",
+            "path": "/media"
+          }
+        ]
+      },
+      {
+        "title": "More Info",
+        "list": [
+          {
+            "label": "Terms and Conditions",
+            "path": "/terms-conditions"
+          },
+          {
+            "label": "Privacy Policy",
+            "path": "/policies"
+          },
+          {
+            "label": "Shipping Policy",
+            "path": "/policies"
+          }
+        ]
+      },
+      {
+        "title": "Location",
+        "description": "Location Country"
+      }
+    ],
+    "copyright": "Copyright © 2024 SoundWave"
+  },
+  "categories": [
+    {
+      "id": 1,
+      "name": "Instruments",
+      "code": "INSTRUMENTS",
+      "path": "/instruments",
+      "description": "Musical Instruments",
+      "types": [
+        {
+          "id": 1,
+          "name": "Guitars",
+          "description": "Acoustic, Electric, and Bass Guitars"
+        },
+        {
+          "id": 2,
+          "name": "Keyboards",
+          "description": "Digital Keyboards and Pianos"
+        },
+        {
+          "id": 3,
+          "name": "Drums",
+          "description": "Drums and Percussion Instruments"
+        },
+        {
+          "id": 4,
+          "name": "Wind Instruments",
+          "description": "Flutes, Saxophones, Trumpets, and more"
+        },
+        {
+          "id": 5,
+          "name": "String Instruments",
+          "description": "Violins, Cellos, and more"
+        }
+      ],
+      "meta_data": {
+        "brands": [
+          "Yamaha",
+          "Fender",
+          "Gibson",
+          "Roland",
+          "Casio",
+          "Ibanez"
+        ],
+        "price_range": [
+          "$100",
+          "$5000"
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "name": "Equipment",
+      "code": "EQUIPMENT",
+      "path": "/equipment",
+      "description": "Audio Equipment",
+      "types": [
+        {
+          "id": 6,
+          "name": "Microphones",
+          "description": "Dynamic and Condenser Microphones"
+        },
+        {
+          "id": 7,
+          "name": "Amplifiers",
+          "description": "Guitar and Bass Amplifiers"
+        },
+        {
+          "id": 8,
+          "name": "Mixers",
+          "description": "Audio Mixers for Recording and Live Sound"
+        },
+        {
+          "id": 9,
+          "name": "Speakers",
+          "description": "Studio and Live Sound Speakers"
+        },
+        {
+          "id": 10,
+          "name": "Headphones",
+          "description": "Studio Monitoring Headphones"
+        }
+      ],
+      "meta_data": {
+        "brands": [
+          "Shure",
+          "Behringer",
+          "JBL",
+          "Yamaha",
+          "Sennheiser",
+          "Sony"
+        ],
+        "price_range": [
+          "$50",
+          "$3000"
+        ]
+      }
+    },
+    {
+      "id": 3,
+      "name": "Accessories",
+      "code": "ACCESSORIES",
+      "path": "/accessories",
+      "description": "Musical Accessories",
+      "types": [
+        {
+          "id": 11,
+          "name": "Guitar Strings",
+          "description": "Strings for Acoustic, Electric, and Bass Guitars"
+        },
+        {
+          "id": 12,
+          "name": "Cables & Adapters",
+          "description": "Audio and Instrument Cables"
+        },
+        {
+          "id": 13,
+          "name": "Drum Sticks",
+          "description": "Sticks for Drums and Percussion"
+        },
+        {
+          "id": 14,
+          "name": "Stands & Mounts",
+          "description": "Instrument Stands and Mounts"
+        },
+        {
+          "id": 15,
+          "name": "Cases & Bags",
+          "description": "Protective Cases and Bags for Instruments"
+        }
+      ],
+      "meta_data": {
+        "brands": [
+          "Ernie Ball",
+          "D'Addario",
+          "K&M",
+          "Hosa",
+          "Gator Cases"
+        ],
+        "price_range": [
+          "$5",
+          "$150"
+        ]
+      }
+    }
+  ],
+  "products": [
+    {
+      "id": 1,
+      "title": "Fender Stratocaster Electric Guitar",
+      "description": "A classic Fender electric guitar with powerful sound.",
+      "category_id": 1,
+      "type_id": 1,
+      "brand": "Fender",
+      "price": 799.99,
+      "color": [
+        "Sunburst"
+      ],
+      "discount": 10,
+      "thumbnail": "",
+      "images": [
+        ""
+      ],
+      "rating": 4.8
+    },
+    {
+      "id": 2,
+      "title": "Yamaha Digital Keyboard",
+      "description": "Portable keyboard with various voices and functions.",
+      "category_id": 1,
+      "type_id": 2,
+      "brand": "Yamaha",
+      "price": 299.99,
+      "color": [
+        "Black"
+      ],
+      "discount": 5,
+      "thumbnail": "",
+      "images": [
+        ""
+      ],
+      "rating": 4.7
+    },
+    {
+      "id": 3,
+      "title": "Shure SM7B Microphone",
+      "description": "Broadcast-quality microphone, ideal for vocals and recording.",
+      "category_id": 2,
+      "type_id": 6,
+      "brand": "Shure",
+      "price": 399.99,
+      "color": [
+        "Black"
+      ],
+      "discount": 15,
+      "thumbnail": "",
+      "images": [
+        ""
+      ],
+      "rating": 4.9
+    },
+    {
+      "id": 4,
+      "title": "JBL Studio Monitor Speaker",
+      "description": "High-definition studio monitor speaker for precise sound.",
+      "category_id": 2,
+      "type_id": 9,
+      "brand": "JBL",
+      "price": 199.99,
+      "color": [
+        "Black"
+      ],
+      "discount": 10,
+      "thumbnail": "",
+      "images": [
+        ""
+      ],
+      "rating": 4.8
+    },
+    {
+      "id": 5,
+      "title": "Ernie Ball Regular Slinky Guitar Strings",
+      "description": "Classic strings for electric guitars, bright and balanced tone.",
+      "category_id": 3,
+      "type_id": 11,
+      "brand": "Ernie Ball",
+      "price": 9.99,
+      "color": [
+        "Silver"
+      ],
+      "discount": 5,
+      "thumbnail": "",
+      "images": [
+        ""
+      ],
+      "rating": 4.6
+    },
+    {
+      "id": 6,
+      "title": "Gator Hard Case for Guitar",
+      "description": "Durable hard case for electric guitars.",
+      "category_id": 3,
+      "type_id": 15,
+      "brand": "Gator Cases",
+      "price": 119.99,
+      "color": [
+        "Black"
+      ],
+      "discount": 8,
+      "thumbnail": "",
+      "images": [
+        ""
+      ],
+      "rating": 4.7
+    },
+    {
+      "id": 7,
+      "title": "Sony MDR7506 Headphones",
+      "description": "Professional-grade headphones with excellent sound clarity.",
+      "category_id": 2,
+      "type_id": 10,
+      "brand": "Sony",
+      "price": 89.99,
+      "color": [
+        "Black"
+      ],
+      "discount": 12,
+      "thumbnail": "",
+      "images": [
+        ""
+      ],
+      "rating": 4.8
+    }
+  ]
+}

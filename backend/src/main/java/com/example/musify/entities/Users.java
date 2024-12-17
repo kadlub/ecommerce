@@ -2,6 +2,7 @@ package com.example.musify.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.mapping.Set;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -36,6 +37,14 @@ public class Users {
 
     @Column(nullable = false)
     private Boolean isSeller;
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "user_authorities",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "authority_id")
+    )
+    private List<Authority> authorities; // Lista ról przypisanych użytkownikowi
 
     @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL)
     private List<Products> products;

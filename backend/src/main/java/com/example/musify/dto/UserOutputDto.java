@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -15,4 +16,5 @@ public class UserOutputDto {
     private String email;
     private Boolean isSeller;
     private LocalDateTime createdAt;
+    private List<String> roles;
 }

@@ -1,0 +1,7 @@
+.react-slider-custom-item {
+    max-width: 250px;
+
+    img {
+        height: 300px;
+    }
+}

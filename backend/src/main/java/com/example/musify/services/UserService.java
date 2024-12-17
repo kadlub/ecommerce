@@ -2,9 +2,14 @@ package com.example.musify.services;
 
 import com.example.musify.dto.UserInputDto;
 import com.example.musify.dto.UserOutputDto;
+import com.example.musify.entities.Authority;
 import com.example.musify.entities.Users;
+import com.example.musify.repositories.AuthorityRepository;
 import com.example.musify.repositories.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,10 +21,14 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UsersRepository usersRepository;
+    private final AuthorityRepository authorityRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(UsersRepository usersRepository) {
+    public UserService(UsersRepository usersRepository, AuthorityRepository authorityRepository, PasswordEncoder passwordEncoder) {
         this.usersRepository = usersRepository;
+        this.authorityRepository = authorityRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     // Pobranie wszystkich użytkowników
@@ -36,11 +45,20 @@ public class UserService {
                 .map(this::convertToOutputDto); // Konwersja encji na DTO wyjściowe
     }
 
-    // Tworzenie nowego użytkownika
+    // Tworzenie nowego użytkownika z przypisaniem domyślnej roli USER
     public UserOutputDto createUser(UserInputDto userInputDto) {
-        Users user = convertToEntity(userInputDto); // Konwersja DTO wejściowego na encję
+        Users user = convertToEntity(userInputDto);
+
+        // Hashowanie hasła
+        user.setPasswordHash(passwordEncoder.encode(userInputDto.getPasswordHash()));
+
+        // Dodanie domyślnej roli USER
+        Authority defaultRole = authorityRepository.findByName("ROLE_USER")
+                .orElseThrow(() -> new RuntimeException("Default role not found"));
+        user.setAuthorities(List.of(defaultRole));
+
         Users savedUser = usersRepository.save(user);
-        return convertToOutputDto(savedUser); // Konwersja encji na DTO wyjściowe
+        return convertToOutputDto(savedUser);
     }
 
     // Aktualizacja użytkownika
@@ -49,7 +67,12 @@ public class UserService {
                 .map(user -> {
                     user.setUsername(userInputDto.getUsername());
                     user.setEmail(userInputDto.getEmail());
-                    user.setPasswordHash(userInputDto.getPasswordHash());
+
+                    // Aktualizacja hasła, jeśli dostarczone
+                    if (userInputDto.getPasswordHash() != null) {
+                        user.setPasswordHash(passwordEncoder.encode(userInputDto.getPasswordHash()));
+                    }
+
                     user.setIsSeller(userInputDto.getIsSeller());
                     Users updatedUser = usersRepository.save(user);
                     return convertToOutputDto(updatedUser); // Konwersja encji na DTO wyjściowe
@@ -70,6 +93,9 @@ public class UserService {
                 .email(user.getEmail())
                 .isSeller(user.getIsSeller())
                 .createdAt(user.getCreatedAt())
+                .roles(user.getAuthorities().stream()
+                        .map(Authority::getName)
+                        .collect(Collectors.toList())) // Dodanie listy ról do DTO
                 .build();
     }
 
@@ -78,8 +104,9 @@ public class UserService {
         return Users.builder()
                 .username(userInputDto.getUsername())
                 .email(userInputDto.getEmail())
-                .passwordHash(userInputDto.getPasswordHash())
+                .passwordHash(userInputDto.getPasswordHash()) // Hasło będzie hashowane przed zapisem
                 .isSeller(userInputDto.getIsSeller())
                 .build();
     }
 }
+
