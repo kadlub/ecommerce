@@ -3,6 +3,7 @@ package com.example.musify.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,6 +18,11 @@ public class JwtUtil {
 
     @Value("${JWT_KEY}")
     private String SECRET_KEY; // Ustaw to w pliku .properties
+
+    @PostConstruct
+    public void testSecretKey() {
+        System.out.println("Loaded SECRET_KEY: " + SECRET_KEY);
+    }
 
     public String generateToken(Authentication authentication) {
         Map<String, Object> claims = new HashMap<>();

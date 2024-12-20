@@ -24,8 +24,8 @@ public class JwtFilter extends OncePerRequestFilter {
 
     // Ścieżki wykluczone z filtrowania JWT
     private static final Set<String> EXCLUDED_PATHS = Set.of(
-            "api/auth/register",
-            "api/auth/login"
+            "/api/auth/register",
+            "/api/auth/login"
     );
 
     public JwtFilter(JwtUtil jwtUtil, @Qualifier("customUserDetailsService") UserDetailsService userDetailsService) {

@@ -47,6 +47,9 @@ public class UserService {
 
     // Tworzenie nowego użytkownika z przypisaniem domyślnej roli USER
     public UserOutputDto createUser(UserInputDto userInputDto) {
+        if (usersRepository.existsByEmail(userInputDto.getEmail())) {
+            throw new IllegalArgumentException("Email already exists.");
+        }
         System.out.println("Creating user: " + userInputDto);
         try {
             Users user = convertToEntity(userInputDto);

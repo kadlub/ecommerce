@@ -15,6 +15,7 @@ import java.util.UUID;
 @Builder
 @Getter
 @Setter
+@ToString(exclude = "users")
 public class Authority {
 
     @Id

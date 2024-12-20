@@ -9,7 +9,7 @@ import VerifyCode from './VerifyCode';
 const Register = () => {
   const [values, setValues] = useState({
     email: '',
-    password: '',
+    passwordHash: '',
     firstName: "",
     lastName: "",
     phone: '',
@@ -56,7 +56,7 @@ const Register = () => {
               <label>Adres Email</label>
               <input type="email" name='email' value={values?.userName} onChange={handleOnChange} placeholder='Adres Email' className='h-[48px] w-full border p-2 mt-2 mb-4 border-gray-400' required autoComplete='off' />
               <label>Hasło</label>
-              <input type="password" name='password' value={values?.password} onChange={handleOnChange} placeholder='Hasło' className='h-[48px] mt-2 w-full border p-2 border-gray-400' required autoComplete='new-password' />
+              <input type="password" name='passwordHash' value={values?.passwordHash} onChange={handleOnChange} placeholder='Hasło' className='h-[48px] mt-2 w-full border p-2 border-gray-400' required autoComplete='new-password' />
               <button className='border w-full rounded-lg h-[48px] mb-4 bg-black text-white mt-4 hover:opacity-80'>Zarejestruj się</button>
             </form>
           </div>

@@ -18,5 +18,5 @@ public class UserInputDto {
     private String passwordHash;
 
     @NotNull(message = "Seller status is required")
-    private Boolean isSeller;
+    private Boolean isSeller = false; // Domyślnie `false`
 }
