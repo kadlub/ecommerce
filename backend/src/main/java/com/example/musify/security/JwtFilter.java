@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Set;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
@@ -22,10 +22,10 @@ public class JwtFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
     private final UserDetailsService userDetailsService;
 
-    // Ścieżki, które będą ignorowane przez filtr
-    private static final List<String> EXCLUDED_PATHS = List.of(
-            "/api/auth/register",
-            "/api/auth/login"
+    // Ścieżki wykluczone z filtrowania JWT
+    private static final Set<String> EXCLUDED_PATHS = Set.of(
+            "api/auth/register",
+            "api/auth/login"
     );
 
     public JwtFilter(JwtUtil jwtUtil, @Qualifier("customUserDetailsService") UserDetailsService userDetailsService) {
@@ -37,9 +37,10 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
         String requestPath = request.getServletPath();
+        System.out.println("Request path: " + requestPath);
 
-        // Pomijanie wybranych ścieżek
-        if (EXCLUDED_PATHS.stream().anyMatch(requestPath::equals)) {
+        // Pomijanie autoryzacji JWT dla wykluczonych ścieżek
+        if (shouldSkipPath(requestPath)) { // Przekaż request
             chain.doFilter(request, response);
             return;
         }
@@ -65,5 +66,14 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         chain.doFilter(request, response);
+    }
+    /**
+     * Sprawdza, czy ścieżka powinna zostać pominięta przez filtr.
+     */
+    private boolean shouldSkipPath(String path) {
+        String normalizedPath = path.startsWith("/api/") ? path : "/api" + path;
+        boolean shouldSkip = EXCLUDED_PATHS.stream().anyMatch(normalizedPath::endsWith);
+        System.out.println("Skipping JWT filter for path: " + path + "? " + shouldSkip);
+        return shouldSkip;
     }
 }

@@ -38,6 +38,8 @@ public class Users {
     @Column(nullable = false)
     private Boolean isSeller;
 
+    private String verificationCode;
+
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(
             name = "user_authorities",

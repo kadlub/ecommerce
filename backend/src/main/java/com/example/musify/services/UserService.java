@@ -47,19 +47,28 @@ public class UserService {
 
     // Tworzenie nowego użytkownika z przypisaniem domyślnej roli USER
     public UserOutputDto createUser(UserInputDto userInputDto) {
-        Users user = convertToEntity(userInputDto);
+        System.out.println("Creating user: " + userInputDto);
+        try {
+            Users user = convertToEntity(userInputDto);
 
-        // Hashowanie hasła
-        user.setPasswordHash(passwordEncoder.encode(userInputDto.getPasswordHash()));
+            // Hashowanie hasła
+            user.setPasswordHash(passwordEncoder.encode(userInputDto.getPasswordHash()));
 
-        // Dodanie domyślnej roli USER
-        Authority defaultRole = authorityRepository.findByName("ROLE_USER")
-                .orElseThrow(() -> new RuntimeException("Default role not found"));
-        user.setAuthorities(List.of(defaultRole));
+            // Dodanie domyślnej roli USER
+            Authority defaultRole = authorityRepository.findByName("ROLE_USER")
+                    .orElseThrow(() -> new RuntimeException("Default role not found"));
+            user.setAuthorities(List.of(defaultRole));
 
-        Users savedUser = usersRepository.save(user);
-        return convertToOutputDto(savedUser);
+            Users savedUser = usersRepository.save(user);
+            System.out.println("User saved: " + savedUser);
+
+            return convertToOutputDto(savedUser);
+        } catch (Exception e) {
+            System.out.println("Error during user creation: " + e.getMessage());
+            throw e;
+        }
     }
+
 
     // Aktualizacja użytkownika
     public UserOutputDto updateUser(UUID userId, UserInputDto userInputDto) {
