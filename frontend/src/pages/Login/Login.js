@@ -8,7 +8,7 @@ import { saveToken } from '../../utils/jwt-helper';
 
 const Login = () => {
   const [values, setValues] = useState({
-    userName: '',
+    username: '',
     password: '',
   });
   const [error, setError] = useState('');
@@ -56,11 +56,11 @@ const Login = () => {
         <div className="pt-4">
           <form onSubmit={onSubmit}>
             <input
-              type="email"
-              name="userName"
-              value={values?.userName}
+              type="username"
+              name="username"
+              value={values?.username}
               onChange={handleOnChange}
-              placeholder="Adres Email"
+              placeholder="Nazwa użytkownika"
               className="h-[48px] w-full border p-2 border-gray-400 mb-4"
               required
             />

@@ -12,6 +12,7 @@ import com.example.musify.repositories.ProductsRepository;
 import com.example.musify.repositories.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -106,9 +107,35 @@ public class ProductService {
                 .map(this::convertToOutputDto);
     }
 
+    @Transactional
     public ProductOutputDto createProduct(ProductInputDto productInputDto) {
-        Products product = convertToEntity(productInputDto);
+        // Find the category
+        Categories category = categoriesRepository.findById(productInputDto.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+
+        // Find the seller
+        Users seller = usersRepository.findById(productInputDto.getSellerId())
+                .orElseThrow(() -> new RuntimeException("Seller not found"));
+
+        // Create the product
+        Products product = Products.builder()
+                .name(productInputDto.getName())
+                .price(productInputDto.getPrice())
+                .description(productInputDto.getDescription())
+                .condition(productInputDto.getCondition())
+                .category(category)
+                .seller(seller)
+                .build();
+
+        // Save the product
         Products savedProduct = productsRepository.save(product);
+
+        // Update the seller's `isSeller` field if not already true
+        if (!Boolean.TRUE.equals(seller.getIsSeller())) {
+            seller.setIsSeller(true);
+            usersRepository.save(seller);
+        }
+
         return convertToOutputDto(savedProduct);
     }
 
@@ -160,23 +187,6 @@ public class ProductService {
                 .categoryName(product.getCategory().getName())
                 .sellerId(product.getSeller().getUserId())
                 .sellerName(product.getSeller().getUsername())
-                .build();
-    }
-
-    private Products convertToEntity(ProductInputDto productInputDto) {
-        Categories category = categoriesRepository.findById(productInputDto.getCategoryId())
-                .orElseThrow(() -> new RuntimeException("Category not found"));
-
-        Users seller = usersRepository.findById(productInputDto.getSellerId())
-                .orElseThrow(() -> new RuntimeException("Seller not found"));
-
-        return Products.builder()
-                .name(productInputDto.getName())
-                .price(productInputDto.getPrice())
-                .description(productInputDto.getDescription())
-                .condition(productInputDto.getCondition())
-                .category(category)
-                .seller(seller)
                 .build();
     }
 }

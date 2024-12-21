@@ -35,7 +35,10 @@ public class WebSecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable) // Wyłącz CSRF
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Obsługa CORS
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll() // Zezwól na wszystkie żądania
+                        .requestMatchers("/auth/register", "/auth/login").permitAll() // Zezwól na te endpointy bez autoryzacji
+                        .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll() // Zezwól na preflight OPTIONS
+                        .anyRequest().authenticated() // Wszystkie inne żądania wymagają autoryzacji
+                        //.anyRequest().permitAll() // Zezwól na wszystkie żądania
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Ustaw stateless session
                 .exceptionHandling(exception -> exception.disable()); // Wyłącz obsługę błędów autoryzacji
