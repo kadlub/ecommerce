@@ -54,4 +54,14 @@ public class UserController {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
+
+    // Pobranie profilu użytkownika
+    @GetMapping("/profile")
+    public ResponseEntity<UserOutputDto> getUserProfile(@RequestHeader("Authorization") String token) {
+        String username = userService.getUsernameFromToken(token);
+        return userService.findUserByUsername(username)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
 }
+

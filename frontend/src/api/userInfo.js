@@ -2,7 +2,7 @@ import axios from "axios";
 import { API_BASE_URL, getHeaders } from "./constant";
 
 export const fetchUserDetails = async () => {
-    const url = API_BASE_URL + '/api/user/profile';
+    const url = API_BASE_URL + '/api/users/profile';
     try {
         const response = await axios(url, {
             method: "GET",
@@ -45,7 +45,7 @@ export const deleteAddressAPI = async (id) => {
 }
 
 export const fetchOrderAPI = async () => {
-    const url = API_BASE_URL + `/api/order/user`;
+    const url = API_BASE_URL + `/api/orders/user`;
     try {
         const response = await axios(url, {
             method: "GET",
@@ -59,7 +59,7 @@ export const fetchOrderAPI = async () => {
 }
 
 export const cancelOrderAPI = async (id) => {
-    const url = API_BASE_URL + `/api/order/cancel/${id}`;
+    const url = API_BASE_URL + `/api/orders/cancel/${id}`;
     try {
         const response = await axios(url, {
             method: "POST",

@@ -6,6 +6,10 @@ export const isTokenValid = () => {
 
     try {
         const decoded = jwtDecode(token);
+        if (!decoded.exp) {
+            console.error("Token does not contain 'exp' field");
+            return false;
+        }
         const currentTime = Date.now() / 1000; // Current time in seconds
 
         // Check if the token is expired
@@ -21,8 +25,10 @@ export const saveToken = (token) => {
 }
 
 export const logOut = () => {
+    console.info("Logging out user, clearing token.");
     localStorage.removeItem('authToken');
-}
+};
+
 
 export const getToken = () => {
     return localStorage.getItem('authToken');

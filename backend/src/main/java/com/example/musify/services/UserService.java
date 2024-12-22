@@ -6,6 +6,7 @@ import com.example.musify.entities.Authority;
 import com.example.musify.entities.Users;
 import com.example.musify.repositories.AuthorityRepository;
 import com.example.musify.repositories.UsersRepository;
+import com.example.musify.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -23,12 +24,29 @@ public class UserService {
     private final UsersRepository usersRepository;
     private final AuthorityRepository authorityRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil; // Dodaj zależność do JwtUtil
 
     @Autowired
-    public UserService(UsersRepository usersRepository, AuthorityRepository authorityRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UsersRepository usersRepository, AuthorityRepository authorityRepository,
+                       PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
         this.usersRepository = usersRepository;
         this.authorityRepository = authorityRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil; // Inicjalizuj JwtUtil
+    }
+
+    // Metoda do wyciągania nazwy użytkownika z tokena JWT
+    public String getUsernameFromToken(String token) {
+        if (token.startsWith("Bearer ")) {
+            token = token.substring(7); // Usuń prefix "Bearer " z tokena
+        }
+        return jwtUtil.extractUsername(token);
+    }
+
+    // Metoda do pobierania użytkownika po nazwie użytkownika
+    public Optional<UserOutputDto> findUserByUsername(String username) {
+        return usersRepository.findByUsername(username)
+                .map(this::convertToOutputDto);
     }
 
     // Pobranie wszystkich użytkowników
