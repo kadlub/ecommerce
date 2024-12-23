@@ -10,9 +10,7 @@ const Register = () => {
   const [values, setValues] = useState({
     email: '',
     passwordHash: '',
-    firstName: "",
-    lastName: "",
-    phone: '',
+    username: '',
   });
   const [error, setError] = useState('');
   const dispatch = useDispatch();
@@ -53,8 +51,10 @@ const Register = () => {
 
           <div className='pt-4'>
             <form onSubmit={onSubmit} autoComplete='off'>
+              <label>Nazwa użytkownika</label>
+              <input type="username" name='username' value={values?.username} onChange={handleOnChange} placeholder='Nazwa użytkownika' className='h-[48px] w-full border p-2 mt-2 mb-4 border-gray-400' required autoComplete='off' />
               <label>Adres Email</label>
-              <input type="email" name='email' value={values?.userName} onChange={handleOnChange} placeholder='Adres Email' className='h-[48px] w-full border p-2 mt-2 mb-4 border-gray-400' required autoComplete='off' />
+              <input type="email" name='email' value={values?.email} onChange={handleOnChange} placeholder='Adres Email' className='h-[48px] w-full border p-2 mt-2 mb-4 border-gray-400' required autoComplete='off' />
               <label>Hasło</label>
               <input type="password" name='passwordHash' value={values?.passwordHash} onChange={handleOnChange} placeholder='Hasło' className='h-[48px] mt-2 w-full border p-2 border-gray-400' required autoComplete='new-password' />
               <button className='border w-full rounded-lg h-[48px] mb-4 bg-black text-white mt-4 hover:opacity-80'>Zarejestruj się</button>

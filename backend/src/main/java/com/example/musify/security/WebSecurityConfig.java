@@ -37,11 +37,18 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/register", "/auth/login").permitAll() // Zezwól na te endpointy bez autoryzacji
                         .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll() // Zezwól na preflight OPTIONS
+                        .requestMatchers("/users/profile").hasAnyRole("USER", "ADMIN") // Endpoint wymaga ról USER lub ADMIN
+                        .requestMatchers("/categories", "categories/**").permitAll()
+                        .requestMatchers("/products/**","/products").permitAll()
                         .anyRequest().authenticated() // Wszystkie inne żądania wymagają autoryzacji
                         //.anyRequest().permitAll() // Zezwól na wszystkie żądania
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Ustaw stateless session
-                .exceptionHandling(exception -> exception.disable()); // Wyłącz obsługę błędów autoryzacji
+                .exceptionHandling(exception -> exception.disable()) // Wyłącz obsługę błędów autoryzacji
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+
+        System.out.println("Security Filter Chain configured!");
+
 
         return http.build();
     }
