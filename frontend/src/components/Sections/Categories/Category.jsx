@@ -1,21 +1,34 @@
-import React from 'react'
-import SectionHeading from '../SectionsHeading/SectionHeading'
-import Card from '../../Card/Card'
+import React from 'react';
+import SectionHeading from '../SectionsHeading/SectionHeading';
+import Card from '../../Card/Card';
 
-const Category = ({title,data}) => {
+const Category = ({ name, subcategories }) => {
   return (
     <>
-    <SectionHeading title={title}/>
-    <div className='flex items-center px-8 flex-wrap'>
-    {data && data?.map((item,index)=>{
-        return (
-            <Card key={index} title={item?.title} description={item?.description} imagePath={item?.image}
-             actionArrow={true} height={'240px'} width={'200px'}/>
-        )
-    })}
-    </div>
+      <SectionHeading title={name} />
+      <div className='flex items-center px-8 flex-wrap'>
+        {subcategories && subcategories.map((subcategory, index) => (
+          <Card
+            key={subcategory.categoryId}
+            title={subcategory.name}
+            description={subcategory.description}
+            imagePath={subcategory.image || '/default-image.jpg'} // Opcjonalny obraz
+            actionArrow={true}
+            height={'240px'}
+            width={'200px'}
+          />
+        ))}
+      </div>
+      {/* Rekursja dla kolejnych poziomów podkategorii */}
+      {subcategories && subcategories.map((subcategory) => (
+        <Category
+          key={subcategory.categoryId}
+          name={subcategory.name}
+          subcategories={subcategory.subcategories} // Przekazujemy zagnieżdżone podkategorie
+        />
+      ))}
     </>
-  )
-}
+  );
+};
 
-export default Category
+export default Category;

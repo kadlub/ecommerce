@@ -7,9 +7,7 @@ import com.example.musify.repositories.CategoriesRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -51,6 +49,36 @@ public class CategoryService {
         return convertToOutputDto(savedCategory);
     }
 
+    public List<CategoryOutputDto> getCategoryTree() {
+        List<Categories> allCategories = categoriesRepository.findAll();
+
+        // Mapa kategorii z kluczem jako ID
+        Map<UUID, CategoryOutputDto> categoryMap = allCategories.stream()
+                .collect(Collectors.toMap(
+                        Categories::getCategoryId,
+                        this::convertToOutputDto
+                ));
+
+        // Budowanie drzewa kategorii
+        List<CategoryOutputDto> rootCategories = new ArrayList<>();
+        for (Categories category : allCategories) {
+            Categories parentCategory = category.getParentCategory();
+            if (parentCategory == null) {
+                // Jeśli nie ma nadrzędnej kategorii, to jest to kategoria główna
+                rootCategories.add(categoryMap.get(category.getCategoryId()));
+            } else {
+                // Przypisz jako podkategorię
+                CategoryOutputDto parentCategoryDto = categoryMap.get(parentCategory.getCategoryId());
+                if (parentCategoryDto != null) {
+                    parentCategoryDto.getSubcategories().add(categoryMap.get(category.getCategoryId()));
+                }
+            }
+        }
+
+        return rootCategories;
+    }
+
+
     private CategoryOutputDto convertToOutputDto(Categories category) {
         return CategoryOutputDto.builder()
                 .categoryId(category.getCategoryId())
@@ -61,6 +89,8 @@ public class CategoryService {
                                 ? category.getParentCategory().getCategoryId()
                                 : null
                 )
+                .subcategories(new ArrayList<>()) // Inicjalizujemy pustą listę podkategorii
                 .build();
     }
 }
+

@@ -1,39 +1,40 @@
-import React, { useEffect } from 'react'
-import HeroSection from './components/Carousel/Carousel'
-import NewArrivals from './components/Sections/NewArrivals'
-import Category from './components/Sections/Categories/Category'
-import content from './data/content.json';
-import Footer from './components/Footer/Footer'
-import { fetchCategories } from './api/fetchCategories';
-import { useDispatch } from 'react-redux';
-import { loadCategories } from './store/features/category';
-import { setLoading } from './store/features/common';
+import React, { useEffect, useState } from 'react';
+import HeroSection from './components/Carousel/Carousel';
+import NewArrivals from './components/Sections/NewArrivals';
+import Category from './components/Sections/Categories/Category';
+import Footer from './components/Footer/Footer';
+import { fetchCategoriesTree } from './api/fetchCategories'; // Użycie nowego endpointu
 
 const Shop = () => {
-
-  const dispatch = useDispatch();
-
-
+  const [categories, setCategories] = useState([]);
 
   useEffect(() => {
-    //dispatch(setLoading(true));
-    fetchCategories().then(res => {
-      dispatch(loadCategories(res));
-    }).catch(err => {
+    const loadCategories = async () => {
+      try {
+        const response = await fetchCategoriesTree();
+        setCategories(response); // Oczekujemy danych w formacie drzewa
+      } catch (error) {
+        console.error('Błąd podczas pobierania kategorii:', error);
+      }
+    };
 
-    }).finally(() => {
-      dispatch(setLoading(false));
-    })
-  }, [dispatch]);
+    loadCategories();
+  }, []);
 
   return (
     <>
       <HeroSection />
       <NewArrivals />
-      {content?.pages?.shop?.sections && content?.pages?.shop?.sections?.map((item, index) => <Category key={item?.title + index} {...item} />)}
-      <Footer content={content?.footer} />
+      {categories.map((category) => (
+        <Category
+          key={category.categoryId}
+          name={category.name}
+          subcategories={category.subcategories} // Zagnieżdżone podkategorie
+        />
+      ))}
+      <Footer content={{ copyright: '© 2024 YourCompany' }} />
     </>
-  )
-}
+  );
+};
 
-export default Shop
+export default Shop;

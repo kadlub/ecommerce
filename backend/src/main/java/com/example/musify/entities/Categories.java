@@ -26,15 +26,15 @@ public class Categories {
     @Column
     private String description;
 
-    // Relacja do kategorii nadrzędnej
-    @ManyToOne(fetch = FetchType.LAZY)
+    // Relacja do nadrzędnej kategorii
+    @ManyToOne
     @JoinColumn(name = "parent_category_id")
     private Categories parentCategory;
 
-    // Relacja do podkategorii
-    @OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL, orphanRemoval = true)
+    // Relacja do podrzędnych kategorii
+    @OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL)
     private List<Categories> subcategories;
 
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
     private List<Products> products;
 }

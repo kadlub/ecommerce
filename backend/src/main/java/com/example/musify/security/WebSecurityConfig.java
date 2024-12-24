@@ -38,7 +38,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/auth/register", "/auth/login").permitAll() // Zezwól na te endpointy bez autoryzacji
                         .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll() // Zezwól na preflight OPTIONS
                         .requestMatchers("/users/profile").hasAnyRole("USER", "ADMIN") // Endpoint wymaga ról USER lub ADMIN
-                        .requestMatchers("/categories", "categories/**").permitAll()
+                        .requestMatchers("/categories", "categories/tree").permitAll()
                         .requestMatchers("/products/**","/products").permitAll()
                         .anyRequest().authenticated() // Wszystkie inne żądania wymagają autoryzacji
                         //.anyRequest().permitAll() // Zezwól na wszystkie żądania

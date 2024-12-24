@@ -33,6 +33,11 @@ public class CategoryController {
         return categoryService.createCategory(categoryInputDto);
     }
 
+    @GetMapping("/tree")
+    public List<CategoryOutputDto> getCategoryTree() {
+        return categoryService.getCategoryTree();
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<CategoryOutputDto> getCategoryById(@PathVariable UUID id) {
         return categoryService.findCategoryById(id)
