@@ -12,4 +12,5 @@ public class CategoryOutputDto {
     private UUID categoryId;
     private String name;
     private String description;
+    private UUID parentCategoryId; // ID kategorii nadrzędnej
 }

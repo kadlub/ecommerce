@@ -34,21 +34,33 @@ public class CategoryService {
                 .map(this::convertToOutputDto);
     }
 
-    public CategoryOutputDto createCategory(CategoryInputDto categoryInputDto){
+    public CategoryOutputDto createCategory(CategoryInputDto categoryInputDto) {
+        Categories parentCategory = null;
+        if (categoryInputDto.getParentCategoryId() != null) {
+            parentCategory = categoriesRepository.findById(categoryInputDto.getParentCategoryId())
+                    .orElseThrow(() -> new IllegalArgumentException("Parent category not found"));
+        }
+
         Categories category = Categories.builder()
                 .name(categoryInputDto.getName())
                 .description(categoryInputDto.getDescription())
+                .parentCategory(parentCategory)
                 .build();
 
         Categories savedCategory = categoriesRepository.save(category);
         return convertToOutputDto(savedCategory);
     }
 
-    private CategoryOutputDto convertToOutputDto(Categories category){
+    private CategoryOutputDto convertToOutputDto(Categories category) {
         return CategoryOutputDto.builder()
                 .categoryId(category.getCategoryId())
                 .name(category.getName())
                 .description(category.getDescription())
+                .parentCategoryId(
+                        category.getParentCategory() != null
+                                ? category.getParentCategory().getCategoryId()
+                                : null
+                )
                 .build();
     }
 }

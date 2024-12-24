@@ -3,6 +3,8 @@ package com.example.musify.dto;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
+import java.util.UUID;
+
 @Data
 public class CategoryInputDto {
 
@@ -10,4 +12,6 @@ public class CategoryInputDto {
     private String name;
 
     private String description;
+
+    private UUID parentCategoryId; // ID kategorii nadrzędnej
 }

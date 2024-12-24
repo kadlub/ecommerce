@@ -2,7 +2,6 @@ package com.example.musify.controllers;
 
 import com.example.musify.dto.CategoryInputDto;
 import com.example.musify.dto.CategoryOutputDto;
-import com.example.musify.entities.Categories;
 import com.example.musify.services.CategoryService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +29,7 @@ public class CategoryController {
     }
 
     @PostMapping
-    public CategoryOutputDto createCategory(@Valid @RequestBody CategoryInputDto categoryInputDto){
+    public CategoryOutputDto createCategory(@Valid @RequestBody CategoryInputDto categoryInputDto) {
         return categoryService.createCategory(categoryInputDto);
     }
 
@@ -40,5 +39,4 @@ public class CategoryController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
-
 }
