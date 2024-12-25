@@ -19,7 +19,6 @@ import Orders from "./pages/Account/Orders";
 import Settings from "./pages/Account/Settings";
 import { AdminPanel } from "./pages/AdminPanel/AdminPanel";
 
-
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -30,16 +29,8 @@ export const router = createBrowserRouter([
         element: <Shop />
       },
       {
-        path: "/Instrumenty",
-        element: <ProductListPage categoryType={'INSTRUMENTY'} />,
-      },
-      {
-        path: "/Sprzęt",
-        element: <ProductListPage categoryType={'SPRZĘT'} />,
-      },
-      {
-        path: "/Inne",
-        element: <ProductListPage categoryType={'INNE'} />,
+        path: "/categories/:categoryType", // Dynamiczny routing dla kategorii
+        element: <ProductListPage />,
       },
       {
         path: "/product/:slug",

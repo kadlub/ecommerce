@@ -1,6 +1,6 @@
 import { getToken } from "../utils/jwt-helper";
 export const API_URLS = {
-    GET_PRODUCTS: '/api/products', // Bez prefiksu `/api`, jeśli backend go nie używa.
+    GET_PRODUCTS: '/api/products/by-category', // Bez prefiksu `/api`, jeśli backend go nie używa.
     GET_PRODUCT: (id) => `/api/products/${id}`,
     GET_CATEGORIES: '/api/categories',
     GET_CATEGORY: (id) => `/api/categories/${id}`,

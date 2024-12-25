@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,34 +28,12 @@ public class ProductController {
         this.productService = productService;
     }
 
-    // Upload image for a product
-    @PostMapping("/{productId}/images")
-    public ResponseEntity<String> uploadProductImage(
-            @PathVariable UUID productId,
-            @RequestParam("file") MultipartFile file,
-            @RequestParam(value = "altText", required = false) String altText) {
-        productService.uploadProductImage(productId, file, altText);
-        return ResponseEntity.ok("Image uploaded successfully");
-    }
-
-    // Retrieve all image URLs for a product
-    @GetMapping("/{productId}/images")
-    public ResponseEntity<List<String>> getProductImages(@PathVariable UUID productId) {
-        List<String> imageUrls = productService.getProductImages(productId);
-        return ResponseEntity.ok(imageUrls);
-    }
-
-    // Serve an image file by filename
-    @GetMapping("/images/{fileName}")
-    public ResponseEntity<byte[]> getImageFile(@PathVariable String fileName) {
-        byte[] image = productService.getImageFile(fileName);
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.IMAGE_JPEG); // Adjust MIME type if necessary
-        return new ResponseEntity<>(image, headers, HttpStatus.OK);
-    }
-
     @GetMapping
-    public List<ProductOutputDto> getAllProducts() {
+    public List<ProductOutputDto> getProducts(
+            @RequestParam(required = false) UUID categoryId) {
+        if (categoryId != null) {
+            return productService.findProductsByCategory(categoryId);
+        }
         return productService.findAllProducts();
     }
 
@@ -80,5 +59,21 @@ public class ProductController {
         productService.deleteProduct(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/filter")
+    public List<ProductOutputDto> getFilteredProducts(
+            @RequestParam(required = false) UUID categoryId,
+            @RequestParam(required = false) BigDecimal priceMin,
+            @RequestParam(required = false) BigDecimal priceMax,
+            @RequestParam(required = false) String condition) {
+        return productService.findFilteredProducts(categoryId, priceMin, priceMax, condition);
+    }
+
+    @GetMapping("/by-category/{categoryName}")
+    public List<ProductOutputDto> getProductsByCategoryName(@PathVariable String categoryName) {
+        return productService.findProductsByCategoryName(categoryName);
+    }
+
 }
+
 

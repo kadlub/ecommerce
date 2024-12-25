@@ -11,12 +11,14 @@ import com.example.musify.repositories.ProductImagesRepository;
 import com.example.musify.repositories.ProductsRepository;
 import com.example.musify.repositories.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -53,22 +55,18 @@ public class ProductService {
         }
     }
 
-    // Upload product image and save metadata
     public void uploadProductImage(UUID productId, MultipartFile imageFile, String altText) {
         Products product = productsRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
-        // Generate unique filename
         String fileName = productId + "_" + UUID.randomUUID() + ".jpg";
         Path imagePath = Paths.get(uploadDir, fileName);
         try {
-            // Save the file to disk
             Files.write(imagePath, imageFile.getBytes());
         } catch (IOException e) {
             throw new RuntimeException("Failed to save product image", e);
         }
 
-        // Save image metadata in the database
         ProductImages productImage = ProductImages.builder()
                 .product(product)
                 .url(fileName)
@@ -78,7 +76,6 @@ public class ProductService {
         productImagesRepository.save(productImage);
     }
 
-    // Fetch all images for a product
     public List<String> getProductImages(UUID productId) {
         return productImagesRepository.findByProduct_ProductId(productId)
                 .stream()
@@ -86,7 +83,6 @@ public class ProductService {
                 .collect(Collectors.toList());
     }
 
-    // Fetch image file data by filename
     public byte[] getImageFile(String fileName) {
         Path imagePath = Paths.get(uploadDir, fileName);
         try {
@@ -108,17 +104,40 @@ public class ProductService {
                 .map(this::convertToOutputDto);
     }
 
+    public List<ProductOutputDto> findFilteredProducts(UUID categoryId, BigDecimal priceMin, BigDecimal priceMax, String condition) {
+        Specification<Products> spec = Specification.where(null);
+
+        if (categoryId != null) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.equal(root.get("category").get("categoryId"), categoryId));
+        }
+        if (priceMin != null) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.greaterThanOrEqualTo(root.get("price"), priceMin));
+        }
+        if (priceMax != null) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.lessThanOrEqualTo(root.get("price"), priceMax));
+        }
+        if (condition != null) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.equal(root.get("condition"), condition));
+        }
+
+        return productsRepository.findAll(spec)
+                .stream()
+                .map(this::convertToOutputDto)
+                .collect(Collectors.toList());
+    }
+
     @Transactional
     public ProductOutputDto createProduct(ProductInputDto productInputDto) {
-        // Find the category
         Categories category = categoriesRepository.findById(productInputDto.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Category not found"));
 
-        // Find the seller
         Users seller = usersRepository.findById(productInputDto.getSellerId())
                 .orElseThrow(() -> new RuntimeException("Seller not found"));
 
-        // Create the product
         Products product = Products.builder()
                 .name(productInputDto.getName())
                 .price(productInputDto.getPrice())
@@ -128,10 +147,8 @@ public class ProductService {
                 .seller(seller)
                 .build();
 
-        // Save the product
         Products savedProduct = productsRepository.save(product);
 
-        // Update the seller's `isSeller` field if not already true
         if (!Boolean.TRUE.equals(seller.getIsSeller())) {
             seller.setIsSeller(true);
             usersRepository.save(seller);
@@ -148,33 +165,61 @@ public class ProductService {
                     product.setPrice(productInputDto.getPrice());
                     product.setCondition(productInputDto.getCondition());
 
-                    // Ustawienie kategorii
                     Categories category = categoriesRepository.findById(productInputDto.getCategoryId())
                             .orElseThrow(() -> new RuntimeException("Category not found"));
                     product.setCategory(category);
 
-                    // Ustawienie sprzedawcy
                     Users seller = usersRepository.findById(productInputDto.getSellerId())
                             .orElseThrow(() -> new RuntimeException("Seller not found"));
                     product.setSeller(seller);
 
-                    Products updatedProduct = productsRepository.save(product);
-                    return convertToOutputDto(updatedProduct);
+                    return convertToOutputDto(productsRepository.save(product));
                 })
                 .orElseThrow(() -> new RuntimeException("Product not found"));
     }
 
     public void deleteProduct(UUID productId) {
-        productsRepository.findById(productId).ifPresent(product -> {
-            // Usuń zdjęcie produktu
-            String imagePath = Paths.get(uploadDir, product.getProductId() + ".jpg").toString();
-            File imageFile = new File(imagePath);
-            if (imageFile.exists()) {
-                imageFile.delete();
-            }
-            productsRepository.delete(product);
-        });
+        productsRepository.findById(productId).ifPresent(productsRepository::delete);
     }
+
+    public List<ProductOutputDto> findProductsByCategoryName(String categoryName) {
+        Categories category = categoriesRepository.findByName(categoryName)
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+        return productsRepository.findByCategory_CategoryId(category.getCategoryId())
+                .stream()
+                .map(this::convertToOutputDto)
+                .collect(Collectors.toList());
+    }
+
+    public List<ProductOutputDto> findProductsByCategory(UUID categoryId) {
+        // Pobierz kategorię główną
+        Categories mainCategory = categoriesRepository.findById(categoryId)
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+
+        // Pobierz wszystkie subkategorie (rekurencyjnie)
+        List<Categories> allCategories = getAllSubcategories(mainCategory);
+
+        // Pobierz produkty z tych kategorii
+        List<Products> products = productsRepository.findByCategoryIn(allCategories);
+
+        return products.stream()
+                .map(this::convertToOutputDto)
+                .collect(Collectors.toList());
+    }
+
+    // Pomocnicza metoda do pobierania subkategorii
+    private List<Categories> getAllSubcategories(Categories category) {
+        List<Categories> subcategories = categoriesRepository.findByParentCategory_CategoryId(category.getCategoryId());
+        List<Categories> allSubcategories = new ArrayList<>(subcategories);
+
+        for (Categories subcategory : subcategories) {
+            allSubcategories.addAll(getAllSubcategories(subcategory));
+        }
+
+        allSubcategories.add(category); // Dodaj główną kategorię
+        return allSubcategories;
+    }
+
 
     private ProductOutputDto convertToOutputDto(Products product) {
         return ProductOutputDto.builder()
