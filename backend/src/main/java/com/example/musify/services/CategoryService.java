@@ -49,6 +49,18 @@ public class CategoryService {
         return convertToOutputDto(savedCategory);
     }
 
+    public List<UUID> getAllSubcategoryIds(UUID categoryId) {
+        List<UUID> categoryIds = new ArrayList<>();
+        categoryIds.add(categoryId);
+        List<Categories> subcategories = categoriesRepository.findByParentCategory_CategoryId(categoryId);
+
+        for (Categories subcategory : subcategories) {
+            categoryIds.addAll(getAllSubcategoryIds(subcategory.getCategoryId()));
+        }
+
+        return categoryIds;
+    }
+
     public List<CategoryOutputDto> getCategoryTree() {
         List<Categories> allCategories = categoriesRepository.findAll();
 

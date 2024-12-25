@@ -108,8 +108,8 @@ public class ProductService {
         Specification<Products> spec = Specification.where(null);
 
         if (categoryId != null) {
-            spec = spec.and((root, query, criteriaBuilder) ->
-                    criteriaBuilder.equal(root.get("category").get("categoryId"), categoryId));
+            List<UUID> categoryIds = getAllSubcategoryIds(categoryId);
+            spec = spec.and((root, query, criteriaBuilder) -> root.get("category").get("categoryId").in(categoryIds));
         }
         if (priceMin != null) {
             spec = spec.and((root, query, criteriaBuilder) ->
@@ -125,6 +125,21 @@ public class ProductService {
         }
 
         return productsRepository.findAll(spec)
+                .stream()
+                .map(this::convertToOutputDto)
+                .collect(Collectors.toList());
+    }
+
+    public List<ProductOutputDto> findProductsByCategoryName(String categoryName) {
+        // Pobierz kategorię na podstawie nazwy
+        Categories category = categoriesRepository.findByName(categoryName)
+                .orElseThrow(() -> new RuntimeException("Category not found"));
+
+        // Pobierz wszystkie ID podkategorii (rekurencyjnie)
+        List<UUID> categoryIds = getAllSubcategoryIds(category.getCategoryId());
+
+        // Pobierz produkty z kategorii i ich podkategorii
+        return productsRepository.findByCategory_CategoryIdIn(categoryIds)
                 .stream()
                 .map(this::convertToOutputDto)
                 .collect(Collectors.toList());
@@ -182,44 +197,26 @@ public class ProductService {
         productsRepository.findById(productId).ifPresent(productsRepository::delete);
     }
 
-    public List<ProductOutputDto> findProductsByCategoryName(String categoryName) {
-        Categories category = categoriesRepository.findByName(categoryName)
-                .orElseThrow(() -> new RuntimeException("Category not found"));
-        return productsRepository.findByCategory_CategoryId(category.getCategoryId())
+    public List<ProductOutputDto> findProductsByCategory(UUID categoryId) {
+        List<UUID> categoryIds = getAllSubcategoryIds(categoryId);
+
+        return productsRepository.findByCategory_CategoryIdIn(categoryIds)
                 .stream()
                 .map(this::convertToOutputDto)
                 .collect(Collectors.toList());
     }
 
-    public List<ProductOutputDto> findProductsByCategory(UUID categoryId) {
-        // Pobierz kategorię główną
-        Categories mainCategory = categoriesRepository.findById(categoryId)
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+    private List<UUID> getAllSubcategoryIds(UUID categoryId) {
+        List<UUID> categoryIds = new ArrayList<>();
+        categoryIds.add(categoryId);
 
-        // Pobierz wszystkie subkategorie (rekurencyjnie)
-        List<Categories> allCategories = getAllSubcategories(mainCategory);
-
-        // Pobierz produkty z tych kategorii
-        List<Products> products = productsRepository.findByCategoryIn(allCategories);
-
-        return products.stream()
-                .map(this::convertToOutputDto)
-                .collect(Collectors.toList());
-    }
-
-    // Pomocnicza metoda do pobierania subkategorii
-    private List<Categories> getAllSubcategories(Categories category) {
-        List<Categories> subcategories = categoriesRepository.findByParentCategory_CategoryId(category.getCategoryId());
-        List<Categories> allSubcategories = new ArrayList<>(subcategories);
-
+        List<Categories> subcategories = categoriesRepository.findByParentCategory_CategoryId(categoryId);
         for (Categories subcategory : subcategories) {
-            allSubcategories.addAll(getAllSubcategories(subcategory));
+            categoryIds.addAll(getAllSubcategoryIds(subcategory.getCategoryId()));
         }
 
-        allSubcategories.add(category); // Dodaj główną kategorię
-        return allSubcategories;
+        return categoryIds;
     }
-
 
     private ProductOutputDto convertToOutputDto(Products product) {
         return ProductOutputDto.builder()
