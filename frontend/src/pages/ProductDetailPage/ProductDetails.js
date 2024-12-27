@@ -7,8 +7,8 @@ import Rating from '../../components/Rating/Rating';
 import { getAllProducts } from '../../api/fetchProducts';
 
 const ProductDetails = () => {
-  const { product } = useLoaderData() || {};
-  const [image, setImage] = useState(product?.imageUrl || '');
+  const { product } = useLoaderData() || {}; // Ładowanie danych z react-router loadera
+  const [image, setImage] = useState(product?.imageUrl || '/placeholder.jpg'); // Domyślny obrazek
   const [breadCrumbLinks, setBreadCrumbLink] = useState([]);
   const [similarProducts, setSimilarProducts] = useState([]);
 
@@ -16,49 +16,51 @@ const ProductDetails = () => {
   useEffect(() => {
     const arrayLinks = [
       { title: 'Sklep', path: '/' },
-      { title: product?.categoryName || 'Kategoria', path: `/categories/${product?.categoryId}` }
+      product?.categoryName
+        ? { title: product?.categoryName, path: `/categories/${product?.categoryId}` }
+        : { title: 'Kategoria', path: '/categories' }
     ];
-    setBreadCrumbLink(arrayLinks);
+    setBreadCrumbLink(arrayLinks.filter(Boolean)); // Filtrowanie, aby usunąć puste wartości
   }, [product]);
 
-  // Fetch similar products by category
+  // Pobieranie podobnych produktów
   useEffect(() => {
     if (product?.categoryId) {
       getAllProducts(product?.categoryId).then((res) => {
-        const excludedProducts = res?.filter((item) => item?.id !== product?.id);
+        const excludedProducts = res?.filter((item) => item?.productId !== product?.productId);
         setSimilarProducts(excludedProducts || []);
       });
     }
-  }, [product?.categoryId, product?.id]);
+  }, [product?.categoryId, product?.productId]);
 
   return (
     <>
       <div className="flex flex-col md:flex-row px-10">
-        {/* Image Section */}
+        {/* Sekcja obrazu */}
         <div className="w-[100%] lg:w-[50%] md:w-[40%]">
           <div className="w-full flex justify-center md:pt-0 pt-10">
             <img
               src={image}
               className="h-full w-full max-h-[520px] border rounded-lg cursor-pointer object-cover"
-              alt={product?.name}
+              alt={product?.name || 'Produkt'}
             />
           </div>
         </div>
-        {/* Product Details Section */}
+        {/* Szczegóły produktu */}
         <div className="w-[60%] px-10">
           <Breadcrumb links={breadCrumbLinks} />
-          <p className="text-3xl pt-4">{product?.name}</p>
-          <Rating rating={product?.rating} />
-          <p className="text-xl bold py-2">${product?.price}</p>
-          <p className="py-4">{product?.description}</p>
+          <p className="text-3xl pt-4">{product?.name || 'Nazwa produktu'}</p>
+          <Rating rating={product?.rating || 0} />
+          <p className="text-xl bold py-2">${product?.price || 'Cena niedostępna'}</p>
+          <p className="py-4">{product?.description || 'Brak opisu produktu.'}</p>
         </div>
       </div>
-      {/* Product Description */}
+      {/* Opis produktu */}
       <SectionHeading title={'Opis produktu'} />
       <div className="md:w-[50%] w-full p-2">
-        <p className="px-8">{product?.description}</p>
+        <p className="px-8">{product?.description || 'Brak opisu produktu.'}</p>
       </div>
-      {/* Similar Products */}
+      {/* Podobne produkty */}
       <SectionHeading title={'Podobne produkty'} />
       <div className="flex px-10">
         <div className="pt-4 grid grid-cols-1 lg:grid-cols-4 md:grid-cols-3 gap-8 px-2 pb-10">

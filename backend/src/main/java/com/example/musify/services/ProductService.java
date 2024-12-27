@@ -22,10 +22,7 @@ import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -172,6 +169,11 @@ public class ProductService {
         return convertToOutputDto(savedProduct);
     }
 
+    public Optional<ProductOutputDto> findProductBySlug(String slug) {
+        return productsRepository.findBySlug(slug) // Musisz dodać odpowiednią metodę w repository
+                .map(this::convertToOutputDto);
+    }
+
     public ProductOutputDto updateProduct(UUID productId, ProductInputDto productInputDto) {
         return productsRepository.findById(productId)
                 .map(product -> {
@@ -193,9 +195,15 @@ public class ProductService {
                 .orElseThrow(() -> new RuntimeException("Product not found"));
     }
 
-    public void deleteProduct(UUID productId) {
-        productsRepository.findById(productId).ifPresent(productsRepository::delete);
+    public boolean deleteProduct(UUID productId) {
+        Optional<Products> product = productsRepository.findById(productId);
+        if (product.isPresent()) {
+            productsRepository.delete(product.get());
+            return true; // Produkt został usunięty
+        }
+        return false; // Produkt nie istnieje
     }
+
 
     public List<ProductOutputDto> findProductsByCategory(UUID categoryId) {
         List<UUID> categoryIds = getAllSubcategoryIds(categoryId);
@@ -219,17 +227,29 @@ public class ProductService {
     }
 
     private ProductOutputDto convertToOutputDto(Products product) {
+        // Sprawdzenie, czy productImages nie jest null i operowanie na liście
+        List<String> imageUrls = (product.getProductImages() != null)
+                ? product.getProductImages().stream()
+                .map(ProductImages::getUrl)
+                .collect(Collectors.toList())
+                : Collections.emptyList();
+
         return ProductOutputDto.builder()
-                .productId(product.getProductId())
+                .productId(product.getProductId()) // Zakładam, że getter jest poprawny
                 .name(product.getName())
                 .price(product.getPrice())
                 .description(product.getDescription())
                 .condition(product.getCondition())
                 .creationDate(product.getCreationDate())
-                .categoryId(product.getCategory().getCategoryId())
-                .categoryName(product.getCategory().getName())
-                .sellerId(product.getSeller().getUserId())
-                .sellerName(product.getSeller().getUsername())
+                .imageUrl(imageUrls.isEmpty() ? null : imageUrls.get(0)) // Pierwszy obraz jako domyślny, null jeśli brak
+                .imageUrls(imageUrls) // Pełna lista obrazów
+                .categoryId(product.getCategory() != null ? product.getCategory().getCategoryId() : null) // Sprawdzenie null dla kategorii
+                .categoryName(product.getCategory() != null ? product.getCategory().getName() : null) // Sprawdzenie null dla nazwy kategorii
+                .sellerId(product.getSeller() != null ? product.getSeller().getUserId() : null) // Sprawdzenie null dla sprzedawcy
+                .sellerName(product.getSeller() != null ? product.getSeller().getUsername() : null) // Sprawdzenie null dla nazwy sprzedawcy
+                .slug(product.getSlug())
                 .build();
     }
+
+
 }

@@ -45,6 +45,9 @@ public class Products {
     @Column(nullable = false)
     private LocalDateTime updateDate;
 
+    @Column(nullable = false, unique = true) // Dodanie pola slug
+    private String slug;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private Categories category;
@@ -57,6 +60,9 @@ public class Products {
     public void onPrePersist(){
         this.setCreationDate(LocalDateTime.now());
         this.setUpdateDate(LocalDateTime.now());
+        if (this.slug == null || this.slug.isEmpty()) {
+            this.slug = this.name.toLowerCase().replaceAll("\\s+", "-");
+        }
     }
 
     @PreUpdate

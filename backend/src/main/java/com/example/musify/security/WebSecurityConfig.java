@@ -40,6 +40,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/users/profile").hasAnyRole("USER", "ADMIN") // Endpoint wymaga ról USER lub ADMIN
                         .requestMatchers("/categories", "categories/tree").permitAll()
                         .requestMatchers("/products/**","/products").permitAll()
+                        .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated() // Wszystkie inne żądania wymagają autoryzacji
                         //.anyRequest().permitAll() // Zezwól na wszystkie żądania
                 )

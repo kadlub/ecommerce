@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -17,9 +18,11 @@ public class ProductOutputDto {
     private String description;
     private String condition;
     private LocalDateTime creationDate;
-    private String imageUrl;
+    private String imageUrl; // Domyślny obraz
+    private List<String> imageUrls; // Lista wszystkich obrazów
     private UUID categoryId;
     private String categoryName;
     private UUID sellerId;
     private String sellerName;
+    private String slug;
 }
