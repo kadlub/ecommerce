@@ -29,4 +29,7 @@ public class ProductImages {
 
     @Column
     private String altText;
+
+    @Column(nullable = false)
+    private boolean isPrimary;
 }

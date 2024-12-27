@@ -10,11 +10,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -29,94 +30,125 @@ public class ProductController {
         this.productService = productService;
     }
 
+    // Pobieranie produktów z opcjonalnym filtrowaniem po kategorii
     @GetMapping
     public ResponseEntity<List<ProductOutputDto>> getProducts(
             @RequestParam(required = false) UUID categoryId) {
-        logger.debug("Fetching products with categoryId: {}", categoryId);
+        logger.info("Fetching products with categoryId: {}", categoryId);
 
         List<ProductOutputDto> products = (categoryId != null) ?
                 productService.findProductsByCategory(categoryId) :
                 productService.findAllProducts();
 
         if (products.isEmpty()) {
+            logger.info("No products found for categoryId: {}", categoryId);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(products);
     }
 
+    // Pobieranie produktu po ID
     @GetMapping("/{id}")
     public ResponseEntity<ProductOutputDto> getProductById(@PathVariable UUID id) {
-        logger.debug("Fetching product with id: {}", id);
+        logger.info("Fetching product with id: {}", id);
 
         return productService.findProductById(id)
                 .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .orElseGet(() -> {
+                    logger.warn("Product with id: {} not found", id);
+                    return ResponseEntity.notFound().build();
+                });
     }
 
+    // Tworzenie produktu - uwzględnia zalogowanego użytkownika jako sprzedawcę
     @PostMapping
-    public ResponseEntity<ProductOutputDto> createProduct(@Valid @RequestBody ProductInputDto productInputDto) {
-        logger.debug("Creating product with input: {}", productInputDto);
+    public ResponseEntity<ProductOutputDto> createProduct(
+            @Valid @RequestBody ProductInputDto productInputDto,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        logger.info("Creating product with input: {}", productInputDto);
+
+        // Przypisanie sprzedawcy na podstawie zalogowanego użytkownika
+        UUID sellerId = UUID.fromString(userDetails.getUsername());
+        productInputDto.setSellerId(sellerId);
 
         ProductOutputDto createdProduct = productService.createProduct(productInputDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
     }
 
+    // Aktualizacja istniejącego produktu
     @PutMapping("/{id}")
     public ResponseEntity<ProductOutputDto> updateProduct(@PathVariable UUID id, @Valid @RequestBody ProductInputDto productInputDto) {
-        logger.debug("Updating product with id: {}, input: {}", id, productInputDto);
+        logger.info("Updating product with id: {}, input: {}", id, productInputDto);
 
-        ProductOutputDto updatedProduct = productService.updateProduct(id, productInputDto);
-        return ResponseEntity.ok(updatedProduct);
+        return productService.findProductById(id)
+                .map(product -> {
+                    ProductOutputDto updatedProduct = productService.updateProduct(id, productInputDto);
+                    return ResponseEntity.ok(updatedProduct);
+                })
+                .orElseGet(() -> {
+                    logger.warn("Product with id: {} not found for update", id);
+                    return ResponseEntity.notFound().build();
+                });
     }
 
-
+    // Usuwanie produktu
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable UUID id) {
-        logger.debug("Deleting product with id: {}", id);
+        logger.info("Deleting product with id: {}", id);
 
         boolean deleted = productService.deleteProduct(id);
         if (deleted) {
+            logger.info("Product with id: {} successfully deleted", id);
             return ResponseEntity.noContent().build();
         } else {
+            logger.warn("Product with id: {} not found for deletion", id);
             return ResponseEntity.notFound().build();
         }
     }
 
+    // Pobieranie produktów z filtrami
     @GetMapping("/filter")
     public ResponseEntity<List<ProductOutputDto>> getFilteredProducts(
             @RequestParam(required = false) UUID categoryId,
             @RequestParam(required = false) BigDecimal priceMin,
             @RequestParam(required = false) BigDecimal priceMax,
             @RequestParam(required = false) String condition) {
-        logger.debug("Fetching filtered products with categoryId: {}, priceMin: {}, priceMax: {}, condition: {}",
+        logger.info("Fetching filtered products with categoryId: {}, priceMin: {}, priceMax: {}, condition: {}",
                 categoryId, priceMin, priceMax, condition);
 
         List<ProductOutputDto> filteredProducts = productService.findFilteredProducts(categoryId, priceMin, priceMax, condition);
 
         if (filteredProducts.isEmpty()) {
+            logger.info("No filtered products found for the given criteria");
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(filteredProducts);
     }
 
+    // Pobieranie produktów po nazwie kategorii
     @GetMapping("/by-category/{categoryName}")
     public ResponseEntity<List<ProductOutputDto>> getProductsByCategoryName(@PathVariable String categoryName) {
-        logger.debug("Fetching products by category name: {}", categoryName);
+        logger.info("Fetching products by category name: {}", categoryName);
 
         List<ProductOutputDto> products = productService.findProductsByCategoryName(categoryName);
 
         if (products.isEmpty()) {
+            logger.info("No products found for category name: {}", categoryName);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(products);
     }
 
+    // Pobieranie produktu po slug
     @GetMapping("/slug/{slug}")
     public ResponseEntity<ProductOutputDto> getProductBySlug(@PathVariable String slug) {
-        logger.debug("Fetching product by slug: {}", slug);
+        logger.info("Fetching product by slug: {}", slug);
 
         return productService.findProductBySlug(slug)
                 .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .orElseGet(() -> {
+                    logger.warn("Product with slug: {} not found", slug);
+                    return ResponseEntity.notFound().build();
+                });
     }
 }

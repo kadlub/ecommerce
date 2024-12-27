@@ -18,6 +18,7 @@ import Profile from "./pages/Account/Profile";
 import Orders from "./pages/Account/Orders";
 import Settings from "./pages/Account/Settings";
 import { AdminPanel } from "./pages/AdminPanel/AdminPanel";
+import UserCreateProduct from "./pages/UserCreateProduct";
 
 export const router = createBrowserRouter([
   {
@@ -29,7 +30,7 @@ export const router = createBrowserRouter([
         element: <Shop />
       },
       {
-        path: "/categories/:categoryType", // Dynamiczny routing dla kategorii
+        path: "/categories/:categoryType", // Dynamic routing for categories
         element: <ProductListPage />,
       },
       {
@@ -38,34 +39,38 @@ export const router = createBrowserRouter([
         element: <ProductDetails />
       },
       {
-        path: '/cart-items',
+        path: "/cart-items",
         element: <Cart />
       },
       {
-        path: '/account-details/',
+        path: "/account-details/",
         element: <ProtectedRoute><Account /></ProtectedRoute>,
         children: [
           {
-            path: 'profile',
+            path: "profile",
             element: <ProtectedRoute><Profile /></ProtectedRoute>
           },
           {
-            path: 'orders',
+            path: "orders",
             element: <ProtectedRoute><Orders /></ProtectedRoute>
           },
           {
-            path: 'settings',
+            path: "settings",
             element: <ProtectedRoute><Settings /></ProtectedRoute>
           }
         ]
       },
       {
-        path: '/checkout',
+        path: "/checkout",
         element: <ProtectedRoute><Checkout /></ProtectedRoute>
       },
       {
-        path: '/orderConfirmed',
+        path: "/orderConfirmed",
         element: <OrderConfirmed />
+      },
+      {
+        path: "/create-product", // Add the new route here
+        element: <ProtectedRoute><UserCreateProduct /></ProtectedRoute> // Protect the route for logged-in users
       }
     ]
   },
@@ -84,15 +89,16 @@ export const router = createBrowserRouter([
     ]
   },
   {
-    path: '/oauth2/callback',
+    path: "/oauth2/callback",
     element: <OAuth2LoginCallback />
   },
   {
-    path: '/confirmPayment',
+    path: "/confirmPayment",
     element: <ConfirmPayment />
   },
   {
-    path: '/admin/*',
+    path: "/admin/*",
     element: <ProtectedRoute><AdminPanel /></ProtectedRoute>
   }
 ]);
+
