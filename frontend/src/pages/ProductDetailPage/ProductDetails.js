@@ -12,15 +12,20 @@ const ProductDetails = () => {
   const [breadCrumbLinks, setBreadCrumbLink] = useState([]);
   const [similarProducts, setSimilarProducts] = useState([]);
 
-  // Breadcrumbs
+  // Pobieranie pełnej ścieżki kategorii
   useEffect(() => {
-    const arrayLinks = [
-      { title: 'Sklep', path: '/' },
-      product?.categoryName
-        ? { title: product?.categoryName, path: `/categories/${product?.categoryId}` }
-        : { title: 'Kategoria', path: '/categories' }
-    ];
-    setBreadCrumbLink(arrayLinks.filter(Boolean)); // Filtrowanie, aby usunąć puste wartości
+    const fetchBreadcrumbs = async () => {
+      const categoryPath = [
+        { title: 'Sklep', path: '/' },
+        ...(product?.categoryPath || []).map((cat) => ({
+          title: cat.name,
+          path: `/categories/${cat.id}`
+        })),
+        { title: product?.name || 'Produkt' }
+      ];
+      setBreadCrumbLink(categoryPath);
+    };
+    fetchBreadcrumbs();
   }, [product]);
 
   // Pobieranie podobnych produktów
@@ -53,6 +58,22 @@ const ProductDetails = () => {
           <Rating rating={product?.rating || 0} />
           <p className="text-xl bold py-2">${product?.price || 'Cena niedostępna'}</p>
           <p className="py-4">{product?.description || 'Brak opisu produktu.'}</p>
+          <p className="py-2 text-gray-700">Stan: {product?.condition || 'Nieznany'}</p>
+          {/* Przyciski */}
+          <div className="flex space-x-4 py-4">
+            <button
+              onClick={() => console.log('Dodano do koszyka')}
+              className="bg-blue-500 text-white py-2 px-4 rounded-lg"
+            >
+              Dodaj do koszyka
+            </button>
+            <button
+              onClick={() => console.log('Dodano do ulubionych')}
+              className="bg-gray-500 text-white py-2 px-4 rounded-lg"
+            >
+              Dodaj do ulubionych
+            </button>
+          </div>
         </div>
       </div>
       {/* Opis produktu */}
