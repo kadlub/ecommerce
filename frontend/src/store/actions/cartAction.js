@@ -1,39 +1,39 @@
-import { addToCart, deleteCart, removeFromCart, updateQuantity } from "../features/cart"
+import { addToCart, deleteCart, removeFromCart, updateQuantity } from "../features/cart";
 
-
-export const addItemToCartAction = (productItem)=>{
-    return (dispatch,state) =>{
+export const addItemToCartAction = (productItem) => {
+    return (dispatch, getState) => {
         dispatch(addToCart(productItem));
-        updateLocalStorage(state);
-    }
-}
+        updateLocalStorage(getState);
+    };
+};
 
-export const updateItemToCartAction = (productItem) =>{
-    return (dispatch,state) =>{
-        dispatch(updateQuantity({
-            variant_id: productItem?.variant_id,
-            quantity: productItem?.quantity
-        }))
-        updateLocalStorage(state);
+export const updateItemToCartAction = (productItem) => {
+    return (dispatch, getState) => {
+        dispatch(
+            updateQuantity({
+                variant_id: productItem?.variant_id,
+                quantity: productItem?.quantity,
+            })
+        );
+        updateLocalStorage(getState);
+    };
+};
 
-    }
-}
-
-export const delteItemFromCartAction = (payload)=>{
-    return (dispatch,state)=>{
+export const delteItemFromCartAction = (payload) => {
+    return (dispatch, getState) => {
         dispatch(removeFromCart(payload));
-        updateLocalStorage(state);
-    }
-}
+        updateLocalStorage(getState);
+    };
+};
 
-const updateLocalStorage = (state)=>{
-    const {cartState} = state();
-    localStorage.setItem('cart',JSON.stringify(cartState?.cart))
-}
+const updateLocalStorage = (getState) => {
+    const { cartState } = getState(); // Wywołanie funkcji getState()
+    localStorage.setItem("cart", JSON.stringify(cartState?.cart));
+};
 
-export const clearCart = ()=>{
-    return (dispatch,state) =>{
-       dispatch(deleteCart());
-       localStorage.removeItem('cart');
-    }
-}
+export const clearCart = () => {
+    return (dispatch) => {
+        dispatch(deleteCart());
+        localStorage.removeItem("cart");
+    };
+};

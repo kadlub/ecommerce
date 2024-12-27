@@ -1,31 +1,30 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useLoaderData } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import Breadcrumb from '../../components/Breadcrumb/Breadcrumb';
 import SectionHeading from '../../components/Sections/SectionsHeading/SectionHeading';
 import ProductCard from '../ProductListPage/ProductCard';
 import Rating from '../../components/Rating/Rating';
 import { getAllProducts } from '../../api/fetchProducts';
+import { addItemToCartAction } from '../../store/actions/cartAction';
 
 const ProductDetails = () => {
   const { product } = useLoaderData() || {}; // Ładowanie danych z react-router loadera
+  const dispatch = useDispatch();
+
   const [image, setImage] = useState(product?.imageUrl || '/placeholder.jpg'); // Domyślny obrazek
   const [breadCrumbLinks, setBreadCrumbLink] = useState([]);
   const [similarProducts, setSimilarProducts] = useState([]);
 
-  // Pobieranie pełnej ścieżki kategorii
+  // Breadcrumbs
   useEffect(() => {
-    const fetchBreadcrumbs = async () => {
-      const categoryPath = [
-        { title: 'Sklep', path: '/' },
-        ...(product?.categoryPath || []).map((cat) => ({
-          title: cat.name,
-          path: `/categories/${cat.id}`
-        })),
-        { title: product?.name || 'Produkt' }
-      ];
-      setBreadCrumbLink(categoryPath);
-    };
-    fetchBreadcrumbs();
+    const arrayLinks = [
+      { title: 'Sklep', path: '/' },
+      product?.categoryName
+        ? { title: product?.categoryName, path: `/categories/${product?.categoryId}` }
+        : { title: 'Kategoria', path: '/categories' }
+    ];
+    setBreadCrumbLink(arrayLinks.filter(Boolean)); // Filtrowanie, aby usunąć puste wartości
   }, [product]);
 
   // Pobieranie podobnych produktów
@@ -37,6 +36,19 @@ const ProductDetails = () => {
       });
     }
   }, [product?.categoryId, product?.productId]);
+
+  // Obsługa dodawania do koszyka
+  const handleAddToCart = () => {
+    const cartItem = {
+      productId: product?.productId,
+      name: product?.name,
+      price: product?.price,
+      thumbnail: product?.imageUrl || '/placeholder.jpg',
+      quantity: 1,
+      subTotal: product?.price,
+    };
+    dispatch(addItemToCartAction(cartItem));
+  };
 
   return (
     <>
@@ -58,22 +70,12 @@ const ProductDetails = () => {
           <Rating rating={product?.rating || 0} />
           <p className="text-xl bold py-2">${product?.price || 'Cena niedostępna'}</p>
           <p className="py-4">{product?.description || 'Brak opisu produktu.'}</p>
-          <p className="py-2 text-gray-700">Stan: {product?.condition || 'Nieznany'}</p>
-          {/* Przyciski */}
-          <div className="flex space-x-4 py-4">
-            <button
-              onClick={() => console.log('Dodano do koszyka')}
-              className="bg-blue-500 text-white py-2 px-4 rounded-lg"
-            >
-              Dodaj do koszyka
-            </button>
-            <button
-              onClick={() => console.log('Dodano do ulubionych')}
-              className="bg-gray-500 text-white py-2 px-4 rounded-lg"
-            >
-              Dodaj do ulubionych
-            </button>
-          </div>
+          <button
+            onClick={handleAddToCart}
+            className="bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600"
+          >
+            Dodaj do koszyka
+          </button>
         </div>
       </div>
       {/* Opis produktu */}
