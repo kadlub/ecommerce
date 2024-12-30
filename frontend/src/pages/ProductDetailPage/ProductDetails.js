@@ -9,25 +9,25 @@ import { getAllProducts } from '../../api/fetchProducts';
 import { addItemToCartAction } from '../../store/actions/cartAction';
 
 const ProductDetails = () => {
-  const { product } = useLoaderData() || {}; // Ładowanie danych z react-router loadera
+  const { product } = useLoaderData() || {}; // Loading data from react-router loader
   const dispatch = useDispatch();
 
-  const [image, setImage] = useState(product?.imageUrl || '/placeholder.jpg'); // Domyślny obrazek
-  const [breadCrumbLinks, setBreadCrumbLink] = useState([]);
+  const [image, setImage] = useState(product?.imageUrl || '/placeholder.jpg'); // Default image
+  const [breadCrumbLinks, setBreadCrumbLinks] = useState([]);
   const [similarProducts, setSimilarProducts] = useState([]);
 
-  // Breadcrumbs
+  // Setting up Breadcrumbs
   useEffect(() => {
     const arrayLinks = [
       { title: 'Sklep', path: '/' },
       product?.categoryName
         ? { title: product?.categoryName, path: `/categories/${product?.categoryId}` }
-        : { title: 'Kategoria', path: '/categories' }
+        : { title: 'Kategoria', path: '/categories' },
     ];
-    setBreadCrumbLink(arrayLinks.filter(Boolean)); // Filtrowanie, aby usunąć puste wartości
+    setBreadCrumbLinks(arrayLinks.filter(Boolean)); // Remove empty values
   }, [product]);
 
-  // Pobieranie podobnych produktów
+  // Fetching similar products
   useEffect(() => {
     if (product?.categoryId) {
       getAllProducts(product?.categoryId).then((res) => {
@@ -37,7 +37,7 @@ const ProductDetails = () => {
     }
   }, [product?.categoryId, product?.productId]);
 
-  // Obsługa dodawania do koszyka
+  // Add to Cart
   const handleAddToCart = () => {
     const cartItem = {
       productId: product?.productId,
@@ -53,7 +53,7 @@ const ProductDetails = () => {
   return (
     <>
       <div className="flex flex-col md:flex-row px-10">
-        {/* Sekcja obrazu */}
+        {/* Image Section */}
         <div className="w-[100%] lg:w-[50%] md:w-[40%]">
           <div className="w-full flex justify-center md:pt-0 pt-10">
             <img
@@ -63,7 +63,7 @@ const ProductDetails = () => {
             />
           </div>
         </div>
-        {/* Szczegóły produktu */}
+        {/* Product Details Section */}
         <div className="w-[60%] px-10">
           <Breadcrumb links={breadCrumbLinks} />
           <p className="text-3xl pt-4">{product?.name || 'Nazwa produktu'}</p>
@@ -78,12 +78,12 @@ const ProductDetails = () => {
           </button>
         </div>
       </div>
-      {/* Opis produktu */}
+      {/* Product Description */}
       <SectionHeading title={'Opis produktu'} />
       <div className="md:w-[50%] w-full p-2">
         <p className="px-8">{product?.description || 'Brak opisu produktu.'}</p>
       </div>
-      {/* Podobne produkty */}
+      {/* Similar Products */}
       <SectionHeading title={'Podobne produkty'} />
       <div className="flex px-10">
         <div className="pt-4 grid grid-cols-1 lg:grid-cols-4 md:grid-cols-3 gap-8 px-2 pb-10">

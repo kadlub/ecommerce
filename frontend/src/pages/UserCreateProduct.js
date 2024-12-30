@@ -1,118 +1,179 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { createProductAPI } from '../api/productAPI'
+import { createProductAPI } from '../api/productAPI';
+import { fetchCategoriesTree } from '../api/fetchCategories';
+import { getSellerIdFromToken } from '../api/authUtils'; // Import the utility function
 
 const UserCreateProduct = () => {
     const navigate = useNavigate();
-    const dispatch = useDispatch();
 
-    const [formData, setFormData] = useState({
-        name: '',
-        description: '',
-        price: '',
-        categoryId: '',
-        thumbnail: null,
-        condition: 'Nowa',
-    });
+    const [name, setName] = useState('');
+    const [price, setPrice] = useState('');
+    const [description, setDescription] = useState('');
+    const [condition, setCondition] = useState('Nowa');
+    const [categoryId, setCategoryId] = useState('');
+    const [imageFiles, setImageFiles] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [loadingCategories, setLoadingCategories] = useState(true);
+    const [error, setError] = useState('');
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
-    };
+    useEffect(() => {
+        const loadCategories = async () => {
+            try {
+                setLoadingCategories(true);
+                const categoryList = await fetchCategoriesTree();
+                setCategories(categoryList);
+            } catch (err) {
+                console.error('Błąd podczas ładowania kategorii:', err);
+                setError('Nie udało się załadować kategorii. Spróbuj ponownie później.');
+            } finally {
+                setLoadingCategories(false);
+            }
+        };
+        loadCategories();
+    }, []);
 
     const handleFileChange = (e) => {
-        setFormData({ ...formData, thumbnail: e.target.files[0] });
+        setImageFiles(e.target.files);
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
         try {
-            const formDataToSend = new FormData();
-            Object.entries(formData).forEach(([key, value]) => {
-                formDataToSend.append(key, value);
-            });
-            await createProductAPI(formDataToSend); // Wywołanie metody API
-            navigate('/'); // Powrót do strony głównej
-        } catch (error) {
-            console.error('Error creating product:', error);
+            const sellerId = getSellerIdFromToken();
+            console.log("Seller ID:", sellerId); // Debugowanie wartości
+            if (!sellerId || typeof sellerId !== 'string') {
+                setError("Niepoprawny sellerId. Upewnij się, że jesteś zalogowany.");
+                return;
+            }
+
+            const formData = new FormData();
+
+            // Dodaj dane produktu
+            formData.append("name", name);
+            formData.append("description", description);
+            formData.append("price", parseFloat(price).toString()); // Upewnij się, że to string
+            formData.append("categoryId", categoryId);
+            formData.append("condition", condition);
+            formData.append("sellerId", sellerId); // Upewnij się, że sellerId jest stringiem
+
+            // Dodaj obrazy
+            for (let i = 0; i < imageFiles.length; i++) {
+                formData.append("images", imageFiles[i]);
+            }
+
+            // Wywołaj API
+            console.log("FormData:", formData);
+            await createProductAPI(formData);
+
+            navigate("/"); // Po sukcesie
+        } catch (err) {
+            console.error("Błąd podczas tworzenia produktu:", err.message);
+            setError("Wystąpił błąd podczas dodawania produktu. Spróbuj ponownie.");
         }
     };
 
     return (
-        <div className="create-product-container">
-            <h1 className="text-2xl font-bold mb-4">Wystaw Produkt</h1>
+        <div className="container mx-auto py-10">
+            <h1 className="text-2xl font-bold mb-6">Wystaw produkt</h1>
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                    <label className="block text-gray-700">Nazwa produktu:</label>
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                        Nazwa produktu
+                    </label>
                     <input
                         type="text"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
+                        id="name"
+                        className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
                         required
-                        className="w-full border px-3 py-2"
                     />
                 </div>
                 <div>
-                    <label className="block text-gray-700">Opis produktu:</label>
-                    <textarea
-                        name="description"
-                        value={formData.description}
-                        onChange={handleChange}
-                        required
-                        className="w-full border px-3 py-2"
-                    />
-                </div>
-                <div>
-                    <label className="block text-gray-700">Cena (PLN):</label>
+                    <label htmlFor="price" className="block text-sm font-medium text-gray-700">
+                        Cena
+                    </label>
                     <input
                         type="number"
-                        name="price"
-                        value={formData.price}
-                        onChange={handleChange}
+                        id="price"
+                        className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                        value={price}
+                        onChange={(e) => setPrice(e.target.value)}
                         required
-                        className="w-full border px-3 py-2"
                     />
                 </div>
                 <div>
-                    <label className="block text-gray-700">Kategoria:</label>
-                    <input
-                        type="text"
-                        name="categoryId"
-                        value={formData.categoryId}
-                        onChange={handleChange}
+                    <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+                        Opis
+                    </label>
+                    <textarea
+                        id="description"
+                        className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
                         required
-                        className="w-full border px-3 py-2"
                     />
                 </div>
                 <div>
-                    <label className="block text-gray-700">Stan produktu:</label>
+                    <label htmlFor="condition" className="block text-sm font-medium text-gray-700">
+                        Stan
+                    </label>
                     <select
-                        name="condition"
-                        value={formData.condition}
-                        onChange={handleChange}
-                        className="w-full border px-3 py-2"
+                        id="condition"
+                        className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                        value={condition}
+                        onChange={(e) => setCondition(e.target.value)}
+                        required
                     >
                         <option value="Nowa">Nowa</option>
                         <option value="Używana">Używana</option>
                     </select>
                 </div>
                 <div>
-                    <label className="block text-gray-700">Zdjęcie główne:</label>
+                    <label htmlFor="category" className="block text-sm font-medium text-gray-700">
+                        Kategoria
+                    </label>
+                    {loadingCategories ? (
+                        <p>Ładowanie kategorii...</p>
+                    ) : error ? (
+                        <p className="text-red-500">{error}</p>
+                    ) : (
+                        <select
+                            id="category"
+                            className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                            value={categoryId}
+                            onChange={(e) => setCategoryId(e.target.value)}
+                            required
+                        >
+                            <option value="">Wybierz kategorię</option>
+                            {categories.map((cat) => (
+                                <option key={cat.categoryId} value={cat.categoryId}>
+                                    {cat.name}
+                                </option>
+                            ))}
+                        </select>
+                    )}
+                </div>
+                <div>
+                    <label htmlFor="images" className="block text-sm font-medium text-gray-700">
+                        Zdjęcia
+                    </label>
                     <input
                         type="file"
-                        name="thumbnail"
+                        id="images"
+                        className="mt-1 block w-full"
+                        multiple
+                        accept="image/*"
                         onChange={handleFileChange}
-                        required
-                        className="w-full border px-3 py-2"
                     />
                 </div>
                 <button
                     type="submit"
-                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                    className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600"
                 >
-                    Dodaj Produkt
+                    Dodaj produkt
                 </button>
             </form>
         </div>

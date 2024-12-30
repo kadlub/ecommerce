@@ -2,7 +2,7 @@ package com.example.musify.controllers;
 
 import com.example.musify.dto.ProductInputDto;
 import com.example.musify.dto.ProductOutputDto;
-import com.example.musify.entities.Products;
+import com.example.musify.security.CustomUserDetails;
 import com.example.musify.services.ProductService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -30,15 +31,14 @@ public class ProductController {
         this.productService = productService;
     }
 
-    // Pobieranie produktów z opcjonalnym filtrowaniem po kategorii
     @GetMapping
     public ResponseEntity<List<ProductOutputDto>> getProducts(
             @RequestParam(required = false) UUID categoryId) {
         logger.info("Fetching products with categoryId: {}", categoryId);
 
-        List<ProductOutputDto> products = (categoryId != null) ?
-                productService.findProductsByCategory(categoryId) :
-                productService.findAllProducts();
+        List<ProductOutputDto> products = (categoryId != null)
+                ? productService.findProductsByCategory(categoryId)
+                : productService.findAllProducts();
 
         if (products.isEmpty()) {
             logger.info("No products found for categoryId: {}", categoryId);
@@ -47,7 +47,6 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
 
-    // Pobieranie produktu po ID
     @GetMapping("/{id}")
     public ResponseEntity<ProductOutputDto> getProductById(@PathVariable UUID id) {
         logger.info("Fetching product with id: {}", id);
@@ -60,24 +59,40 @@ public class ProductController {
                 });
     }
 
-    // Tworzenie produktu - uwzględnia zalogowanego użytkownika jako sprzedawcę
-    @PostMapping
+    @PostMapping(consumes = {"multipart/form-data"})
     public ResponseEntity<ProductOutputDto> createProduct(
-            @Valid @RequestBody ProductInputDto productInputDto,
-            @AuthenticationPrincipal UserDetails userDetails) {
-        logger.info("Creating product with input: {}", productInputDto);
+            @RequestPart("product") @Valid ProductInputDto productInputDto,
+            @RequestPart("images") List<MultipartFile> images,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
-        // Przypisanie sprzedawcy na podstawie zalogowanego użytkownika
-        UUID sellerId = UUID.fromString(userDetails.getUsername());
-        productInputDto.setSellerId(sellerId);
+        logger.info("Received request to create product with input: {}", productInputDto);
 
-        ProductOutputDto createdProduct = productService.createProduct(productInputDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
+        UUID userId = customUserDetails.getUserId();
+        String username = customUserDetails.getUsername();
+
+        logger.debug("Extracted userId: {} and username: {}", userId, username);
+
+        try {
+            // Ustawienie `sellerId` w DTO
+            productInputDto.setSellerId(userId);
+
+            // Wywołanie usługi tworzenia produktu
+            ProductOutputDto createdProduct = productService.createProduct(productInputDto, images, customUserDetails);
+
+            logger.info("Product created successfully with ID: {}", createdProduct.getProductId());
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
+
+        } catch (Exception e) {
+            logger.error("An unexpected error occurred while creating product: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
-    // Aktualizacja istniejącego produktu
+
     @PutMapping("/{id}")
-    public ResponseEntity<ProductOutputDto> updateProduct(@PathVariable UUID id, @Valid @RequestBody ProductInputDto productInputDto) {
+    public ResponseEntity<ProductOutputDto> updateProduct(
+            @PathVariable UUID id,
+            @Valid @RequestBody ProductInputDto productInputDto) {
         logger.info("Updating product with id: {}, input: {}", id, productInputDto);
 
         return productService.findProductById(id)
@@ -91,7 +106,6 @@ public class ProductController {
                 });
     }
 
-    // Usuwanie produktu
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable UUID id) {
         logger.info("Deleting product with id: {}", id);
@@ -106,7 +120,6 @@ public class ProductController {
         }
     }
 
-    // Pobieranie produktów z filtrami
     @GetMapping("/filter")
     public ResponseEntity<List<ProductOutputDto>> getFilteredProducts(
             @RequestParam(required = false) UUID categoryId,
@@ -125,7 +138,6 @@ public class ProductController {
         return ResponseEntity.ok(filteredProducts);
     }
 
-    // Pobieranie produktów po nazwie kategorii
     @GetMapping("/by-category/{categoryName}")
     public ResponseEntity<List<ProductOutputDto>> getProductsByCategoryName(@PathVariable String categoryName) {
         logger.info("Fetching products by category name: {}", categoryName);
@@ -139,7 +151,6 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
 
-    // Pobieranie produktu po slug
     @GetMapping("/slug/{slug}")
     public ResponseEntity<ProductOutputDto> getProductBySlug(@PathVariable String slug) {
         logger.info("Fetching product by slug: {}", slug);

@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchAllCategories } from '../../api/fetchProducts'; // API do pobierania kategorii
-import { createProductAPI } from '../../api/productAPI'; // API do tworzenia produktów
 import { useNavigate } from 'react-router-dom';
+import { fetchAllCategories } from '../../api/fetchProducts'; // API to fetch categories
+import { createProductAPI } from '../../api/productAPI'; // API to create products
 
 const CreateProduct = () => {
   const [name, setName] = useState('');
@@ -12,14 +11,25 @@ const CreateProduct = () => {
   const [categoryId, setCategoryId] = useState('');
   const [imageFiles, setImageFiles] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const dispatch = useDispatch();
-
   useEffect(() => {
-    fetchAllCategories()
-      .then((data) => setCategories(data))
-      .catch((err) => console.error('Błąd podczas ładowania kategorii:', err));
+    const loadCategories = async () => {
+      try {
+        setLoadingCategories(true);
+        const data = await fetchAllCategories();
+        setCategories(data);
+      } catch (err) {
+        console.error('Error loading categories:', err);
+        setError('Nie udało się załadować kategorii. Spróbuj ponownie później.');
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+
+    loadCategories();
   }, []);
 
   const handleFileChange = (e) => {
@@ -29,23 +39,32 @@ const CreateProduct = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const formData = new FormData();
-    formData.append('name', name);
-    formData.append('price', price);
-    formData.append('description', description);
-    formData.append('condition', condition);
-    formData.append('categoryId', categoryId);
-    for (let i = 0; i < imageFiles.length; i++) {
-      formData.append('images', imageFiles[i]);
-    }
-
     try {
-      await createProductAPI(formData); // API POST do backendu
-      alert('Produkt został pomyślnie utworzony!');
-      navigate('/');
-    } catch (err) {
-      console.error('Błąd podczas tworzenia produktu:', err);
-      alert('Wystąpił błąd podczas tworzenia produktu.');
+      // Przygotowanie obiektu FormData
+      const formDataToSend = new FormData();
+
+      // Dodanie szczegółów produktu jako JSON
+      const productDetails = {
+        name: name,
+        description: description,
+        price: price,
+        categoryId: categoryId,
+        condition: condition,
+      };
+      formDataToSend.append("product", JSON.stringify(productDetails));
+
+      // Dodanie obrazów
+      for (let i = 0; i < imageFiles.length; i++) {
+        formDataToSend.append("images", imageFiles[i]);
+      }
+
+      // Wywołanie API
+      await createProductAPI(formDataToSend);
+
+      // Powrót na stronę główną lub komunikat o sukcesie
+      navigate("/");
+    } catch (error) {
+      console.error("Błąd podczas tworzenia produktu:", error);
     }
   };
 
@@ -53,6 +72,7 @@ const CreateProduct = () => {
     <div className="container mx-auto py-10">
       <h1 className="text-2xl font-bold mb-6">Wystaw produkt na sprzedaż</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Product Name */}
         <div>
           <label htmlFor="name" className="block text-sm font-medium text-gray-700">
             Nazwa produktu
@@ -66,6 +86,8 @@ const CreateProduct = () => {
             required
           />
         </div>
+
+        {/* Price */}
         <div>
           <label htmlFor="price" className="block text-sm font-medium text-gray-700">
             Cena
@@ -79,6 +101,8 @@ const CreateProduct = () => {
             required
           />
         </div>
+
+        {/* Description */}
         <div>
           <label htmlFor="description" className="block text-sm font-medium text-gray-700">
             Opis produktu
@@ -91,6 +115,8 @@ const CreateProduct = () => {
             required
           />
         </div>
+
+        {/* Condition */}
         <div>
           <label htmlFor="condition" className="block text-sm font-medium text-gray-700">
             Stan produktu
@@ -105,25 +131,35 @@ const CreateProduct = () => {
             <option value="Używana">Używana</option>
           </select>
         </div>
+
+        {/* Category */}
         <div>
           <label htmlFor="category" className="block text-sm font-medium text-gray-700">
             Kategoria
           </label>
-          <select
-            id="category"
-            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-            value={categoryId}
-            onChange={(e) => setCategoryId(e.target.value)}
-            required
-          >
-            <option value="">Wybierz kategorię</option>
-            {categories.map((cat) => (
-              <option key={cat.categoryId} value={cat.categoryId}>
-                {cat.name}
-              </option>
-            ))}
-          </select>
+          {loadingCategories ? (
+            <p>Ładowanie kategorii...</p>
+          ) : error ? (
+            <p className="text-red-500">{error}</p>
+          ) : (
+            <select
+              id="category"
+              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+              value={categoryId}
+              onChange={(e) => setCategoryId(e.target.value)}
+              required
+            >
+              <option value="">Wybierz kategorię</option>
+              {categories.map((cat) => (
+                <option key={cat.categoryId} value={cat.categoryId}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
+          )}
         </div>
+
+        {/* Images */}
         <div>
           <label htmlFor="images" className="block text-sm font-medium text-gray-700">
             Zdjęcia produktu
@@ -137,6 +173,8 @@ const CreateProduct = () => {
             onChange={handleFileChange}
           />
         </div>
+
+        {/* Submit Button */}
         <button
           type="submit"
           className="bg-blue-500 text-white py-2 px-4 rounded-lg shadow-md hover:bg-blue-600"

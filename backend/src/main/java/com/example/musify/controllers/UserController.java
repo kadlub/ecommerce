@@ -58,10 +58,14 @@ public class UserController {
     // Pobranie profilu użytkownika
     @GetMapping("/profile")
     public ResponseEntity<UserOutputDto> getUserProfile(@RequestHeader("Authorization") String token) {
-        String username = userService.getUsernameFromToken(token);
-        return userService.findUserByUsername(username)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+        try {
+            String username = userService.getUsernameFromToken(token);
+            return userService.findUserByUsername(username)
+                    .map(ResponseEntity::ok)
+                    .orElse(ResponseEntity.notFound().build());
+        } catch (Exception e) {
+            return ResponseEntity.status(401).build(); // Zwracaj odpowiedni status w przypadku błędu
+        }
     }
 }
 

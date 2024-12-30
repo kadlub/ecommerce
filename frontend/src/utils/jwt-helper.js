@@ -26,9 +26,9 @@ export const saveToken = (token) => {
 
 export const logOut = () => {
     console.info("Logging out user, clearing token.");
-    localStorage.removeItem('authToken');
+    localStorage.removeItem('authToken'); // Usuń token z localStorage
+    window.location.reload(); // Opcjonalne, odświeża stronę, aby wymusić ponowne zalogowanie
 };
-
 
 export const getToken = () => {
     return localStorage.getItem('authToken');

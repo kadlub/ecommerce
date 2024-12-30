@@ -2,34 +2,46 @@ package com.example.musify.services;
 
 import com.example.musify.entities.Users;
 import com.example.musify.repositories.UsersRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
+import com.example.musify.security.CustomUserDetails;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
-public class CustomUserDetailsService implements UserDetailsService {
+public class CustomUserDetailsService implements org.springframework.security.core.userdetails.UserDetailsService {
 
     private final UsersRepository usersRepository;
 
-    @Autowired
     public CustomUserDetailsService(UsersRepository usersRepository) {
         this.usersRepository = usersRepository;
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Users user = usersRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+    public UserDetails loadUserByUsername(String identifier) throws UsernameNotFoundException {
+        Users user;
 
-        return User.builder()
-                .username(user.getUsername())
-                .password(user.getPasswordHash()) // Zaszyfrowane hasło
-                .roles(user.getAuthorities().stream()
-                        .map(role -> role.getName().replace("ROLE_", ""))
-                        .toArray(String[]::new)) // Mapowanie ról użytkownika
-                .build();
+        try {
+            // Sprawdź, czy identyfikator to UUID
+            UUID userId = UUID.fromString(identifier);
+            user = usersRepository.findById(userId)
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found with ID: " + userId));
+        } catch (IllegalArgumentException e) {
+            // Jeśli to nie UUID, traktuj jako username
+            user = usersRepository.findByUsername(identifier)
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + identifier));
+        }
+
+        // Konwertuj encję użytkownika na obiekt UserDetails
+        return new CustomUserDetails(
+                user.getUserId(),
+                user.getUsername(),
+                user.getPasswordHash(),
+                user.getAuthorities().stream()
+                        .map(authority -> (GrantedAuthority) () -> authority.getName()) // Mapowanie Authority na GrantedAuthority
+                        .toList()
+        );
     }
 }

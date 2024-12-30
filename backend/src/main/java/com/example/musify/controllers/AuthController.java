@@ -2,7 +2,9 @@ package com.example.musify.controllers;
 
 import com.example.musify.dto.UserInputDto;
 import com.example.musify.dto.UserOutputDto;
+import com.example.musify.security.CustomUserDetails;
 import com.example.musify.security.JwtUtil;
+import com.example.musify.services.CustomUserDetailsService;
 import com.example.musify.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,9 +12,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/auth")
@@ -20,13 +25,15 @@ public class AuthController {
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
+    private final UserDetailsService userDetailsService;
 
     @Autowired
-    public AuthController(UserService userService, AuthenticationManager authenticationManager, JwtUtil jwtUtil) {
+    public AuthController(UserService userService, AuthenticationManager authenticationManager, JwtUtil jwtUtil, UserDetailsService userDetailsService) {
         System.out.println("AuthController initialized!");
         this.userService = userService;
         this.authenticationManager = authenticationManager;
         this.jwtUtil = jwtUtil;
+        this.userDetailsService = userDetailsService;
     }
 
     @GetMapping("/test")
@@ -59,8 +66,17 @@ public class AuthController {
             // Uwierzytelnienie użytkownika
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
 
-            // Generowanie tokena JWT
-            String token = jwtUtil.generateToken(new UsernamePasswordAuthenticationToken(username, null));
+            // Pobranie szczegółów użytkownika
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            if (!(userDetails instanceof CustomUserDetails)) {
+                throw new IllegalStateException("Unexpected user details implementation");
+            }
+
+            // Wyciągnięcie `userId` z `CustomUserDetails`
+            UUID userId = ((CustomUserDetails) userDetails).getUserId();
+
+            // Generowanie tokena JWT z uwzględnieniem `userId`
+            String token = jwtUtil.generateToken(userId);
 
             return ResponseEntity.ok(Map.of(
                     "message", "Login successful",

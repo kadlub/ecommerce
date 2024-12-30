@@ -12,6 +12,7 @@ import com.example.musify.repositories.ProductsRepository;
 import com.example.musify.repositories.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -143,7 +144,7 @@ public class ProductService {
     }
 
     @Transactional
-    public ProductOutputDto createProduct(ProductInputDto productInputDto) {
+    public ProductOutputDto createProduct(ProductInputDto productInputDto, List<MultipartFile> images, UserDetails userDetails) {
         Categories category = categoriesRepository.findById(productInputDto.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("Category not found"));
 
@@ -159,7 +160,22 @@ public class ProductService {
                 .seller(seller)
                 .build();
 
+        // Zapisujemy produkt do bazy danych
         Products savedProduct = productsRepository.save(product);
+
+        // Zapis zdjęć
+        for (int i = 0; i < images.size(); i++) {
+            MultipartFile image = images.get(i);
+            String imageUrl = saveImageToStorage(image);
+
+            ProductImages productImage = ProductImages.builder()
+                    .product(savedProduct)
+                    .url(imageUrl)
+                    .isPrimary(i == 0) // Pierwsze zdjęcie jest główne
+                    .build();
+
+            productImagesRepository.save(productImage);
+        }
 
         if (!Boolean.TRUE.equals(seller.getIsSeller())) {
             seller.setIsSeller(true);
@@ -204,6 +220,23 @@ public class ProductService {
         return false; // Produkt nie istnieje
     }
 
+    private String saveImageToStorage(MultipartFile file) {
+        try {
+            // Tworzenie unikalnej nazwy pliku
+            String filename = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+            Path filePath = Paths.get(uploadDir, filename);
+
+            // Tworzenie katalogu, jeśli nie istnieje
+            Files.createDirectories(filePath.getParent());
+
+            // Zapis pliku na dysk
+            Files.write(filePath, file.getBytes());
+
+            return "/uploads/products/" + filename; // Ścieżka URL do zapisanego pliku
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to save image to storage", e);
+        }
+    }
 
     public List<ProductOutputDto> findProductsByCategory(UUID categoryId) {
         List<UUID> categoryIds = getAllSubcategoryIds(categoryId);
@@ -227,29 +260,33 @@ public class ProductService {
     }
 
     private ProductOutputDto convertToOutputDto(Products product) {
-        // Sprawdzenie, czy productImages nie jest null i operowanie na liście
-        List<String> imageUrls = (product.getProductImages() != null)
-                ? product.getProductImages().stream()
+        List<ProductImages> productImages = product.getProductImages();
+
+        // Szukamy głównego zdjęcia
+        String mainImageUrl = productImages.stream()
+                .filter(ProductImages::isPrimary)
                 .map(ProductImages::getUrl)
-                .collect(Collectors.toList())
-                : Collections.emptyList();
+                .findFirst()
+                .orElse(null);
+
+        List<String> allImageUrls = productImages.stream()
+                .map(ProductImages::getUrl)
+                .collect(Collectors.toList());
 
         return ProductOutputDto.builder()
-                .productId(product.getProductId()) // Zakładam, że getter jest poprawny
+                .productId(product.getProductId())
                 .name(product.getName())
                 .price(product.getPrice())
                 .description(product.getDescription())
                 .condition(product.getCondition())
                 .creationDate(product.getCreationDate())
-                .imageUrl(imageUrls.isEmpty() ? null : imageUrls.get(0)) // Pierwszy obraz jako domyślny, null jeśli brak
-                .imageUrls(imageUrls) // Pełna lista obrazów
-                .categoryId(product.getCategory() != null ? product.getCategory().getCategoryId() : null) // Sprawdzenie null dla kategorii
-                .categoryName(product.getCategory() != null ? product.getCategory().getName() : null) // Sprawdzenie null dla nazwy kategorii
-                .sellerId(product.getSeller() != null ? product.getSeller().getUserId() : null) // Sprawdzenie null dla sprzedawcy
-                .sellerName(product.getSeller() != null ? product.getSeller().getUsername() : null) // Sprawdzenie null dla nazwy sprzedawcy
+                .imageUrl(mainImageUrl) // Główne zdjęcie
+                .imageUrls(allImageUrls) // Wszystkie zdjęcia
+                .categoryId(product.getCategory() != null ? product.getCategory().getCategoryId() : null)
+                .categoryName(product.getCategory() != null ? product.getCategory().getName() : null)
+                .sellerId(product.getSeller() != null ? product.getSeller().getUserId() : null)
+                .sellerName(product.getSeller() != null ? product.getSeller().getUsername() : null)
                 .slug(product.getSlug())
                 .build();
     }
-
-
 }

@@ -36,43 +36,52 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-        String requestPath = request.getServletPath();
-        System.out.println("Request path: " + requestPath);
 
-        // Pomijanie autoryzacji JWT dla wykluczonych ścieżek
-        if (shouldSkipPath(requestPath)) { // Przekaż request
+        String path = request.getRequestURI();
+
+        // Sprawdzenie, czy ścieżka jest wykluczona
+        if (shouldSkipPath(path)) {
             chain.doFilter(request, response);
             return;
         }
 
         String authHeader = request.getHeader("Authorization");
-        String username = null;
+        String identifier = null;
         String jwtToken = null;
 
+        // Pobierz token JWT
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             jwtToken = authHeader.substring(7);
-            username = jwtUtil.extractUsername(jwtToken);
+            identifier = jwtUtil.extractUsername(jwtToken); // Domyślnie traktuj "username" lub "userId" jako subject
         }
 
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        // Jeśli w kontekście nie ma autoryzacji
+        if (identifier != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            try {
+                // Pobierz dane użytkownika
+                UserDetails userDetails = userDetailsService.loadUserByUsername(identifier);
 
-            if (jwtUtil.validateToken(jwtToken, userDetails)) {
-                UsernamePasswordAuthenticationToken authenticationToken =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                // Walidacja tokena JWT
+                if (jwtUtil.validateToken(jwtToken, userDetails)) {
+                    UsernamePasswordAuthenticationToken authenticationToken =
+                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                }
+            } catch (Exception e) {
+                logger.error("Authentication failed for token: " + jwtToken, e);
             }
         }
 
         chain.doFilter(request, response);
     }
+
     /**
      * Sprawdza, czy ścieżka powinna zostać pominięta przez filtr.
      */
     private boolean shouldSkipPath(String path) {
         String normalizedPath = path.startsWith("/api/") ? path : "/api" + path;
-        boolean shouldSkip = EXCLUDED_PATHS.stream().anyMatch(normalizedPath::endsWith);
+        boolean shouldSkip = EXCLUDED_PATHS.stream().anyMatch(normalizedPath::equals);
         System.out.println("Skipping JWT filter for path: " + path + "? " + shouldSkip);
         return shouldSkip;
     }

@@ -11,7 +11,6 @@ import java.util.UUID;
 
 @Data
 public class ProductInputDto {
-
     @NotBlank(message = "Product name is required")
     private String name;
 
@@ -22,8 +21,6 @@ public class ProductInputDto {
     @NotBlank(message = "Description is required")
     private String description;
 
-    private MultipartFile image;
-
     @NotBlank(message = "Condition is required")
     private String condition;
 
@@ -33,3 +30,4 @@ public class ProductInputDto {
     @NotNull(message = "Seller ID is required")
     private UUID sellerId;
 }
+
