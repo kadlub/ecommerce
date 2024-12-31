@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { createProductAPI } from '../api/productAPI'
+import { createProductAPI } from '../api/productAPI';
+import { fetchCategoriesTree } from '../api/fetchCategories';
 
 const UserCreateProduct = () => {
     const navigate = useNavigate();
@@ -15,6 +16,24 @@ const UserCreateProduct = () => {
         thumbnail: null,
         condition: 'Nowa',
     });
+
+    const [categories, setCategories] = useState([]); // Stan dla kategorii
+    const [loadingCategories, setLoadingCategories] = useState(true);
+
+    useEffect(() => {
+        // Pobierz kategorie przy montowaniu komponentu
+        const loadCategories = async () => {
+            try {
+                const categoryTree = await fetchCategoriesTree();
+                setCategories(categoryTree);
+            } catch (error) {
+                console.error('Błąd podczas ładowania kategorii:', error);
+            } finally {
+                setLoadingCategories(false);
+            }
+        };
+        loadCategories();
+    }, []);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -37,6 +56,14 @@ const UserCreateProduct = () => {
         } catch (error) {
             console.error('Error creating product:', error);
         }
+    };
+
+    const renderCategoryOptions = (categories) => {
+        return categories.map((category) => (
+            <option key={category.categoryId} value={category.categoryId}>
+                {category.name}
+            </option>
+        ));
     };
 
     return (
@@ -77,14 +104,20 @@ const UserCreateProduct = () => {
                 </div>
                 <div>
                     <label className="block text-gray-700">Kategoria:</label>
-                    <input
-                        type="text"
-                        name="categoryId"
-                        value={formData.categoryId}
-                        onChange={handleChange}
-                        required
-                        className="w-full border px-3 py-2"
-                    />
+                    {loadingCategories ? (
+                        <p>Ładowanie kategorii...</p>
+                    ) : (
+                        <select
+                            name="categoryId"
+                            value={formData.categoryId}
+                            onChange={handleChange}
+                            required
+                            className="w-full border px-3 py-2"
+                        >
+                            <option value="">Wybierz kategorię</option>
+                            {renderCategoryOptions(categories)}
+                        </select>
+                    )}
                 </div>
                 <div>
                     <label className="block text-gray-700">Stan produktu:</label>

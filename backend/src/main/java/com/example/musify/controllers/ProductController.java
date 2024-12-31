@@ -9,10 +9,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -61,17 +63,22 @@ public class ProductController {
     }
 
     // Tworzenie produktu - uwzględnia zalogowanego użytkownika jako sprzedawcę
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ProductOutputDto> createProduct(
-            @Valid @RequestBody ProductInputDto productInputDto,
-            @AuthenticationPrincipal UserDetails userDetails) {
+            @Valid @ModelAttribute ProductInputDto productInputDto,
+            @RequestParam(required = false) List<MultipartFile> images) {
         logger.info("Creating product with input: {}", productInputDto);
 
-        // Przypisanie sprzedawcy na podstawie zalogowanego użytkownika
-        UUID sellerId = UUID.fromString(userDetails.getUsername());
-        productInputDto.setSellerId(sellerId);
-
+        // Tworzenie produktu w serwisie
         ProductOutputDto createdProduct = productService.createProduct(productInputDto);
+
+        // Jeśli przesłano obrazy, zapisz je
+        if (images != null && !images.isEmpty()) {
+            for (MultipartFile image : images) {
+                productService.uploadProductImage(createdProduct.getProductId(), image, "Default alt text");
+            }
+        }
+
         return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
     }
 

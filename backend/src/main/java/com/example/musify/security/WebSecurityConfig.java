@@ -15,11 +15,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.Arrays;
 
 @Configuration
-public class WebSecurityConfig {
+public class WebSecurityConfig implements WebMvcConfigurer {
 
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtFilter jwtFilter;
@@ -27,6 +29,12 @@ public class WebSecurityConfig {
     public WebSecurityConfig(JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint, JwtFilter jwtFilter) {
         this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
         this.jwtFilter = jwtFilter;
+    }
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("uploads/products/**")
+                .addResourceLocations("file:uploads/products/");
     }
 
     @Bean
@@ -40,6 +48,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/users/profile").hasAnyRole("USER", "ADMIN") // Endpoint wymaga ról USER lub ADMIN
                         .requestMatchers("/categories", "categories/tree").permitAll()
                         .requestMatchers("/products/**","/products").permitAll()
+                        .requestMatchers("/uploads/products/**","/uploads/products/0e732607-1ae9-45c5-978f-ba54e7619cde_c7fff558-ae21-4cea-9b74-d4c5f056afa0").permitAll()
                         .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated() // Wszystkie inne żądania wymagają autoryzacji
                         //.anyRequest().permitAll() // Zezwól na wszystkie żądania

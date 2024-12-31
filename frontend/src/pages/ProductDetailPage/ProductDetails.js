@@ -12,8 +12,13 @@ const ProductDetails = () => {
   const { product } = useLoaderData() || {}; // Ładowanie danych z react-router loadera
   const dispatch = useDispatch();
 
-  const [image, setImage] = useState(product?.imageUrl || '/placeholder.jpg'); // Domyślny obrazek
-  const [breadCrumbLinks, setBreadCrumbLink] = useState([]);
+  const imageBaseUrl = "http://localhost:8080/api/uploads/products/";
+  const fullImageUrls = product?.imageUrls?.map((url) => imageBaseUrl + url);
+
+  const [selectedImage, setSelectedImage] = useState(
+    fullImageUrls?.length ? fullImageUrls[0] : '/placeholder.jpg'
+  );
+  const [breadCrumbLinks, setBreadCrumbLinks] = useState([]);
   const [similarProducts, setSimilarProducts] = useState([]);
 
   // Breadcrumbs
@@ -22,9 +27,9 @@ const ProductDetails = () => {
       { title: 'Sklep', path: '/' },
       product?.categoryName
         ? { title: product?.categoryName, path: `/categories/${product?.categoryId}` }
-        : { title: 'Kategoria', path: '/categories' }
+        : { title: 'Kategoria', path: '/categories' },
     ];
-    setBreadCrumbLink(arrayLinks.filter(Boolean)); // Filtrowanie, aby usunąć puste wartości
+    setBreadCrumbLinks(arrayLinks.filter(Boolean)); // Filtrowanie, aby usunąć puste wartości
   }, [product]);
 
   // Pobieranie podobnych produktów
@@ -43,7 +48,7 @@ const ProductDetails = () => {
       productId: product?.productId,
       name: product?.name,
       price: product?.price,
-      thumbnail: product?.imageUrl || '/placeholder.jpg',
+      thumbnail: fullImageUrls?.[0] || '/placeholder.jpg',
       quantity: 1,
       subTotal: product?.price,
     };
@@ -53,14 +58,25 @@ const ProductDetails = () => {
   return (
     <>
       <div className="flex flex-col md:flex-row px-10">
-        {/* Sekcja obrazu */}
+        {/* Galeria zdjęć */}
         <div className="w-[100%] lg:w-[50%] md:w-[40%]">
           <div className="w-full flex justify-center md:pt-0 pt-10">
             <img
-              src={image}
+              src={selectedImage}
               className="h-full w-full max-h-[520px] border rounded-lg cursor-pointer object-cover"
               alt={product?.name || 'Produkt'}
             />
+          </div>
+          <div className="flex gap-2 mt-4 overflow-x-auto">
+            {fullImageUrls?.map((url, index) => (
+              <img
+                key={index}
+                src={url}
+                className="h-20 w-20 border rounded-lg cursor-pointer object-cover"
+                alt={`Miniatura ${index + 1}`}
+                onClick={() => setSelectedImage(url)} // Zmień wybrane zdjęcie
+              />
+            ))}
           </div>
         </div>
         {/* Szczegóły produktu */}

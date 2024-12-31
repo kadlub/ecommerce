@@ -18,16 +18,16 @@ const Account = () => {
       .then((res) => {
         dispatch(loadUserInfo(res));
       })
-      .catch((err) => {})
+      .catch((err) => { })
       .finally(() => {
         dispatch(setLoading(false));
       });
   }, []);
 
- 
+
   return (
     <div className="p-8">
-        {isUserAdmin && <div className="text-right"><Link to={"/admin"} className="text-lg text-blue-900 underline">Manage Admin</Link></div>}
+      {isUserAdmin && <div className="text-right"><Link to={"/admin"} className="text-lg text-blue-900 underline">Manage Admin</Link></div>}
       {userInfo?.email && (
         <>
           <p className="text-xl font-bold">Hello {userInfo?.firstName}</p>
@@ -37,8 +37,8 @@ const Account = () => {
               <li>
                 <NavLink
                   to={"/account-details/profile"}
-                  className={({isActive})=> [
-                    isActive? "bg-black hover:bg-gray-400":"bg-gray-400 hover:bg-black",
+                  className={({ isActive }) => [
+                    isActive ? "bg-black hover:bg-gray-400" : "bg-gray-400 hover:bg-black",
                     "inline-flex items-center px-4 py-3 text-white rounded-lg active w-full"
                   ].join(" ")}
                 >
@@ -57,8 +57,8 @@ const Account = () => {
               <li>
                 <NavLink
                   to={"/account-details/orders"}
-                  className={({isActive})=> [
-                    isActive? "bg-black hover:bg-gray-400":"bg-gray-400 hover:bg-black",
+                  className={({ isActive }) => [
+                    isActive ? "bg-black hover:bg-gray-400" : "bg-gray-400 hover:bg-black",
                     "inline-flex items-center px-4 py-3 text-white rounded-lg active w-full"
                   ].join(" ")}
                 >
@@ -79,8 +79,8 @@ const Account = () => {
               <li>
                 <NavLink
                   to={"/account-details/settings"}
-                  className={({isActive})=> [
-                    isActive? "bg-black hover:bg-gray-400":"bg-gray-400 hover:bg-black",
+                  className={({ isActive }) => [
+                    isActive ? "bg-black hover:bg-gray-400" : "bg-gray-400 hover:bg-black",
                     "inline-flex items-center px-4 py-3 text-white rounded-lg active w-full"
                   ].join(" ")}
                 >
@@ -98,7 +98,7 @@ const Account = () => {
               </li>
             </ul>
             <div className="px-4 w-full rounded-lg">
-                <Outlet />
+              <Outlet />
 
             </div>
           </div>

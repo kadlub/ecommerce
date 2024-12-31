@@ -66,7 +66,7 @@ public class ProductService {
 
         ProductImages productImage = ProductImages.builder()
                 .product(product)
-                .url(fileName)
+                .url("/uploads/products/" + fileName)
                 .altText(altText)
                 .build();
 

@@ -4,19 +4,22 @@ import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { addItemToCartAction } from '../../store/actions/cartAction';
 
-const ProductCard = ({ id, title, description, price, discount, rating, brand, thumbnail, slug }) => {
+const ProductCard = ({ id, title, description, price, discount, rating, brand, imageUrls, slug }) => {
   const dispatch = useDispatch();
+  const imageBaseUrl = "http://localhost:8080/api/uploads/products/";
 
-  // Funkcja obsługująca dodawanie do koszyka
+  // Wybierz pierwsze zdjęcie z `imageUrls` jako miniaturę
+  const thumbnail = imageUrls?.length > 0 ? `${imageBaseUrl}${imageUrls[0]}` : '/placeholder-image.png';
+
   const handleAddToCart = () => {
-    const discountedPrice = discount ? price - price * (discount / 100) : price; // Obliczanie ceny po rabacie
+    const discountedPrice = discount ? price - price * (discount / 100) : price;
     const product = {
       productId: id,
       name: title,
       price: discountedPrice,
       thumbnail,
       quantity: 1,
-      subTotal: discountedPrice, // Cena dla 1 sztuki z uwzględnieniem rabatu
+      subTotal: discountedPrice,
     };
     dispatch(addItemToCartAction(product));
   };
@@ -39,7 +42,6 @@ const ProductCard = ({ id, title, description, price, discount, rating, brand, t
           {description && <p className="text-[12px] text-gray-600">{brand}</p>}
         </div>
         <div>
-          {/* Cena z uwzględnieniem rabatu */}
           {discount ? (
             <div>
               <p className="text-red-500 line-through text-sm">${price}</p>
@@ -51,7 +53,6 @@ const ProductCard = ({ id, title, description, price, discount, rating, brand, t
         </div>
       </div>
 
-      {/* Sekcja ocen */}
       <div className="flex items-center mt-2">
         {rating ? (
           <p className="text-yellow-500 text-sm">{'⭐'.repeat(Math.round(rating))}</p>
@@ -60,16 +61,13 @@ const ProductCard = ({ id, title, description, price, discount, rating, brand, t
         )}
       </div>
 
-      {/* Przyciski akcji */}
       <div className="absolute top-0 right-0 pt-4 pr-4 flex space-x-2">
-        {/* Dodaj do koszyka */}
         <button
           onClick={handleAddToCart}
           className="bg-blue-500 text-white py-1 px-4 rounded-lg text-sm hover:bg-blue-600"
         >
           Dodaj do koszyka
         </button>
-        {/* Dodaj do ulubionych */}
         <button
           onClick={() => console.log('Dodano do ulubionych')}
           className="cursor-pointer text-gray-500 hover:text-gray-800"
@@ -82,3 +80,4 @@ const ProductCard = ({ id, title, description, price, discount, rating, brand, t
 };
 
 export default ProductCard;
+
