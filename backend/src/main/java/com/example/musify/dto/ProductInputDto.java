@@ -31,6 +31,5 @@ public class ProductInputDto {
     @NotNull(message = "Category ID is required")
     private UUID categoryId;
 
-    @NotNull(message = "Seller ID is required")
     private UUID sellerId;
 }

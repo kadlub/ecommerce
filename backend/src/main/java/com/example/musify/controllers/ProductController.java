@@ -3,6 +3,8 @@ package com.example.musify.controllers;
 import com.example.musify.dto.ProductInputDto;
 import com.example.musify.dto.ProductOutputDto;
 import com.example.musify.entities.Products;
+import com.example.musify.entities.Users;
+import com.example.musify.repositories.UsersRepository;
 import com.example.musify.services.ProductService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -13,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,10 +29,12 @@ public class ProductController {
 
     private final ProductService productService;
     private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
+    private final UsersRepository usersRepository;
 
     @Autowired
-    public ProductController(ProductService productService) {
+    public ProductController(ProductService productService, UsersRepository usersRepository) {
         this.productService = productService;
+        this.usersRepository = usersRepository;
     }
 
     // Pobieranie produktów z opcjonalnym filtrowaniem po kategorii
@@ -66,7 +71,17 @@ public class ProductController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ProductOutputDto> createProduct(
             @Valid @ModelAttribute ProductInputDto productInputDto,
-            @RequestParam(required = false) List<MultipartFile> images) {
+            @RequestParam(required = false) List<MultipartFile> images,
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        String username = userDetails.getUsername();
+
+        UUID sellerId = usersRepository.findByUsername(username)
+                        .orElseThrow(() -> new UsernameNotFoundException("User not found"))
+                        .getUserId();
+
+        productInputDto.setSellerId(sellerId);
+
         logger.info("Creating product with input: {}", productInputDto);
 
         // Tworzenie produktu w serwisie

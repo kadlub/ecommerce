@@ -66,7 +66,7 @@ public class ProductService {
 
         ProductImages productImage = ProductImages.builder()
                 .product(product)
-                .url("/uploads/products/" + fileName)
+                .url(fileName)
                 .altText(altText)
                 .build();
 
@@ -250,6 +250,4 @@ public class ProductService {
                 .slug(product.getSlug())
                 .build();
     }
-
-
 }

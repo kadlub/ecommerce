@@ -1,27 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
 import { createProductAPI } from '../api/productAPI';
 import { fetchCategoriesTree } from '../api/fetchCategories';
 
 const UserCreateProduct = () => {
     const navigate = useNavigate();
-    const dispatch = useDispatch();
 
     const [formData, setFormData] = useState({
         name: '',
         description: '',
         price: '',
         categoryId: '',
-        thumbnail: null,
+        images: null,
         condition: 'Nowa',
     });
 
-    const [categories, setCategories] = useState([]); // Stan dla kategorii
+    const [categories, setCategories] = useState([]);
     const [loadingCategories, setLoadingCategories] = useState(true);
 
     useEffect(() => {
-        // Pobierz kategorie przy montowaniu komponentu
         const loadCategories = async () => {
             try {
                 const categoryTree = await fetchCategoriesTree();
@@ -32,6 +29,7 @@ const UserCreateProduct = () => {
                 setLoadingCategories(false);
             }
         };
+
         loadCategories();
     }, []);
 
@@ -41,7 +39,7 @@ const UserCreateProduct = () => {
     };
 
     const handleFileChange = (e) => {
-        setFormData({ ...formData, thumbnail: e.target.files[0] });
+        setFormData({ ...formData, images: e.target.files[0] });
     };
 
     const handleSubmit = async (e) => {
@@ -51,7 +49,7 @@ const UserCreateProduct = () => {
             Object.entries(formData).forEach(([key, value]) => {
                 formDataToSend.append(key, value);
             });
-            await createProductAPI(formDataToSend); // Wywołanie metody API
+            await createProductAPI(formDataToSend);
             navigate('/'); // Powrót do strony głównej
         } catch (error) {
             console.error('Error creating product:', error);
@@ -65,6 +63,10 @@ const UserCreateProduct = () => {
             </option>
         ));
     };
+
+    if (loadingCategories) {
+        return <p>Ładowanie danych...</p>;
+    }
 
     return (
         <div className="create-product-container">
@@ -104,20 +106,16 @@ const UserCreateProduct = () => {
                 </div>
                 <div>
                     <label className="block text-gray-700">Kategoria:</label>
-                    {loadingCategories ? (
-                        <p>Ładowanie kategorii...</p>
-                    ) : (
-                        <select
-                            name="categoryId"
-                            value={formData.categoryId}
-                            onChange={handleChange}
-                            required
-                            className="w-full border px-3 py-2"
-                        >
-                            <option value="">Wybierz kategorię</option>
-                            {renderCategoryOptions(categories)}
-                        </select>
-                    )}
+                    <select
+                        name="categoryId"
+                        value={formData.categoryId}
+                        onChange={handleChange}
+                        required
+                        className="w-full border px-3 py-2"
+                    >
+                        <option value="">Wybierz kategorię</option>
+                        {renderCategoryOptions(categories)}
+                    </select>
                 </div>
                 <div>
                     <label className="block text-gray-700">Stan produktu:</label>
@@ -135,7 +133,7 @@ const UserCreateProduct = () => {
                     <label className="block text-gray-700">Zdjęcie główne:</label>
                     <input
                         type="file"
-                        name="thumbnail"
+                        name="images"
                         onChange={handleFileChange}
                         required
                         className="w-full border px-3 py-2"
