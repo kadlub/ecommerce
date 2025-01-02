@@ -89,7 +89,10 @@ export const getAllProductsByCategoryName = async (categoryName) => {
         throw new Error("Brak nazwy kategorii.");
     }
 
-    const url = `${API_BASE_URL}/api/products/by-category/${categoryName}`;
+    // Kodowanie nazwy kategorii, aby uniknąć problemów z polskimi znakami
+    const encodedCategoryName = encodeURIComponent(categoryName);
+    const url = `${API_BASE_URL}/api/products/by-category/${encodeURIComponent(categoryName)}`;
+
     try {
         const result = await axios.get(url, { headers: getHeaders() });
         return result?.data || [];

@@ -44,4 +44,11 @@ public class CategoryController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
+
+    @GetMapping("/by-name/{name}/subcategories")
+    public List<CategoryOutputDto> getSubcategoriesByName(@PathVariable String name) {
+        return categoryService.findSubcategoriesByName(name);
+    }
+
+
 }

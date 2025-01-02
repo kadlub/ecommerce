@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
 
@@ -150,12 +151,13 @@ public class ProductController {
     // Pobieranie produktów po nazwie kategorii
     @GetMapping("/by-category/{categoryName}")
     public ResponseEntity<List<ProductOutputDto>> getProductsByCategoryName(@PathVariable String categoryName) {
-        logger.info("Fetching products by category name: {}", categoryName);
+        String decodedCategoryName = java.net.URLDecoder.decode(categoryName, StandardCharsets.UTF_8);
+        logger.info("Fetching products by category name: {}", decodedCategoryName);
 
-        List<ProductOutputDto> products = productService.findProductsByCategoryName(categoryName);
+        List<ProductOutputDto> products = productService.findProductsByCategoryName(decodedCategoryName);
 
         if (products.isEmpty()) {
-            logger.info("No products found for category name: {}", categoryName);
+            logger.info("No products found for category name: {}", decodedCategoryName);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(products);

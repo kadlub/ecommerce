@@ -90,6 +90,41 @@ public class CategoryService {
         return rootCategories;
     }
 
+    private List<CategoryOutputDto> findSubcategories(UUID parentCategoryId) {
+        // Pobierz bezpośrednie podkategorie
+        return categoriesRepository.findByParentCategory_CategoryId(parentCategoryId)
+                .stream()
+                .map(category -> {
+                    // Konwertuj bieżącą kategorię do DTO
+                    CategoryOutputDto dto = convertToOutputDto(category);
+
+                    // Rekurencyjnie pobierz i ustaw podkategorie
+                    dto.setSubcategories(findSubcategories(category.getCategoryId()));
+
+                    return dto;
+                })
+                .collect(Collectors.toList());
+    }
+
+    public List<CategoryOutputDto> findSubcategoriesByName(String parentCategoryName) {
+        // Znajdź kategorię nadrzędną według nazwy
+        Categories parentCategory = categoriesRepository.findByName(parentCategoryName)
+                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono kategorii o nazwie: " + parentCategoryName));
+
+        // Pobierz podkategorie rekurencyjnie
+        return categoriesRepository.findByParentCategory_CategoryId(parentCategory.getCategoryId())
+                .stream()
+                .map(category -> {
+                    CategoryOutputDto dto = convertToOutputDto(category);
+                    // Ustawienie zagnieżdżonych podkategorii
+                    dto.setSubcategories(findSubcategories(category.getCategoryId()));
+                    return dto;
+                })
+                .collect(Collectors.toList());
+    }
+
+
+
 
     private CategoryOutputDto convertToOutputDto(Categories category) {
         return CategoryOutputDto.builder()
