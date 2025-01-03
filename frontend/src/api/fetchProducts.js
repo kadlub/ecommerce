@@ -101,3 +101,20 @@ export const getAllProductsByCategoryName = async (categoryName) => {
         throw new Error('Nie udało się pobrać produktów.');
     }
 };
+
+// Filtrowanie produktów
+export const getFilteredProducts = async (filters) => {
+    const { categoryNames, priceMin, priceMax } = filters;
+
+    try {
+        const response = await axios.get(`${API_BASE_URL}/api/products/filter`, {
+            params: { categoryNames, priceMin, priceMax },
+            headers: getHeaders(),
+        });
+        return response.data || [];
+    } catch (err) {
+        console.error('Błąd podczas filtrowania produktów:', err);
+        throw err;
+    }
+};
+

@@ -1,16 +1,28 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 const Categories = ({ types, onCategoryClick }) => {
-  // Komponent rekurencyjny do renderowania kategorii i podkategorii
-  const renderCategories = (categories) => {
+  const [selectedCategories, setSelectedCategories] = useState([]);
+
+  const handleCheckboxChange = (categoryName) => {
+    const updatedCategories = selectedCategories.includes(categoryName)
+      ? selectedCategories.filter((name) => name !== categoryName) // Usuń kategorię
+      : [...selectedCategories, categoryName]; // Dodaj kategorię
+
+    setSelectedCategories(updatedCategories);
+    onCategoryClick(updatedCategories); // Przekaż zaktualizowaną listę do rodzica
+  };
+
+  // Funkcja rekurencyjnego renderowania kategorii i podkategorii
+  const renderCategories = (categories, level = 0) => {
     return categories.map((category) => (
-      <div key={category.categoryId} className="ml-2">
+      <div key={category.categoryId} className={`ml-${level * 4}`}> {/* Dodanie wcięcia */}
         <div className="flex items-center p-1">
           <input
             type="checkbox"
             id={category.categoryId}
             className="border rounded-xl w-4 h-4 accent-black text-black"
-            onChange={() => onCategoryClick(category.name)} // Obsługa kliknięcia
+            checked={selectedCategories.includes(category.name)}
+            onChange={() => handleCheckboxChange(category.name)}
           />
           <label
             htmlFor={category.categoryId}
@@ -19,9 +31,11 @@ const Categories = ({ types, onCategoryClick }) => {
             {category.name}
           </label>
         </div>
-        {/* Rekurencyjne wyświetlanie podkategorii */}
+        {/* Renderowanie podkategorii, jeśli istnieją */}
         {category.subcategories && category.subcategories.length > 0 && (
-          <div>{renderCategories(category.subcategories)}</div>
+          <div className="ml-4">
+            {renderCategories(category.subcategories, level + 1)}
+          </div>
         )}
       </div>
     ));

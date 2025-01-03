@@ -12,4 +12,6 @@ import java.util.UUID;
 public interface CategoriesRepository extends JpaRepository<Categories, UUID> {
     Optional<Categories> findByName(String name);
     List<Categories> findByParentCategory_CategoryId(UUID parentCategoryId);
+    List<Categories> findByNameIn(List<String> names);
+
 }

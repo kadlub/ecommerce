@@ -46,7 +46,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                         .requestMatchers("/auth/register", "/auth/login").permitAll() // Zezwól na te endpointy bez autoryzacji
                         .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll() // Zezwól na preflight OPTIONS
                         .requestMatchers("/users/profile").hasAnyRole("USER", "ADMIN") // Endpoint wymaga ról USER lub ADMIN
-                        .requestMatchers("/categories", "categories/tree").permitAll()
+                        .requestMatchers("/categories", "categories/**").permitAll()
                         .requestMatchers("/products/**","/products").permitAll()
                         .requestMatchers("/uploads/products/**","/uploads/products/0e732607-1ae9-45c5-978f-ba54e7619cde_c7fff558-ae21-4cea-9b74-d4c5f056afa0").permitAll()
                         .requestMatchers("/error").permitAll()
@@ -76,21 +76,6 @@ public class WebSecurityConfig implements WebMvcConfigurer {
         source.registerCorsConfiguration("/**", config);
         return source;
     }
-
-    /*@Bean
-    public UrlBasedCorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://127.0.0.1:3000")); // Dokładne domeny
-        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-        config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Cache-Control"));
-        config.setExposedHeaders(Arrays.asList("Authorization")); // Dodaj nagłówki zwracane w odpowiedziach
-        config.setAllowCredentials(true);
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
-        System.out.println("CORS configuration initialized!");
-        return source;
-    }*/
 
     @Bean
     public PasswordEncoder passwordEncoder() {

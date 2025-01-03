@@ -132,14 +132,14 @@ public class ProductController {
     // Pobieranie produktów z filtrami
     @GetMapping("/filter")
     public ResponseEntity<List<ProductOutputDto>> getFilteredProducts(
-            @RequestParam(required = false) UUID categoryId,
+            @RequestParam(required = false) List<String> categoryNames,
             @RequestParam(required = false) BigDecimal priceMin,
             @RequestParam(required = false) BigDecimal priceMax,
             @RequestParam(required = false) String condition) {
         logger.info("Fetching filtered products with categoryId: {}, priceMin: {}, priceMax: {}, condition: {}",
-                categoryId, priceMin, priceMax, condition);
+                categoryNames, priceMin, priceMax, condition);
 
-        List<ProductOutputDto> filteredProducts = productService.findFilteredProducts(categoryId, priceMin, priceMax, condition);
+        List<ProductOutputDto> filteredProducts = productService.findFilteredProductsByNames(categoryNames, priceMin, priceMax);
 
         if (filteredProducts.isEmpty()) {
             logger.info("No filtered products found for the given criteria");
@@ -175,4 +175,41 @@ public class ProductController {
                     return ResponseEntity.notFound().build();
                 });
     }
+
+    @GetMapping("/filter-by-id")
+    public ResponseEntity<List<ProductOutputDto>> getFilteredProductsById(
+            @RequestParam(required = false) UUID categoryId,
+            @RequestParam(required = false) BigDecimal priceMin,
+            @RequestParam(required = false) BigDecimal priceMax,
+            @RequestParam(required = false) String condition) {
+        logger.info("Fetching filtered products by ID with categoryId: {}, priceMin: {}, priceMax: {}, condition: {}",
+                categoryId, priceMin, priceMax, condition);
+
+        List<ProductOutputDto> filteredProducts = productService.findFilteredProducts(categoryId, priceMin, priceMax, condition);
+
+        if (filteredProducts.isEmpty()) {
+            logger.info("No filtered products found for the given criteria");
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(filteredProducts);
+    }
+
+    // Endpoint dla filtrowania po nazwach kategorii
+    @GetMapping("/filter-by-name")
+    public ResponseEntity<List<ProductOutputDto>> getFilteredProductsByName(
+            @RequestParam List<String> categoryNames,
+            @RequestParam(required = false) BigDecimal priceMin,
+            @RequestParam(required = false) BigDecimal priceMax) {
+        logger.info("Fetching filtered products by name with categoryNames: {}, priceMin: {}, priceMax: {}",
+                categoryNames, priceMin, priceMax);
+
+        List<ProductOutputDto> filteredProducts = productService.findFilteredProductsByNames(categoryNames, priceMin, priceMax);
+
+        if (filteredProducts.isEmpty()) {
+            logger.info("No filtered products found for the given criteria");
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(filteredProducts);
+    }
 }
+

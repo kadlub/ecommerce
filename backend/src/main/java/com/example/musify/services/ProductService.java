@@ -226,6 +226,34 @@ public class ProductService {
         return categoryIds;
     }
 
+    public List<ProductOutputDto> findFilteredProductsByNames(List<String> categoryNames, BigDecimal priceMin, BigDecimal priceMax) {
+        // Pobierz wszystkie kategorie na podstawie nazw
+        List<UUID> categoryIds = categoriesRepository.findByNameIn(categoryNames)
+                .stream()
+                .flatMap(category -> getAllSubcategoryIds(category.getCategoryId()).stream()) // Dodanie ID podkategorii
+                .distinct()
+                .collect(Collectors.toList());
+
+        Specification<Products> spec = Specification.where(null);
+
+        if (!categoryIds.isEmpty()) {
+            spec = spec.and((root, query, criteriaBuilder) -> root.get("category").get("categoryId").in(categoryIds));
+        }
+        if (priceMin != null) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.greaterThanOrEqualTo(root.get("price"), priceMin));
+        }
+        if (priceMax != null) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.lessThanOrEqualTo(root.get("price"), priceMax));
+        }
+
+        return productsRepository.findAll(spec)
+                .stream()
+                .map(this::convertToOutputDto)
+                .collect(Collectors.toList());
+    }
+
     private ProductOutputDto convertToOutputDto(Products product) {
         // Sprawdzenie, czy productImages nie jest null i operowanie na liście
         List<String> imageUrls = (product.getProductImages() != null)

@@ -20,16 +20,4 @@ public class MusifyApplication {
 		SpringApplication.run(MusifyApplication.class, args);
 	}
 
-	/*@Bean
-	public CorsFilter corsFilter() {
-		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-		CorsConfiguration config = new CorsConfiguration();
-		config.setAllowedOriginPatterns(Collections.singletonList("*")); // Insecure, but for demo purposes it's ok
-		config.setAllowedHeaders(Arrays.asList("Origin", "Content-Type", "Accept", "responseType", "Authorization", "x-authorization", "content-range", "range"));
-		config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "OPTIONS", "DELETE", "PATCH"));
-		config.setExposedHeaders(Arrays.asList("X-Total-Count", "content-range", "Content-Type", "Accept", "X-Requested-With", "remember-me"));
-		source.registerCorsConfiguration("/**", config);
-		return new CorsFilter(source);
-	}*/
-
 }
