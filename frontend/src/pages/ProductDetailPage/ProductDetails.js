@@ -18,6 +18,7 @@ const ProductDetails = () => {
   const [selectedImage, setSelectedImage] = useState(
     fullImageUrls?.length ? fullImageUrls[0] : '/placeholder.jpg'
   );
+  const [isModalOpen, setIsModalOpen] = useState(false); // Modal dla powiększenia obrazu
   const [breadCrumbLinks, setBreadCrumbLinks] = useState([]);
   const [similarProducts, setSimilarProducts] = useState([]);
 
@@ -63,8 +64,9 @@ const ProductDetails = () => {
           <div className="w-full flex justify-center md:pt-0 pt-10">
             <img
               src={selectedImage}
-              className="h-full w-full max-h-[520px] border rounded-lg cursor-pointer object-cover"
+              className="h-full w-full max-h-[520px] border rounded-lg cursor-pointer object-contain"
               alt={product?.name || 'Produkt'}
+              onClick={() => setIsModalOpen(true)} // Otwórz modal po kliknięciu na obraz
             />
           </div>
           <div className="flex gap-2 mt-4 overflow-x-auto">
@@ -85,6 +87,8 @@ const ProductDetails = () => {
           <p className="text-3xl pt-4">{product?.name || 'Nazwa produktu'}</p>
           <Rating rating={product?.rating || 0} />
           <p className="text-xl bold py-2">${product?.price || 'Cena niedostępna'}</p>
+          <p className="text-sm py-1 text-gray-600">Stan: {product?.condition || 'Nieznany'}</p>
+          <p className="text-sm py-1 text-gray-600">Sprzedawca: {product?.sellerName || 'Nieznany'}</p>
           <p className="py-4">{product?.description || 'Brak opisu produktu.'}</p>
           <button
             onClick={handleAddToCart}
@@ -94,6 +98,19 @@ const ProductDetails = () => {
           </button>
         </div>
       </div>
+      {/* Modal dla powiększonego obrazu */}
+      {isModalOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50"
+          onClick={() => setIsModalOpen(false)}
+        >
+          <img
+            src={selectedImage}
+            className="max-h-full max-w-full object-contain"
+            alt="Powiększony obraz"
+          />
+        </div>
+      )}
       {/* Opis produktu */}
       <SectionHeading title={'Opis produktu'} />
       <div className="md:w-[50%] w-full p-2">
