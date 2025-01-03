@@ -226,11 +226,11 @@ public class ProductService {
         return categoryIds;
     }
 
-    public List<ProductOutputDto> findFilteredProductsByNames(List<String> categoryNames, BigDecimal priceMin, BigDecimal priceMax) {
+    public List<ProductOutputDto> findFilteredProductsByNames(List<String> categoryNames, BigDecimal priceMin, BigDecimal priceMax, String condition) {
         // Pobierz wszystkie kategorie na podstawie nazw
         List<UUID> categoryIds = categoriesRepository.findByNameIn(categoryNames)
                 .stream()
-                .flatMap(category -> getAllSubcategoryIds(category.getCategoryId()).stream()) // Dodanie ID podkategorii
+                .flatMap(category -> getAllSubcategoryIds(category.getCategoryId()).stream())
                 .distinct()
                 .collect(Collectors.toList());
 
@@ -246,6 +246,10 @@ public class ProductService {
         if (priceMax != null) {
             spec = spec.and((root, query, criteriaBuilder) ->
                     criteriaBuilder.lessThanOrEqualTo(root.get("price"), priceMax));
+        }
+        if (condition != null && !condition.isBlank()) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.equal(root.get("condition"), condition));
         }
 
         return productsRepository.findAll(spec)

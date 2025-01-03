@@ -125,8 +125,8 @@ const UserCreateProduct = () => {
                         onChange={handleChange}
                         className="w-full border px-3 py-2"
                     >
-                        <option value="Nowa">Nowa</option>
-                        <option value="Używana">Używana</option>
+                        <option value="Nowa">Nowy</option>
+                        <option value="Używana">Używany</option>
                     </select>
                 </div>
                 <div>

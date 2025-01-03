@@ -132,14 +132,14 @@ public class ProductController {
     // Pobieranie produktów z filtrami
     @GetMapping("/filter")
     public ResponseEntity<List<ProductOutputDto>> getFilteredProducts(
-            @RequestParam(required = false) List<String> categoryNames,
+            @RequestParam List<String> categoryNames,
             @RequestParam(required = false) BigDecimal priceMin,
             @RequestParam(required = false) BigDecimal priceMax,
             @RequestParam(required = false) String condition) {
-        logger.info("Fetching filtered products with categoryId: {}, priceMin: {}, priceMax: {}, condition: {}",
+        logger.info("Fetching filtered products with categoryNames: {}, priceMin: {}, priceMax: {}, condition: {}",
                 categoryNames, priceMin, priceMax, condition);
 
-        List<ProductOutputDto> filteredProducts = productService.findFilteredProductsByNames(categoryNames, priceMin, priceMax);
+        List<ProductOutputDto> filteredProducts = productService.findFilteredProductsByNames(categoryNames, priceMin, priceMax, condition);
 
         if (filteredProducts.isEmpty()) {
             logger.info("No filtered products found for the given criteria");
@@ -195,21 +195,22 @@ public class ProductController {
     }
 
     // Endpoint dla filtrowania po nazwach kategorii
-    @GetMapping("/filter-by-name")
+    /*@GetMapping("/filter-by-name")
     public ResponseEntity<List<ProductOutputDto>> getFilteredProductsByName(
             @RequestParam List<String> categoryNames,
             @RequestParam(required = false) BigDecimal priceMin,
-            @RequestParam(required = false) BigDecimal priceMax) {
-        logger.info("Fetching filtered products by name with categoryNames: {}, priceMin: {}, priceMax: {}",
-                categoryNames, priceMin, priceMax);
+            @RequestParam(required = false) BigDecimal priceMax),
+            @RequestParam(required = false) String condition) {
+        logger.info("Fetching filtered products by name with categoryNames: {}, priceMin: {}, priceMax: {}, condition: {}",
+                categoryNames, priceMin, priceMax, condition);
 
-        List<ProductOutputDto> filteredProducts = productService.findFilteredProductsByNames(categoryNames, priceMin, priceMax);
+        List<ProductOutputDto> filteredProducts = productService.findFilteredProductsByNames(categoryNames, priceMin, priceMax, condition);
 
         if (filteredProducts.isEmpty()) {
             logger.info("No filtered products found for the given criteria");
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(filteredProducts);
-    }
+    }*/
 }
 

@@ -17,6 +17,7 @@ const ProductListPage = () => {
   const [subcategories, setSubcategories] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [priceRange, setPriceRange] = useState({ min: 10, max: 1000 });
+  const [selectedCondition, setSelectedCondition] = useState(null); // Dodajemy stan dla warunku
 
   // Dopasowanie kategorii na podstawie URL
   const category = useMemo(() => {
@@ -51,9 +52,10 @@ const ProductListPage = () => {
     axios
       .get(`${API_BASE_URL}/api/products/filter`, {
         params: {
-          categoryNames: categoriesToFilter.join(', '), // Łączymy kategorie w string
+          categoryNames: categoriesToFilter.join(', '),
           priceMin: priceRange.min,
           priceMax: priceRange.max,
+          condition: selectedCondition,
         },
       })
       .then((res) => {
@@ -72,9 +74,14 @@ const ProductListPage = () => {
     setPriceRange({ min, max });
   };
 
-  // Obsługa wyboru kategorii (zaznaczenie/dodanie/usunięcie)
+  // Obsługa wyboru kategorii
   const handleCategoryChange = (categories) => {
     setSelectedCategories(categories);
+  };
+
+  // Obsługa wyboru stanu
+  const handleConditionChange = (condition) => {
+    setSelectedCondition(condition);
   };
 
   // Wywołanie filtrów po kliknięciu przycisku "Zatwierdź"
@@ -100,6 +107,45 @@ const ProductListPage = () => {
           {/* Filtr cenowy */}
           <div>
             <PriceFilter onPriceChange={handlePriceChange} />
+          </div>
+          {/* Filtr stanu */}
+          <div className="mt-5">
+            <p className="text-[16px] text-black">Stan</p>
+            <div className="flex flex-col mt-2">
+              <label>
+                <input
+                  type="radio"
+                  name="condition"
+                  value="Nowy"
+                  checked={selectedCondition === 'Nowy'}
+                  onChange={() => handleConditionChange('Nowy')}
+                  className="mr-2"
+                />
+                Nowy
+              </label>
+              <label className="mt-2">
+                <input
+                  type="radio"
+                  name="condition"
+                  value="Używany"
+                  checked={selectedCondition === 'Używany'}
+                  onChange={() => handleConditionChange('Używany')}
+                  className="mr-2"
+                />
+                Używany
+              </label>
+              <label className="mt-2">
+                <input
+                  type="radio"
+                  name="condition"
+                  value=""
+                  checked={selectedCondition === null}
+                  onChange={() => handleConditionChange(null)}
+                  className="mr-2"
+                />
+                Wszystkie
+              </label>
+            </div>
           </div>
           {/* Przycisk Zatwierdź */}
           <div className="mt-4">
