@@ -45,6 +45,9 @@ public class Products {
     @Column(nullable = false)
     private LocalDateTime updateDate;
 
+    @Column(nullable = false)
+    private boolean isSold = false; // Domyślnie produkt nie jest sprzedany
+
     @Column(nullable = false, unique = true) // Dodanie pola slug
     private String slug;
 

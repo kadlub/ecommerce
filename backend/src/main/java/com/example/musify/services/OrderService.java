@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -48,22 +50,34 @@ public class OrderService {
 
     // Utwórz nowe zamówienie
     public OrderOutputDto createOrder(OrderInputDto orderInputDto) {
-        Users user = usersRepository.findById(orderInputDto.getUserId())
+        Users buyer = usersRepository.findById(orderInputDto.getUserId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         Orders order = new Orders();
-        order.setUser(user);
+        order.setUser(buyer);
         order.setStatus("Pending");
+        order.setPaymentMethod(orderInputDto.getPaymentMethod());
 
-        // Mapuj produkty na elementy zamówienia
+        LocalDateTime deliveryDate = LocalDateTime.parse(orderInputDto.getDeliveryDate(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        order.setDeliveryDate(deliveryDate);
+
+        order.setCity(orderInputDto.getDeliveryAddress().getCity());
+        order.setStreet(orderInputDto.getDeliveryAddress().getStreet());
+        order.setBuildingNumber(orderInputDto.getDeliveryAddress().getBuildingNumber());
+        order.setApartmentNumber(orderInputDto.getDeliveryAddress().getApartmentNumber());
+        order.setZipCode(orderInputDto.getDeliveryAddress().getZipCode());
+
         List<OrderItems> items = orderInputDto.getItems().stream().map(inputItem -> {
             Products product = productsRepository.findById(inputItem.getProductId())
                     .orElseThrow(() -> new RuntimeException("Product not found"));
 
-            // Sprawdź, czy produkt jest już w innym zamówieniu
-            if (ordersRepository.isProductInAnyOrder(product.getProductId())) {
-                throw new RuntimeException("Product is already part of another order");
+            if (product.isSold()) {
+                throw new RuntimeException("Product is already sold");
             }
+
+            // Oznacz produkt jako sprzedany
+            product.setSold(true);
+            productsRepository.save(product);
 
             return OrderItems.builder()
                     .product(product)
@@ -106,6 +120,20 @@ public class OrderService {
         return convertToOutputDto(updatedOrder);
     }
 
+    // Pobierz zamówienia kupującego
+    public List<OrderOutputDto> findOrdersByUser(UUID userId) {
+        return ordersRepository.findByUser_UserId(userId).stream()
+                .map(this::convertToOutputDto)
+                .collect(Collectors.toList());
+    }
+
+    // Pobierz zamówienia sprzedawcy
+    public List<OrderOutputDto> findOrdersBySeller(UUID sellerId) {
+        return ordersRepository.findByItems_Product_Seller_UserId(sellerId).stream()
+                .map(this::convertToOutputDto)
+                .collect(Collectors.toList());
+    }
+
     // Walidacja statusu zamówienia
     private boolean isValidStatus(String status) {
         return List.of("Pending", "Completed", "Cancelled")
@@ -113,19 +141,34 @@ public class OrderService {
                 .anyMatch(validStatus -> validStatus.equalsIgnoreCase(status));
     }
 
-
     // Konwersja encji na DTO
     private OrderOutputDto convertToOutputDto(Orders order) {
+        // Formatter for converting LocalDateTime to String
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
         return OrderOutputDto.builder()
                 .orderId(order.getOrderId())
                 .userId(order.getUser().getUserId())
+                .buyerName(order.getUser().getUsername())
                 .totalPrice(order.getTotalPrice())
                 .status(order.getStatus())
+                .deliveryDate(order.getDeliveryDate().format(formatter)) // Convert LocalDateTime to String
+                .paymentMethod(order.getPaymentMethod())
+                .deliveryAddress(OrderOutputDto.DeliveryAddressDto.builder()
+                        .city(order.getCity())
+                        .street(order.getStreet())
+                        .buildingNumber(order.getBuildingNumber())
+                        .apartmentNumber(order.getApartmentNumber())
+                        .zipCode(order.getZipCode())
+                        .build())
                 .items(order.getOrderItems().stream().map(item -> OrderOutputDto.OrderItemOutputDto.builder()
                         .productId(item.getProduct().getProductId())
                         .productName(item.getProduct().getName())
-                        .price(item.getProduct().getPrice())
+                        .price(item.getPrice())
+                        .sellerId(item.getProduct().getSeller().getUserId())
+                        .sellerName(item.getProduct().getSeller().getUsername())
                         .build()).collect(Collectors.toList()))
                 .build();
     }
+
 }

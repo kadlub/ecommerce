@@ -38,8 +38,21 @@ public class ProductController {
         this.usersRepository = usersRepository;
     }
 
-    // Pobieranie produktów z opcjonalnym filtrowaniem po kategorii
+    // Pobieranie wszystkich dostępnych produktów
     @GetMapping
+    public ResponseEntity<List<ProductOutputDto>> getAllAvailableProducts() {
+        logger.info("Fetching all available products");
+        List<ProductOutputDto> products = productService.findAllAvailableProducts();
+
+        if (products.isEmpty()) {
+            logger.info("No available products found");
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(products);
+    }
+
+    // Pobieranie produktów z opcjonalnym filtrowaniem po kategorii
+    @GetMapping("/all")
     public ResponseEntity<List<ProductOutputDto>> getProducts(
             @RequestParam(required = false) UUID categoryId) {
         logger.info("Fetching products with categoryId: {}", categoryId);
@@ -78,8 +91,8 @@ public class ProductController {
         String username = userDetails.getUsername();
 
         UUID sellerId = usersRepository.findByUsername(username)
-                        .orElseThrow(() -> new UsernameNotFoundException("User not found"))
-                        .getUserId();
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"))
+                .getUserId();
 
         productInputDto.setSellerId(sellerId);
 
@@ -193,8 +206,9 @@ public class ProductController {
         }
         return ResponseEntity.ok(filteredProducts);
     }
+}
 
-    // Endpoint dla filtrowania po nazwach kategorii
+// Endpoint dla filtrowania po nazwach kategorii
     /*@GetMapping("/filter-by-name")
     public ResponseEntity<List<ProductOutputDto>> getFilteredProductsByName(
             @RequestParam List<String> categoryNames,
@@ -212,5 +226,4 @@ public class ProductController {
         }
         return ResponseEntity.ok(filteredProducts);
     }*/
-}
 

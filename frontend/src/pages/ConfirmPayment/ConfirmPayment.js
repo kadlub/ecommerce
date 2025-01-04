@@ -1,57 +1,48 @@
-import { useStripe } from '@stripe/react-stripe-js';
-import React, { useEffect, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
-import { confirmPaymentAPI } from '../../api/order';
-import { useDispatch, useSelector } from 'react-redux';
-import { setLoading } from '../../store/features/common';
+import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import Spinner from '../../components/Spinner/Spinner';
 import { clearCart } from '../../store/actions/cartAction';
 
 const ConfirmPayment = () => {
-
     const location = useLocation();
-    const dispatch = useDispatch();
-    const [errorMessage,setErrorMessage] = useState('');
-    const isLoading = useSelector((state)=> state?.commonState?.loading);
     const navigate = useNavigate();
-   
+    const dispatch = useDispatch();
+    const [loading, setLoading] = useState(true);
+    const [status, setStatus] = useState('');
 
-    useEffect(()=>{
-
+    useEffect(() => {
+        // Symulacja potwierdzenia płatności
         const query = new URLSearchParams(location.search);
-        const clientSecret = query.get('payment_intent_client_secret');
-        const redirectStatus = query.get('redirect_status');
-        const paymentIntent = query.get('payment_intent');
-        if(redirectStatus === 'succeeded'){
-            dispatch(setLoading(true));
-            dispatch(clearCart());
-            confirmPaymentAPI({
-                paymentIntent: paymentIntent,
-                status:paymentIntent
-            }).then(res=>{
-                const orderId = res?.orderId;
-                navigate(`/orderConfirmed?orderId=${orderId}`)
-            }).catch(err=>{
-                setErrorMessage("Something went wrong!");
-            }).finally(()=>{
-                dispatch(setLoading(false));
-            })
-        }
+        const paymentStatus = query.get('status'); // 'success' lub 'failure'
 
-        else{
-            setErrorMessage('Payment Failed - '+redirectStatus)
-        }
+        setTimeout(() => {
+            if (paymentStatus === 'success') {
+                setStatus('success');
+                dispatch(clearCart());
+                navigate('/orderConfirmed?orderId=123456'); // Przykładowy ID zamówienia
+            } else {
+                setStatus('failure');
+                navigate('/checkout');
+            }
+            setLoading(false);
+        }, 3000); // Symulacja czasu autoryzacji
+    }, [location.search, navigate, dispatch]);
 
-        
-    },[dispatch, location.search, navigate]);
+    return (
+        <div className="p-8 text-center">
+            {loading ? (
+                <>
+                    <p className="text-xl font-bold">Processing your payment...</p>
+                    <Spinner />
+                </>
+            ) : status === 'success' ? (
+                <p className="text-green-500">Payment Successful! Redirecting...</p>
+            ) : (
+                <p className="text-red-500">Payment Failed! Redirecting...</p>
+            )}
+        </div>
+    );
+};
 
-  
-  return (
-    <>
-    <div>Processing Payment...</div>
-    {isLoading && <Spinner />}
-    </>
-  )
-}
-
-export default ConfirmPayment
+export default ConfirmPayment;

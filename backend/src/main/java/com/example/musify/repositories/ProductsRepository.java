@@ -4,6 +4,7 @@ import com.example.musify.entities.Categories;
 import com.example.musify.entities.Products;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -16,5 +17,8 @@ public interface ProductsRepository extends JpaRepository<Products, UUID>, JpaSp
     List<Products> findByCategoryIn(List<Categories> categories);
     List<Products> findByCategory_CategoryIdIn(List<UUID> categoryIds);
     Optional<Products> findBySlug(String slug);
+
+    @Query("SELECT p FROM Products p WHERE p.isSold = false")
+    List<Products> findAllAvailableProducts();
 
 }

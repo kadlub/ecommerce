@@ -101,6 +101,28 @@ public class ProductService {
                 .map(this::convertToOutputDto);
     }
 
+    public List<ProductOutputDto> findAllAvailableProducts() {
+        return productsRepository.findAllAvailableProducts()
+                .stream()
+                .map(this::convertToOutputDto)
+                .collect(Collectors.toList());
+    }
+
+    // Oznaczenie produktu jako sprzedanego
+    public boolean markAsSold(UUID productId) {
+        Optional<Products> productOpt = productsRepository.findById(productId);
+        if (productOpt.isPresent()) {
+            Products product = productOpt.get();
+            if (product.isSold()) {
+                return false; // Produkt już sprzedany
+            }
+            product.setSold(true);
+            productsRepository.save(product);
+            return true;
+        }
+        return false;
+    }
+
     public List<ProductOutputDto> findFilteredProducts(UUID categoryId, BigDecimal priceMin, BigDecimal priceMax, String condition) {
         Specification<Products> spec = Specification.where(null);
 
@@ -124,6 +146,7 @@ public class ProductService {
         return productsRepository.findAll(spec)
                 .stream()
                 .map(this::convertToOutputDto)
+                .filter(product -> !product.isSold())
                 .collect(Collectors.toList());
     }
 
@@ -139,6 +162,7 @@ public class ProductService {
         return productsRepository.findByCategory_CategoryIdIn(categoryIds)
                 .stream()
                 .map(this::convertToOutputDto)
+                .filter(product -> !product.isSold())
                 .collect(Collectors.toList());
     }
 
@@ -211,6 +235,7 @@ public class ProductService {
         return productsRepository.findByCategory_CategoryIdIn(categoryIds)
                 .stream()
                 .map(this::convertToOutputDto)
+                .filter(product -> !product.isSold())
                 .collect(Collectors.toList());
     }
 
@@ -252,11 +277,16 @@ public class ProductService {
                     criteriaBuilder.equal(root.get("condition"), condition));
         }
 
+        // Dodaj warunek wykluczający sprzedane produkty
+        spec = spec.and((root, query, criteriaBuilder) ->
+                criteriaBuilder.isFalse(root.get("isSold")));
+
         return productsRepository.findAll(spec)
                 .stream()
                 .map(this::convertToOutputDto)
                 .collect(Collectors.toList());
     }
+
 
     private ProductOutputDto convertToOutputDto(Products product) {
         // Sprawdzenie, czy productImages nie jest null i operowanie na liście
@@ -280,6 +310,7 @@ public class ProductService {
                 .sellerId(product.getSeller() != null ? product.getSeller().getUserId() : null) // Sprawdzenie null dla sprzedawcy
                 .sellerName(product.getSeller() != null ? product.getSeller().getUsername() : null) // Sprawdzenie null dla nazwy sprzedawcy
                 .slug(product.getSlug())
+                .isSold(product.isSold()) // Dodano pole `isSold`
                 .build();
     }
 }

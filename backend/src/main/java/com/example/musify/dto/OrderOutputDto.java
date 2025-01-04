@@ -12,10 +12,14 @@ import java.util.UUID;
 public class OrderOutputDto {
 
     private UUID orderId;
-    private UUID userId;
+    private UUID userId; // Kupujący
+    private String buyerName; // Opcjonalne: nazwa użytkownika kupującego
     private BigDecimal totalPrice;
     private String status;
-    private List<OrderItemOutputDto> items;
+    private String deliveryDate; // Data dostawy
+    private String paymentMethod; // Metoda płatności
+    private DeliveryAddressDto deliveryAddress; // Adres dostawy
+    private List<OrderItemOutputDto> items; // Szczegóły zamówienia
 
     @Data
     @Builder
@@ -23,5 +27,18 @@ public class OrderOutputDto {
         private UUID productId;
         private String productName;
         private BigDecimal price;
+        private Integer quantity; // Ilość zamówionych produktów
+        private String sellerName; // Opcjonalne: sprzedawca
+        private UUID sellerId; // Identyfikator sprzedawcy
+    }
+
+    @Data
+    @Builder
+    public static class DeliveryAddressDto {
+        private String city;
+        private String street;
+        private String buildingNumber;
+        private String apartmentNumber; // Opcjonalne
+        private String zipCode;
     }
 }

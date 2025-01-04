@@ -36,6 +36,28 @@ public class Orders {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(nullable = false)
+    private String paymentMethod;
+
+    @Column(nullable = false)
+    private LocalDateTime deliveryDate;
+
+    // Pola adresu dostawy
+    @Column(nullable = false)
+    private String city;
+
+    @Column(nullable = false)
+    private String street;
+
+    @Column(nullable = false)
+    private String buildingNumber;
+
+    @Column
+    private String apartmentNumber; // Opcjonalne
+
+    @Column(nullable = false)
+    private String zipCode;
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItems> orderItems;
 

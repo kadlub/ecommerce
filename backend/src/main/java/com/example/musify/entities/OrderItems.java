@@ -7,9 +7,7 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity
-@Table(name = "order_items", uniqueConstraints = {
-        @UniqueConstraint(columnNames = "product_id")
-})
+@Table(name = "order_items")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,6 +18,7 @@ public class OrderItems {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(nullable = false, unique = true)
     private UUID orderItemId;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -27,9 +26,9 @@ public class OrderItems {
     private Orders order;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false, unique = true)
+    @JoinColumn(name = "product_id", nullable = false)
     private Products product;
 
     @Column(nullable = false)
-    private BigDecimal price;
+    private BigDecimal price; // Cena jednostkowa produktu
 }

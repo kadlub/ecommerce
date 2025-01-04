@@ -19,6 +19,8 @@ import Orders from "./pages/Account/Orders";
 import Settings from "./pages/Account/Settings";
 import { AdminPanel } from "./pages/AdminPanel/AdminPanel";
 import UserCreateProduct from "./pages/UserCreateProduct";
+import Payment from "./pages/Checkout/Payment"; // Upewnij się, że ścieżka do pliku jest poprawna
+
 
 export const router = createBrowserRouter([
   {
@@ -27,20 +29,20 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <Shop />
+        element: <Shop />,
       },
       {
-        path: "/categories/:categoryType", // Dynamic routing for categories
+        path: "/categories/:categoryType",
         element: <ProductListPage />,
       },
       {
         path: "/products/:slug",
         loader: loadProductBySlug,
-        element: <ProductDetails />
+        element: <ProductDetails />,
       },
       {
         path: "/cart-items",
-        element: <Cart />
+        element: <Cart />,
       },
       {
         path: "/account-details/",
@@ -48,31 +50,35 @@ export const router = createBrowserRouter([
         children: [
           {
             path: "profile",
-            element: <ProtectedRoute><Profile /></ProtectedRoute>
+            element: <ProtectedRoute><Profile /></ProtectedRoute>,
           },
           {
             path: "orders",
-            element: <ProtectedRoute><Orders /></ProtectedRoute>
+            element: <ProtectedRoute><Orders /></ProtectedRoute>,
           },
           {
             path: "settings",
-            element: <ProtectedRoute><Settings /></ProtectedRoute>
-          }
-        ]
+            element: <ProtectedRoute><Settings /></ProtectedRoute>,
+          },
+        ],
       },
       {
         path: "/checkout",
-        element: <ProtectedRoute><Checkout /></ProtectedRoute>
+        element: <ProtectedRoute><Checkout /></ProtectedRoute>,
+      },
+      {
+        path: "/payment",
+        element: <ProtectedRoute><Payment /></ProtectedRoute>, // Dodanie strony płatności
       },
       {
         path: "/orderConfirmed",
-        element: <OrderConfirmed />
+        element: <OrderConfirmed />,
       },
       {
-        path: "/create-product", // Add the new route here
-        element: <ProtectedRoute><UserCreateProduct /></ProtectedRoute> // Protect the route for logged-in users
-      }
-    ]
+        path: "/create-product",
+        element: <ProtectedRoute><UserCreateProduct /></ProtectedRoute>,
+      },
+    ],
   },
   {
     path: "/v1/",
@@ -80,25 +86,24 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "login",
-        element: <Login />
+        element: <Login />,
       },
       {
         path: "register",
-        element: <Register />
-      }
-    ]
+        element: <Register />,
+      },
+    ],
   },
   {
     path: "/oauth2/callback",
-    element: <OAuth2LoginCallback />
+    element: <OAuth2LoginCallback />,
   },
   {
     path: "/confirmPayment",
-    element: <ConfirmPayment />
+    element: <ConfirmPayment />,
   },
   {
     path: "/admin/*",
-    element: <ProtectedRoute><AdminPanel /></ProtectedRoute>
-  }
+    element: <ProtectedRoute><AdminPanel /></ProtectedRoute>,
+  },
 ]);
-

@@ -48,6 +48,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                         .requestMatchers("/users/profile").hasAnyRole("USER", "ADMIN") // Endpoint wymaga ról USER lub ADMIN
                         .requestMatchers("/categories", "categories/**").permitAll()
                         .requestMatchers("/products/**","/products").permitAll()
+                        .requestMatchers("/orders/**","/orders").permitAll()
                         .requestMatchers("/uploads/products/**","/uploads/products/0e732607-1ae9-45c5-978f-ba54e7619cde_c7fff558-ae21-4cea-9b74-d4c5f056afa0").permitAll()
                         .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated() // Wszystkie inne żądania wymagają autoryzacji

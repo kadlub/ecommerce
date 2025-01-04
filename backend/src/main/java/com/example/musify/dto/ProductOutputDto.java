@@ -25,4 +25,5 @@ public class ProductOutputDto {
     private UUID sellerId;
     private String sellerName;
     private String slug;
+    private boolean isSold; // Dodane pole
 }
