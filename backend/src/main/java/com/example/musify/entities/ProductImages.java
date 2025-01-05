@@ -2,6 +2,7 @@ package com.example.musify.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import net.minidev.json.annotate.JsonIgnore;
 
 import java.util.UUID;
 
@@ -22,6 +23,7 @@ public class ProductImages {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
+    @ToString.Exclude
     private Products product;
 
     @Column(nullable = false)

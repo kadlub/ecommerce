@@ -17,6 +17,7 @@ export const getAllProducts = async (categoryId, subcategoryId) => {
 
     try {
         const result = await axios.get(url, { headers: getHeaders() });
+        console.log('Odpowiedź API:', result.data);
         return result?.data || [];
     } catch (err) {
         console.error('Błąd podczas pobierania produktów:', err.message, 'Szczegóły:', err);
@@ -34,6 +35,7 @@ export const getProductBySlug = async (slug) => {
     const url = `${API_BASE_URL}/api/products/slug/${slug}`;
     try {
         const result = await axios.get(url, { headers: getHeaders() });
+        console.log('Odpowiedź API:', result.data);
         return result?.data || null;
     } catch (err) {
         console.error('Błąd podczas pobierania szczegółów produktu:', err.message, 'Szczegóły:', err);

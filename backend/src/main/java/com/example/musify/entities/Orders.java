@@ -1,5 +1,6 @@
 package com.example.musify.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,15 +17,15 @@ import java.util.UUID;
 @Builder
 @Getter
 @Setter
+@ToString(exclude = {"user", "orderItems"})
 public class Orders {
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(nullable = false, unique = true)
     private UUID orderId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore
     private Users user;
 
     @Column(nullable = false)
@@ -42,7 +43,6 @@ public class Orders {
     @Column(nullable = false)
     private LocalDateTime deliveryDate;
 
-    // Pola adresu dostawy
     @Column(nullable = false)
     private String city;
 
@@ -53,12 +53,13 @@ public class Orders {
     private String buildingNumber;
 
     @Column
-    private String apartmentNumber; // Opcjonalne
+    private String apartmentNumber;
 
     @Column(nullable = false)
     private String zipCode;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<OrderItems> orderItems;
 
     @PrePersist

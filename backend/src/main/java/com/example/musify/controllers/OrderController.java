@@ -7,6 +7,8 @@ import com.example.musify.services.OrderService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,23 +27,55 @@ public class OrderController {
 
     @GetMapping
     public List<OrderOutputDto> getAllOrders() {
-        return orderService.findAllOrders();
+        // Pobierz username z kontekstu bezpieczeństwa
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        // Pobierz zamówienia tylko dla zalogowanego użytkownika
+        return orderService.findOrdersByUsername(username);
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<OrderOutputDto> getOrderById(@PathVariable UUID id) {
+        // Pobierz username z kontekstu bezpieczeństwa
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        // Pobierz zamówienie i sprawdź, czy należy do zalogowanego użytkownika
         return orderService.findOrderById(id)
+                .filter(order -> order.getBuyerName().equals(username)) // Sprawdzenie właściciela zamówienia
                 .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .orElse(ResponseEntity.status(403).build()); // Zwróć 403, jeśli użytkownik nie jest właścicielem
     }
 
     @PostMapping
     public OrderOutputDto createOrder(@RequestBody @Valid OrderInputDto orderInputDto) {
+        // Pobierz username z kontekstu bezpieczeństwa
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        // Przypisz username do OrderInputDto
+        orderInputDto.setUsername(username);
+
         return orderService.createOrder(orderInputDto);
     }
 
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteOrder(@PathVariable UUID id) {
+        // Pobierz username z kontekstu bezpieczeństwa
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        // Sprawdź, czy zamówienie należy do zalogowanego użytkownika
+        OrderOutputDto order = orderService.findOrderById(id)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        if (!order.getBuyerName().equals(username)) {
+            return ResponseEntity.status(403).build(); // Zwróć 403, jeśli użytkownik nie jest właścicielem
+        }
+
         orderService.deleteOrder(id);
         return ResponseEntity.noContent().build();
     }
@@ -51,6 +85,18 @@ public class OrderController {
     public ResponseEntity<OrderOutputDto> updateOrderStatus(
             @PathVariable UUID id,
             @RequestParam String status) {
+        // Pobierz username z kontekstu bezpieczeństwa
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+
+        // Sprawdź, czy zamówienie należy do zalogowanego użytkownika
+        OrderOutputDto order = orderService.findOrderById(id)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        if (!order.getBuyerName().equals(username)) {
+            return ResponseEntity.status(403).build(); // Zwróć 403, jeśli użytkownik nie jest właścicielem
+        }
+
         return ResponseEntity.ok(orderService.updateOrderStatus(id, status));
     }
 }

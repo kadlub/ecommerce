@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectCartItems } from '../../store/features/cart';
-import { setLoading } from '../../store/features/common';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
+import { getUsernameFromToken } from '../../utils/jwt-helper';
+import { addOrderAPI } from '../../api/addOrderAPI';
+import { clearCart } from '../../store/actions/cartAction';
 
 const Checkout = () => {
   const cartItems = useSelector(selectCartItems);
@@ -21,46 +23,80 @@ const Checkout = () => {
   const [selectedDate, setSelectedDate] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('');
   const [currentWeekStart, setCurrentWeekStart] = useState(dayjs());
+  const [username, setUsername] = useState(null);
 
-  const subTotal = cartItems.reduce((sum, item) => sum + item.subTotal, 0).toFixed(2);
+  const subTotal = parseFloat(cartItems.reduce((sum, item) => sum + item.subTotal, 0).toFixed(2));
 
-  // Generowanie dostępnych terminów
   useEffect(() => {
-    const generateDates = (start) => {
+    const usernameFromToken = getUsernameFromToken();
+    if (usernameFromToken) {
+      setUsername(usernameFromToken);
+    } else {
+      alert('Nie jesteś zalogowany. Zaloguj się, aby kontynuować.');
+      navigate('/login');
+    }
+  }, [navigate]);
+
+  useEffect(() => {
+    const generateDates = () => {
       const dates = [];
       for (let i = 0; i < 7; i++) {
-        dates.push(start.add(i, 'day').format('YYYY-MM-DD'));
+        dates.push(currentWeekStart.add(i, 'day').format('YYYY-MM-DD'));
       }
-      return dates;
+      setAvailableDates(dates);
     };
-    setAvailableDates(generateDates(currentWeekStart));
+
+    generateDates();
   }, [currentWeekStart]);
 
   const handleAddressChange = (field, value) => {
     setAddress((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handlePayNow = () => {
+  const handlePayNow = async () => {
+    // Sprawdź, czy koszyk nie jest pusty
+    if (cartItems.length === 0) {
+      alert('Koszyk jest pusty. Dodaj produkty przed złożeniem zamówienia.');
+      return;
+    }
+
+    if (!username) {
+      alert('Nie możesz złożyć zamówienia. Brak danych użytkownika.');
+      return;
+    }
+
     if (!address.city || !address.street || !address.buildingNumber || !selectedDate || !paymentMethod) {
       alert('Proszę uzupełnić wszystkie wymagane dane.');
       return;
     }
 
-    navigate('/payment', {
-      state: {
-        paymentMethod,
-        subTotal,
-        address,
-        selectedDate,
-      },
-    });
+    const orderPayload = {
+      username,
+      deliveryAddress: address,
+      deliveryDate: `${selectedDate}T00:00:00`,
+      paymentMethod,
+      items: cartItems.map((item) => ({
+        productId: item.productId,
+      })),
+      totalAmount: subTotal,
+    };
+
+    console.log('Payload wysyłany do API:', orderPayload);
+
+    try {
+      await addOrderAPI(orderPayload);
+      dispatch(clearCart());
+      navigate('/orderConfirmed');
+    } catch (error) {
+      console.error('Błąd podczas składania zamówienia:', error);
+      alert('Wystąpił problem podczas składania zamówienia. Spróbuj ponownie później.');
+    }
   };
+
 
   return (
     <div className="p-8 flex gap-8">
-      {/* Sekcja informacji o zamówieniu */}
       <div className="w-[70%]">
-        {/* Adres dostawy */}
         <div className="mb-6">
           <h2 className="text-xl font-semibold mb-4">Adres dostawy</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -102,7 +138,6 @@ const Checkout = () => {
           </div>
         </div>
 
-        {/* Wybór terminu dostawy */}
         <div className="mb-6">
           <h2 className="text-xl font-semibold mb-4">Wybierz termin dostawy</h2>
           <div className="flex gap-4 items-center overflow-x-auto">
@@ -135,7 +170,6 @@ const Checkout = () => {
           </div>
         </div>
 
-        {/* Metoda płatności */}
         <div className="mb-6">
           <h2 className="text-xl font-semibold mb-4">Metoda płatności</h2>
           <div className="flex flex-col gap-4">
@@ -162,7 +196,6 @@ const Checkout = () => {
           </div>
         </div>
 
-        {/* Przycisk potwierdzenia */}
         <button
           className="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600"
           onClick={handlePayNow}
@@ -171,7 +204,6 @@ const Checkout = () => {
         </button>
       </div>
 
-      {/* Podsumowanie zamówienia */}
       <div className="w-[30%] h-auto border rounded-lg border-gray-500 p-4 bg-white shadow-lg">
         <h2 className="text-xl font-semibold mb-4">Podsumowanie zamówienia</h2>
         <p>Liczba przedmiotów: {cartItems?.length}</p>

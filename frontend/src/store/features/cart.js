@@ -9,40 +9,42 @@ const cartSlice = createSlice({
     initialState: initialState,
     reducers: {
         addToCart: (state, action) => {
+            if (!action.payload.productId) {
+                console.error("Brak productId w dodawanym produkcie:", action.payload);
+                return;
+            }
+
             const existingProductIndex = state.cart.findIndex(
-                (item) => item.productId === action.payload.productId && item.variant?.id === action.payload.variant?.id
+                (item) => item.productId === action.payload.productId
             );
 
             if (existingProductIndex !== -1) {
-                // Jeśli produkt istnieje, zwiększ ilość
-                state.cart[existingProductIndex].quantity += action.payload.quantity;
-                state.cart[existingProductIndex].subTotal =
-                    state.cart[existingProductIndex].quantity * state.cart[existingProductIndex].price;
+                console.warn("Produkt już znajduje się w koszyku.");
             } else {
-                // Jeśli produkt nie istnieje, dodaj do koszyka
-                state.cart.push(action.payload);
+                state.cart.push({
+                    ...action.payload,
+                    quantity: 1,
+                    subTotal: action.payload.price,
+                });
             }
-
-            return state;
         },
         removeFromCart: (state, action) => {
             return {
                 ...state,
-                cart: state?.cart?.filter(
-                    (item) =>
-                        item.productId !== action?.payload?.productId || item?.variant?.id !== action?.payload?.variantId
+                cart: state.cart.filter(
+                    (item) => item.productId !== action.payload.productId
                 ),
             };
         },
         updateQuantity: (state, action) => {
             return {
                 ...state,
-                cart: state?.cart?.map((item) => {
-                    if (item?.variant?.id === action?.payload?.variant_id) {
+                cart: state.cart.map((item) => {
+                    if (item.productId === action.payload.productId) {
                         return {
                             ...item,
-                            quantity: action?.payload?.quantity,
-                            subTotal: action?.payload?.quantity * item.price,
+                            quantity: action.payload.quantity,
+                            subTotal: action.payload.quantity * item.price, // Choć ilość zawsze będzie 1
                         };
                     }
                     return item;
@@ -58,8 +60,8 @@ const cartSlice = createSlice({
     },
 });
 
-export const { addToCart, removeFromCart, updateQuantity, deleteCart } = cartSlice?.actions;
+export const { addToCart, removeFromCart, updateQuantity, deleteCart } = cartSlice.actions;
 
-export const countCartItems = (state) => state?.cartState?.cart?.length;
-export const selectCartItems = (state) => state?.cartState?.cart ?? [];
+export const countCartItems = (state) => state.cartState.cart.length;
+export const selectCartItems = (state) => state.cartState.cart ?? [];
 export default cartSlice.reducer;

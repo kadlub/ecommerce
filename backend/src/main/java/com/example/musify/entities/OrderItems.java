@@ -1,5 +1,6 @@
 package com.example.musify.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -14,21 +15,22 @@ import java.util.UUID;
 @Builder
 @Getter
 @Setter
+@ToString(exclude = {"order", "product"})
 public class OrderItems {
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(nullable = false, unique = true)
     private UUID orderItemId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
+    @JsonIgnore
     private Orders order;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
+    @JsonIgnore
     private Products product;
 
     @Column(nullable = false)
-    private BigDecimal price; // Cena jednostkowa produktu
+    private BigDecimal price;
 }

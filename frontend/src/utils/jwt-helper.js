@@ -29,6 +29,31 @@ export const logOut = () => {
     localStorage.removeItem('authToken');
 };
 
+export const getUserIdFromToken = () => {
+    const token = getToken();
+    if (!token) return null;
+
+    try {
+        const decoded = jwtDecode(token);
+        return decoded?.userId || null; // Zakładamy, że `userId` jest w tokenie
+    } catch (error) {
+        console.error("Nie udało się zdekodować tokena", error);
+        return null;
+    }
+};
+export const getUsernameFromToken = () => {
+    const token = localStorage.getItem('authToken');
+    if (!token) return null;
+
+    try {
+        const decoded = jwtDecode(token);
+        // username znajduje się w polu `sub` tokena
+        return decoded.sub || null;
+    } catch (error) {
+        console.error("Błąd dekodowania tokena:", error);
+        return null;
+    }
+};
 
 export const getToken = () => {
     return localStorage.getItem('authToken');

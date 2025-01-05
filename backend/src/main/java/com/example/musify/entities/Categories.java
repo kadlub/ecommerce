@@ -1,5 +1,8 @@
 package com.example.musify.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -14,8 +17,8 @@ import java.util.UUID;
 @Builder
 @Getter
 @Setter
+@ToString(exclude = {"parentCategory", "subcategories", "products"})
 public class Categories {
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID categoryId;
@@ -26,15 +29,16 @@ public class Categories {
     @Column
     private String description;
 
-    // Relacja do nadrzędnej kategorii
     @ManyToOne
     @JoinColumn(name = "parent_category_id")
+    @JsonIgnore
     private Categories parentCategory;
 
-    // Relacja do podrzędnych kategorii
     @OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Categories> subcategories;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Products> products;
 }

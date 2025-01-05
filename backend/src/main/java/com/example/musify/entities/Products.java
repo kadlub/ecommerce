@@ -1,5 +1,7 @@
 package com.example.musify.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,11 +19,10 @@ import java.util.UUID;
 @Builder
 @Getter
 @Setter
+@ToString(exclude = {"productImages", "category", "seller"})
 public class Products {
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(nullable = false, unique = true)
     private UUID productId;
 
     @Column(nullable = false)
@@ -34,7 +35,8 @@ public class Products {
     private String description;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProductImages> productImages = new ArrayList<>();
+    @JsonIgnore
+    private List<ProductImages> productImages;
 
     @Column(nullable = false)
     private String condition;
@@ -46,32 +48,29 @@ public class Products {
     private LocalDateTime updateDate;
 
     @Column(nullable = false)
-    private boolean isSold = false; // Domyślnie produkt nie jest sprzedany
+    private boolean isSold = false;
 
-    @Column(nullable = false, unique = true) // Dodanie pola slug
+    @Column(nullable = false, unique = true)
     private String slug;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
+    @JsonIgnore
     private Categories category;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seller_id", nullable = false)
+    @JsonIgnore
     private Users seller;
 
     @PrePersist
-    public void onPrePersist(){
-        this.setCreationDate(LocalDateTime.now());
-        this.setUpdateDate(LocalDateTime.now());
-        if (this.slug == null || this.slug.isEmpty()) {
-            this.slug = this.name.toLowerCase().replaceAll("\\s+", "-");
-        }
+    public void onPrePersist() {
+        this.creationDate = LocalDateTime.now();
+        this.updateDate = LocalDateTime.now();
     }
 
     @PreUpdate
-    public void onPreUpdate(){
-        this.setUpdateDate(LocalDateTime.now());
+    public void onPreUpdate() {
+        this.updateDate = LocalDateTime.now();
     }
-
-
 }

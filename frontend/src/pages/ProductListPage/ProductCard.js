@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { addItemToCartAction } from '../../store/actions/cartAction';
 
-const ProductCard = ({ id, title, description, price, discount, rating, brand, imageUrls, slug }) => {
+const ProductCard = ({ productId, title, description, price, discount, rating, brand, imageUrls, slug }) => {
   const dispatch = useDispatch();
   const imageBaseUrl = "http://localhost:8080/api/uploads/products/";
 
@@ -14,7 +14,7 @@ const ProductCard = ({ id, title, description, price, discount, rating, brand, i
   const handleAddToCart = () => {
     const discountedPrice = discount ? price - price * (discount / 100) : price;
     const product = {
-      productId: id,
+      productId,
       name: title,
       price: discountedPrice,
       thumbnail,

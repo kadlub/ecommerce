@@ -48,9 +48,24 @@ public class OrderService {
                 .map(this::convertToOutputDto);
     }
 
+    public List<OrderOutputDto> findOrdersByUsername(String username) {
+        Users user = usersRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return ordersRepository.findByUser_UserId(user.getUserId()).stream()
+                .map(this::convertToOutputDto)
+                .collect(Collectors.toList());
+    }
+
     // Utwórz nowe zamówienie
     public OrderOutputDto createOrder(OrderInputDto orderInputDto) {
-        Users buyer = usersRepository.findById(orderInputDto.getUserId())
+        // Znajdź użytkownika na podstawie username
+
+        System.out.println(usersRepository.findByUsername(orderInputDto.getUsername()));
+
+        System.out.println("Order payload: " + orderInputDto);
+
+        Users buyer = usersRepository.findByUsername(orderInputDto.getUsername())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         Orders order = new Orders();
@@ -77,7 +92,9 @@ public class OrderService {
 
             // Oznacz produkt jako sprzedany
             product.setSold(true);
+            System.out.println("Marking product as sold: " + product.getProductId());
             productsRepository.save(product);
+            System.out.println("Product marked as sold");
 
             return OrderItems.builder()
                     .product(product)
@@ -121,8 +138,11 @@ public class OrderService {
     }
 
     // Pobierz zamówienia kupującego
-    public List<OrderOutputDto> findOrdersByUser(UUID userId) {
-        return ordersRepository.findByUser_UserId(userId).stream()
+    public List<OrderOutputDto> findOrdersByUser(String username) {
+        Users user = usersRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return ordersRepository.findByUser_UserId(user.getUserId()).stream()
                 .map(this::convertToOutputDto)
                 .collect(Collectors.toList());
     }

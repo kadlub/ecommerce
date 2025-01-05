@@ -11,8 +11,8 @@ import java.util.UUID;
 @Data
 public class OrderInputDto {
 
-    @NotNull(message = "User ID is required")
-    private UUID userId;
+    @NotNull(message = "Username is required")
+    private String username;
 
     @NotNull(message = "Delivery address is required")
     private DeliveryAddressDto deliveryAddress;
@@ -40,7 +40,6 @@ public class OrderInputDto {
         @NotNull(message = "Product price is required")
         private BigDecimal price;
 
-        @NotNull(message = "Product quantity is required")
         private Integer quantity;
     }
 

@@ -1,5 +1,6 @@
 package com.example.musify.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.mapping.Set;
@@ -16,11 +17,10 @@ import java.util.UUID;
 @Builder
 @Getter
 @Setter
-@ToString(exclude = "authorities")
+@ToString(exclude = {"authorities", "products", "orders", "receivedReviews", "writtenReviews"})
 public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(nullable = false, unique = true)
     private UUID userId;
 
     @Column(nullable = true, unique = true)
@@ -32,7 +32,7 @@ public class Users {
     @Column(nullable = false)
     private String passwordHash;
 
-    @Column(nullable = true)
+    @Column
     private LocalDateTime createdAt;
 
     @Column(nullable = false)
@@ -46,18 +46,23 @@ public class Users {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "authority_id")
     )
-    private List<Authority> authorities; // Lista ról przypisanych użytkownikowi
+    @JsonIgnore
+    private List<Authority> authorities;
 
     @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Products> products;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Orders> orders;
 
     @OneToMany(mappedBy = "reviewedUser", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Reviews> receivedReviews;
 
     @OneToMany(mappedBy = "reviewer", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Reviews> writtenReviews;
 
     @PrePersist

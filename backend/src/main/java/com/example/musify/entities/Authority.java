@@ -1,5 +1,6 @@
 package com.example.musify.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,14 +18,14 @@ import java.util.UUID;
 @Setter
 @ToString(exclude = "users")
 public class Authority {
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
     @Column(nullable = false, unique = true)
-    private String name; // Przykładowo: "ROLE_USER", "ROLE_ADMIN"
+    private String name;
 
     @ManyToMany(mappedBy = "authorities")
-    private List<Users> users; // Lista użytkowników z tą rolą
+    @JsonIgnore
+    private List<Users> users;
 }

@@ -59,6 +59,7 @@ const ProductListPage = () => {
         },
       })
       .then((res) => {
+        console.log('Produkty pobrane z API:', res.data);
         setFilteredProducts(res.data || []);
       })
       .catch((err) => {
