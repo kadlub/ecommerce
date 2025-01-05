@@ -287,6 +287,15 @@ public class ProductService {
                 .collect(Collectors.toList());
     }
 
+    public List<ProductOutputDto> getUserProducts(String username) {
+        Users user = usersRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return productsRepository.findBySeller_UserId(user.getUserId())
+                .stream()
+                .map(this::convertToOutputDto)
+                .collect(Collectors.toList());
+    }
 
     private ProductOutputDto convertToOutputDto(Products product) {
         // Sprawdzenie, czy productImages nie jest null i operowanie na liście

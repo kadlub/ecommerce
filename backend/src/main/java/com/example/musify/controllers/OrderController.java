@@ -61,6 +61,12 @@ public class OrderController {
         return orderService.createOrder(orderInputDto);
     }
 
+    @GetMapping("/user")
+    public List<OrderOutputDto> getOrdersForUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        return orderService.findOrdersByUsername(username);
+    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteOrder(@PathVariable UUID id) {

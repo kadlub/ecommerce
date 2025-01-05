@@ -81,6 +81,21 @@ public class ProductController {
                 });
     }
 
+    @GetMapping("/user")
+    public ResponseEntity<List<ProductOutputDto>> getUserProducts(@AuthenticationPrincipal UserDetails userDetails) {
+        String username = userDetails.getUsername();
+        logger.info("Fetching products for user: {}", username);
+
+        List<ProductOutputDto> userProducts = productService.getUserProducts(username);
+
+        if (userProducts.isEmpty()) {
+            logger.info("No products found for user: {}", username);
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(userProducts);
+    }
+
     // Tworzenie produktu - uwzględnia zalogowanego użytkownika jako sprzedawcę
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ProductOutputDto> createProduct(

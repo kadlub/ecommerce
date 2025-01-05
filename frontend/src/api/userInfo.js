@@ -52,11 +52,10 @@ export const fetchOrderAPI = async () => {
             headers: getHeaders()
         });
         return response?.data;
-    }
-    catch (err) {
+    } catch (err) {
         throw new Error(err);
     }
-}
+};
 
 export const cancelOrderAPI = async (id) => {
     const url = API_BASE_URL + `/api/orders/cancel/${id}`;
