@@ -6,6 +6,10 @@ import dayjs from 'dayjs';
 import { getUsernameFromToken } from '../../utils/jwt-helper';
 import { addOrderAPI } from '../../api/addOrderAPI';
 import { clearCart } from '../../store/actions/cartAction';
+import PaymentBlik from './PaymentBlik';
+import PaymentPrzelewy24 from './PaymentPrzelewy24';
+import PaymentCard from './PaymentCard';
+import PaymentComponent from './PaymentComponent';
 
 const Checkout = () => {
   const cartItems = useSelector(selectCartItems);
@@ -193,8 +197,19 @@ const Checkout = () => {
               />
               Blik
             </label>
+            <label className="flex items-center gap-2">
+              <input
+                type="radio"
+                name="payment_method"
+                value="Card"
+                onChange={() => setPaymentMethod('Card')}
+                className="accent-blue-500"
+              />
+              Płatność kartą
+            </label>
           </div>
         </div>
+        <PaymentComponent method={paymentMethod} amount={subTotal} />
 
         <button
           className="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600"

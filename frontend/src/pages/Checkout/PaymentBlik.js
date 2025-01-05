@@ -29,10 +29,11 @@ const PaymentBlik = ({ amount }) => {
             />
             <button
                 onClick={handleSimulatePayment}
-                className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+                className="bg-[#023047] text-white py-2 px-4 rounded hover:bg-[#03586e]"
             >
                 Zapłać przez BLIK
             </button>
+
         </div>
     );
 };

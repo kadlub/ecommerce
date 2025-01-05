@@ -15,7 +15,7 @@ const PaymentPrzelewy24 = ({ amount }) => {
             <p>Kwota do zapłaty: ${amount}</p>
             <button
                 onClick={handleSimulatePayment}
-                className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+                className="bg-[#023047] text-white py-2 px-4 rounded hover:bg-[#03586e]"
             >
                 Zapłać przez Przelewy24
             </button>
