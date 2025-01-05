@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { clearCart } from '../../store/actions/cartAction';
+import { addOrderAPI } from '../../api/addOrderAPI';
 
-const PaymentCard = ({ amount }) => {
+const PaymentCard = ({ amount, orderPayload }) => {
     const [cardNumber, setCardNumber] = useState('');
     const [expiryDate, setExpiryDate] = useState('');
     const [cvv, setCvv] = useState('');
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
-    const handleSimulatePayment = () => {
+    const handleSimulatePayment = async () => {
         if (!/^\d{16}$/.test(cardNumber)) {
             alert('Wprowadź poprawny numer karty (16 cyfr).');
             return;
@@ -22,7 +26,19 @@ const PaymentCard = ({ amount }) => {
         }
 
         const isSuccess = Math.random() > 0.2; // 80% szans na sukces
-        navigate('/confirmPayment', { state: { status: isSuccess ? 'success' : 'failure' } });
+
+        if (isSuccess) {
+            try {
+                await addOrderAPI(orderPayload); // Wyślij zamówienie
+                dispatch(clearCart()); // Wyczyść koszyk
+                navigate('/success'); // Przejdź do strony sukcesu
+            } catch (error) {
+                console.error('Błąd podczas tworzenia zamówienia:', error);
+                alert('Nie udało się utworzyć zamówienia. Spróbuj ponownie.');
+            }
+        } else {
+            alert('Płatność kartą nie powiodła się.');
+        }
     };
 
     return (
@@ -58,7 +74,6 @@ const PaymentCard = ({ amount }) => {
             >
                 Zapłać kartą
             </button>
-
         </div>
     );
 };

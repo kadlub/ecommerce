@@ -1,18 +1,33 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { clearCart } from '../../store/actions/cartAction';
+import { addOrderAPI } from '../../api/addOrderAPI';
 
-const PaymentBlik = ({ amount }) => {
+const PaymentBlik = ({ amount, orderPayload }) => {
     const [blikCode, setBlikCode] = useState('');
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
-    const handleSimulatePayment = () => {
+    const handleSimulatePayment = async () => {
         if (blikCode.length !== 6 || isNaN(Number(blikCode))) {
             alert('Wprowadź poprawny kod BLIK (6 cyfr).');
             return;
         }
 
         const isSuccess = Math.random() > 0.2; // 80% szans na sukces
-        navigate('/confirmPayment', { state: { status: isSuccess ? 'success' : 'failure' } });
+        if (isSuccess) {
+            try {
+                await addOrderAPI(orderPayload); // Wyślij zamówienie
+                dispatch(clearCart()); // Wyczyść koszyk
+                navigate('/success'); // Przejdź do strony sukcesu
+            } catch (error) {
+                console.error('Błąd podczas tworzenia zamówienia:', error);
+                alert('Nie udało się utworzyć zamówienia. Spróbuj ponownie.');
+            }
+        } else {
+            alert('Płatność nie powiodła się.');
+        }
     };
 
     return (
@@ -33,7 +48,6 @@ const PaymentBlik = ({ amount }) => {
             >
                 Zapłać przez BLIK
             </button>
-
         </div>
     );
 };

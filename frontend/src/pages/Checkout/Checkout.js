@@ -4,11 +4,6 @@ import { selectCartItems } from '../../store/features/cart';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { getUsernameFromToken } from '../../utils/jwt-helper';
-import { addOrderAPI } from '../../api/addOrderAPI';
-import { clearCart } from '../../store/actions/cartAction';
-import PaymentBlik from './PaymentBlik';
-import PaymentPrzelewy24 from './PaymentPrzelewy24';
-import PaymentCard from './PaymentCard';
 import PaymentComponent from './PaymentComponent';
 
 const Checkout = () => {
@@ -57,49 +52,22 @@ const Checkout = () => {
     setAddress((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handlePayNow = async () => {
-    // Sprawdź, czy koszyk nie jest pusty
-    if (cartItems.length === 0) {
-      alert('Koszyk jest pusty. Dodaj produkty przed złożeniem zamówienia.');
-      return;
-    }
-
-    if (!username) {
-      alert('Nie możesz złożyć zamówienia. Brak danych użytkownika.');
-      return;
-    }
-
-    if (!address.city || !address.street || !address.buildingNumber || !selectedDate || !paymentMethod) {
-      alert('Proszę uzupełnić wszystkie wymagane dane.');
-      return;
-    }
-
-    const orderPayload = {
-      username,
-      deliveryAddress: address,
-      deliveryDate: `${selectedDate}T00:00:00`,
-      paymentMethod,
-      items: cartItems.map((item) => ({
-        productId: item.productId,
-      })),
-      totalAmount: subTotal,
-    };
-
-    console.log('Payload wysyłany do API:', orderPayload);
-
-    try {
-      await addOrderAPI(orderPayload);
-      dispatch(clearCart());
-      navigate('/orderConfirmed');
-    } catch (error) {
-      console.error('Błąd podczas składania zamówienia:', error);
-      alert('Wystąpił problem podczas składania zamówienia. Spróbuj ponownie później.');
-    }
+  const orderPayload = {
+    username,
+    deliveryAddress: address,
+    deliveryDate: `${selectedDate}T00:00:00`,
+    paymentMethod,
+    items: cartItems.map((item) => ({
+      productId: item.productId,
+      productName: item.name,
+      price: item.subTotal,
+      quantity: item.quantity || 1,
+    })),
+    totalAmount: subTotal,
   };
 
-
   return (
-    <div className="p-8 flex gap-8">
+    <div className="p-8 flex gap-8 items-start">
       <div className="w-[70%]">
         <div className="mb-6">
           <h2 className="text-xl font-semibold mb-4">Adres dostawy</h2>
@@ -209,14 +177,8 @@ const Checkout = () => {
             </label>
           </div>
         </div>
-        <PaymentComponent method={paymentMethod} amount={subTotal} />
 
-        <button
-          className="w-full bg-blue-500 text-white py-3 rounded-lg hover:bg-blue-600"
-          onClick={handlePayNow}
-        >
-          Złóż zamówienie
-        </button>
+        <PaymentComponent method={paymentMethod} amount={subTotal} orderPayload={orderPayload} />
       </div>
 
       <div className="w-[30%] h-auto border rounded-lg border-gray-500 p-4 bg-white shadow-lg">
@@ -226,6 +188,16 @@ const Checkout = () => {
         <p>Wysyłka: Darmowa</p>
         <hr className="my-4" />
         <p className="font-bold">Suma: ${subTotal}</p>
+        <div className="mt-4">
+          <h3 className="text-lg font-semibold">Kupowane produkty:</h3>
+          <ul className="list-disc list-inside">
+            {cartItems.map((item) => (
+              <li key={item.productId} className="text-sm text-gray-700">
+                {item.name} - ${item.subTotal.toFixed(2)}
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </div>
   );

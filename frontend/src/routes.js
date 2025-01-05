@@ -20,6 +20,7 @@ import Settings from "./pages/Account/Settings";
 import { AdminPanel } from "./pages/AdminPanel/AdminPanel";
 import UserCreateProduct from "./pages/UserCreateProduct";
 import Payment from "./pages/Checkout/Payment"; // Upewnij się, że ścieżka do pliku jest poprawna
+import Success from "./pages/Checkout/Success";
 
 
 export const router = createBrowserRouter([
@@ -69,6 +70,10 @@ export const router = createBrowserRouter([
       {
         path: "/payment",
         element: <ProtectedRoute><Payment /></ProtectedRoute>, // Dodanie strony płatności
+      },
+      {
+        path: "/success",
+        element: <Success />,
       },
       {
         path: "/orderConfirmed",
