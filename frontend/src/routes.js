@@ -21,6 +21,7 @@ import { AdminPanel } from "./pages/AdminPanel/AdminPanel";
 import UserCreateProduct from "./pages/UserCreateProduct";
 import Payment from "./pages/Checkout/Payment"; // Upewnij się, że ścieżka do pliku jest poprawna
 import Success from "./pages/Checkout/Success";
+import UserProducts from "./pages/Account/UserProducts";
 
 
 export const router = createBrowserRouter([
@@ -56,6 +57,10 @@ export const router = createBrowserRouter([
           {
             path: "orders",
             element: <ProtectedRoute><Orders /></ProtectedRoute>,
+          },
+          {
+            path: "products", // Dodanie zakładki Products
+            element: <ProtectedRoute><UserProducts /></ProtectedRoute>,
           },
           {
             path: "settings",

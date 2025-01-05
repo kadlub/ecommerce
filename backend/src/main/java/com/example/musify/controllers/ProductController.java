@@ -81,7 +81,7 @@ public class ProductController {
                 });
     }
 
-    @GetMapping("/user")
+    @GetMapping("/my-products")
     public ResponseEntity<List<ProductOutputDto>> getUserProducts(@AuthenticationPrincipal UserDetails userDetails) {
         String username = userDetails.getUsername();
         logger.info("Fetching products for user: {}", username);

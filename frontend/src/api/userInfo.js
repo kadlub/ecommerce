@@ -70,3 +70,16 @@ export const cancelOrderAPI = async (id) => {
         throw new Error(err);
     }
 }
+
+export const fetchUserProductsAPI = async () => {
+    const url = API_BASE_URL + "/api/products/my-products";
+    try {
+        const response = await axios.get(url, {
+            headers: getHeaders(),
+        });
+        return response?.data;
+    } catch (error) {
+        console.error("Error fetching user products:", error);
+        throw error;
+    }
+};
