@@ -1,19 +1,35 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import RangeSlider from 'react-range-slider-input';
 import 'react-range-slider-input/dist/style.css';
 import './PriceFilter.css';
 
+const debounce = (func, delay) => {
+    let timeoutId;
+    return (...args) => {
+        if (timeoutId) clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => func(...args), delay);
+    };
+};
+
 const PriceFilter = ({ onPriceChange }) => {
     const [range, setRange] = useState({
         min: 10,
-        max: 1000
+        max: 1000,
     });
 
+    // Debounced version of onPriceChange
+    const handleRangeChange = useCallback(
+        debounce((min, max) => {
+            if (onPriceChange) {
+                onPriceChange(min, max);
+            }
+        }, 300),
+        [onPriceChange]
+    );
+
     useEffect(() => {
-        if (onPriceChange) {
-            onPriceChange(range.min, range.max);
-        }
-    }, [range, onPriceChange]);
+        handleRangeChange(range.min, range.max);
+    }, [range, handleRangeChange]);
 
     return (
         <div className="flex flex-col mb-4">
@@ -26,7 +42,7 @@ const PriceFilter = ({ onPriceChange }) => {
                 onInput={(values) =>
                     setRange({
                         min: values[0],
-                        max: values[1]
+                        max: values[1],
                     })
                 }
             />

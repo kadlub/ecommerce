@@ -6,6 +6,7 @@ import { addItemToCartAction } from '../../store/actions/cartAction';
 import { addItemToFavouritesAction, removeItemFromFavouritesAction } from '../../store/favourites/favouritesAction';
 import { selectFavouritesItems } from '../../store/favourites/favourites';
 import { CartIcon } from '../../components/common/CartIcon';
+import { Wishlist } from '../../components/common/Wishlist';
 
 const ProductCard = ({ productId, title, description, price, discount, rating, brand, imageUrls, slug }) => {
   const dispatch = useDispatch();
@@ -38,7 +39,7 @@ const ProductCard = ({ productId, title, description, price, discount, rating, b
         name: title,
         price,
         thumbnail,
-        slug
+        slug,
       };
       dispatch(addItemToFavouritesAction(favouriteProduct));
     }
@@ -88,9 +89,9 @@ const ProductCard = ({ productId, title, description, price, discount, rating, b
         </button>
         <button
           onClick={toggleFavourite}
-          className={`cursor-pointer ${isFavourite ? 'text-red-500' : 'text-gray-500'} hover:text-gray-800`}
+          className="cursor-pointer text-gray-500 hover:text-gray-800"
         >
-          <SvgFavourite />
+          <Wishlist />
         </button>
       </div>
     </div>
