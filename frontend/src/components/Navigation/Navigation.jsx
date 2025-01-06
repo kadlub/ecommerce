@@ -6,9 +6,11 @@ import { Link, NavLink, useNavigate } from 'react-router-dom';
 import './Navigation.css';
 import { useSelector } from 'react-redux';
 import { countCartItems } from '../../store/features/cart';
+import { countFavouritesItems } from '../../store/favourites/favourites'; // Import selektora dla ulubionych
 
 const Navigation = ({ variant = "default" }) => {
   const cartLength = useSelector(countCartItems);
+  const favouritesLength = useSelector(countFavouritesItems); // Liczba ulubionych
   const navigate = useNavigate();
 
   return (
@@ -44,12 +46,35 @@ const Navigation = ({ variant = "default" }) => {
         {/* Action Items - icons */}
         {variant === "default" &&
           <ul className='flex gap-8 '>
-            <li><button ><Wishlist /></button></li>
-            <li><button onClick={() => navigate('/account-details/profile')}><AccountIcon /></button></li>
-            <li><Link to='/cart-items' className='flex flex-wrap'><CartIcon />
-              {cartLength > 0 && <div className='absolute ml-6 inline-flex items-center justify-center h-6 w-6 bg-black text-white rounded-full border-2 text-xs border-white'>{cartLength}</div>}
-            </Link></li>
-            {/* New Button for Creating Products */}
+            {/* Ikona Wishlist */}
+            <li className='relative'>
+              <button onClick={() => navigate('/wishlist')}>
+                <Wishlist />
+              </button>
+              {favouritesLength > 0 && (
+                <div className='absolute -top-2 -right-2 inline-flex items-center justify-center h-6 w-6 bg-black text-white rounded-full border-2 text-xs border-white'>
+                  {favouritesLength}
+                </div>
+              )}
+            </li>
+            {/* Ikona Profilu */}
+            <li>
+              <button onClick={() => navigate('/account-details/profile')}>
+                <AccountIcon />
+              </button>
+            </li>
+            {/* Ikona Koszyka */}
+            <li>
+              <Link to='/cart-items' className='flex flex-wrap'>
+                <CartIcon />
+                {cartLength > 0 && (
+                  <div className='absolute ml-6 inline-flex items-center justify-center h-6 w-6 bg-black text-white rounded-full border-2 text-xs border-white'>
+                    {cartLength}
+                  </div>
+                )}
+              </Link>
+            </li>
+            {/* Nowy przycisk do wystawiania produktów */}
             <li>
               <button
                 onClick={() => navigate('/create-product')}
@@ -62,13 +87,17 @@ const Navigation = ({ variant = "default" }) => {
         }
         {variant === "auth" &&
           <ul className='flex gap-8'>
-            <li className='text-black border border-black hover:bg-slate-100 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none'><NavLink to={"/v1/login"} className={({ isActive }) => isActive ? 'active-link' : ''}>Logowanie</NavLink></li>
-            <li className='text-black border border-black hover:bg-slate-100 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none'><NavLink to="/v1/register" className={({ isActive }) => isActive ? 'active-link' : ''}>Rejestracja</NavLink></li>
+            <li className='text-black border border-black hover:bg-slate-100 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none'>
+              <NavLink to={"/v1/login"} className={({ isActive }) => isActive ? 'active-link' : ''}>Logowanie</NavLink>
+            </li>
+            <li className='text-black border border-black hover:bg-slate-100 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 focus:outline-none'>
+              <NavLink to="/v1/register" className={({ isActive }) => isActive ? 'active-link' : ''}>Rejestracja</NavLink>
+            </li>
           </ul>
         }
       </div>
     </nav>
-  )
-}
+  );
+};
 
 export default Navigation;

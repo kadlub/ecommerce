@@ -1,15 +1,17 @@
 import React from 'react';
 import SvgFavourite from '../../components/common/SvgFavourite';
 import { Link } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { addItemToCartAction } from '../../store/actions/cartAction';
+import { addItemToFavouritesAction, removeItemFromFavouritesAction } from '../../store/favourites/favouritesAction';
+import { selectFavouritesItems } from '../../store/favourites/favourites';
 import { CartIcon } from '../../components/common/CartIcon';
 
 const ProductCard = ({ productId, title, description, price, discount, rating, brand, imageUrls, slug }) => {
   const dispatch = useDispatch();
+  const favourites = useSelector(selectFavouritesItems);
   const imageBaseUrl = "http://localhost:8080/api/uploads/products/";
 
-  // Wybierz pierwsze zdjęcie z `imageUrls` jako miniaturę
   const thumbnail = imageUrls?.length > 0 ? `${imageBaseUrl}${imageUrls[0]}` : '/placeholder-image.png';
 
   const handleAddToCart = () => {
@@ -25,9 +27,25 @@ const ProductCard = ({ productId, title, description, price, discount, rating, b
     dispatch(addItemToCartAction(product));
   };
 
+  const isFavourite = favourites.some((item) => item.productId === productId);
+
+  const toggleFavourite = () => {
+    if (isFavourite) {
+      dispatch(removeItemFromFavouritesAction({ productId }));
+    } else {
+      const favouriteProduct = {
+        productId,
+        name: title,
+        price,
+        thumbnail,
+        slug
+      };
+      dispatch(addItemToFavouritesAction(favouriteProduct));
+    }
+  };
+
   return (
     <div className="flex flex-col hover:scale-105 relative border rounded-lg shadow-lg p-4">
-      {/* Obraz produktu */}
       <Link to={`/products/${slug}`}>
         <img
           className="h-[320px] w-[280px] border rounded-lg cursor-pointer object-contain"
@@ -36,7 +54,6 @@ const ProductCard = ({ productId, title, description, price, discount, rating, b
         />
       </Link>
 
-      {/* Szczegóły produktu */}
       <div className="flex justify-between items-center mt-4">
         <div className="flex flex-col">
           <p className="text-[16px] font-semibold">{title}</p>
@@ -63,18 +80,15 @@ const ProductCard = ({ productId, title, description, price, discount, rating, b
       </div>
 
       <div className="absolute top-0 right-0 pt-4 pr-4 flex space-x-2">
-        {/* Ikona koszyka */}
         <button
           onClick={handleAddToCart}
           className="cursor-pointer text-gray-500 hover:text-gray-800"
         >
           <CartIcon />
         </button>
-
-        {/* Ikona ulubionych */}
         <button
-          onClick={() => console.log('Dodano do ulubionych')}
-          className="cursor-pointer text-gray-500 hover:text-gray-800"
+          onClick={toggleFavourite}
+          className={`cursor-pointer ${isFavourite ? 'text-red-500' : 'text-gray-500'} hover:text-gray-800`}
         >
           <SvgFavourite />
         </button>

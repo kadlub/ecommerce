@@ -22,7 +22,7 @@ import UserCreateProduct from "./pages/UserCreateProduct";
 import Payment from "./pages/Checkout/Payment"; // Upewnij się, że ścieżka do pliku jest poprawna
 import Success from "./pages/Checkout/Success";
 import UserProducts from "./pages/Account/UserProducts";
-
+import Wishlist from "./store/favourites/Wishlist";
 
 export const router = createBrowserRouter([
   {
@@ -59,7 +59,7 @@ export const router = createBrowserRouter([
             element: <ProtectedRoute><Orders /></ProtectedRoute>,
           },
           {
-            path: "products", // Dodanie zakładki Products
+            path: "products", // Zakładka Products
             element: <ProtectedRoute><UserProducts /></ProtectedRoute>,
           },
           {
@@ -67,6 +67,10 @@ export const router = createBrowserRouter([
             element: <ProtectedRoute><Settings /></ProtectedRoute>,
           },
         ],
+      },
+      {
+        path: "/wishlist", // Dodana ścieżka dla ulubionych
+        element: <ProtectedRoute><Wishlist /></ProtectedRoute>,
       },
       {
         path: "/checkout",
