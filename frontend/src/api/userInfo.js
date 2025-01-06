@@ -85,16 +85,22 @@ export const fetchUserProductsAPI = async () => {
 };
 
 export const fetchUserInfo = async () => {
-    const url = API_BASE_URL + "/api/users/info"; // URL do pobrania informacji o użytkowniku
+    const url = API_BASE_URL + "/api/users/info";
+    const headers = getHeaders();
+
+    console.log("fetchUserInfo headers:", headers);
+
+    if (!headers.Authorization) {
+        console.warn("Brak nagłówka Authorization. Użytkownik nie jest zalogowany.");
+        throw new Error("Unauthorized");
+    }
+
     try {
-        const response = await axios(url, {
-            method: "GET",
-            headers: getHeaders(), // Pobranie nagłówków, w tym tokenu JWT
-        });
-        console.log("fetchUserInfo Response:", response?.data); // Logowanie odpowiedzi
-        return response?.data; // Zwracanie danych użytkownika
+        const response = await axios.get(url, { headers });
+        console.log("fetchUserInfo Response:", response?.data);
+        return response?.data;
     } catch (err) {
-        console.error("Error fetching user info:", err);
-        throw new Error(err); // Rzucenie błędu w razie niepowodzenia
+        console.error("Error fetching user info:", err.response || err.message);
+        throw err;
     }
 };

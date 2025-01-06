@@ -4,6 +4,7 @@ import { API_BASE_URL } from '../../api/constant';
 
 const UserManagement = () => {
     const [users, setUsers] = useState([]);
+    const [editUser, setEditUser] = useState(null);
 
     useEffect(() => {
         axios
@@ -15,10 +16,24 @@ const UserManagement = () => {
     const handleDelete = (userId) => {
         axios
             .delete(`${API_BASE_URL}/api/users/${userId}`)
-            .then(() => {
-                setUsers((prev) => prev.filter((user) => user.userId !== userId));
-            })
+            .then(() => setUsers((prev) => prev.filter((user) => user.userId !== userId)))
             .catch((err) => console.error('Error deleting user:', err));
+    };
+
+    const handleEdit = (user) => {
+        setEditUser(user);
+    };
+
+    const handleSaveEdit = () => {
+        axios
+            .put(`${API_BASE_URL}/api/users/${editUser.userId}`, editUser)
+            .then(() => {
+                setUsers((prev) =>
+                    prev.map((user) => (user.userId === editUser.userId ? editUser : user))
+                );
+                setEditUser(null);
+            })
+            .catch((err) => console.error('Error editing user:', err));
     };
 
     return (
@@ -35,9 +50,50 @@ const UserManagement = () => {
                 <tbody>
                     {users.map((user) => (
                         <tr key={user.userId}>
-                            <td className="border border-gray-300 px-4 py-2">{user.name}</td>
-                            <td className="border border-gray-300 px-4 py-2">{user.email}</td>
                             <td className="border border-gray-300 px-4 py-2">
+                                {editUser?.userId === user.userId ? (
+                                    <input
+                                        type="text"
+                                        value={editUser.username}
+                                        onChange={(e) =>
+                                            setEditUser({ ...editUser, username: e.target.value })
+                                        }
+                                        className="border px-2 py-1"
+                                    />
+                                ) : (
+                                    user.username
+                                )}
+                            </td>
+                            <td className="border border-gray-300 px-4 py-2">
+                                {editUser?.userId === user.userId ? (
+                                    <input
+                                        type="text"
+                                        value={editUser.email}
+                                        onChange={(e) =>
+                                            setEditUser({ ...editUser, email: e.target.value })
+                                        }
+                                        className="border px-2 py-1"
+                                    />
+                                ) : (
+                                    user.email
+                                )}
+                            </td>
+                            <td className="border border-gray-300 px-4 py-2">
+                                {editUser?.userId === user.userId ? (
+                                    <button
+                                        onClick={handleSaveEdit}
+                                        className="text-green-500 hover:underline mr-4"
+                                    >
+                                        Save
+                                    </button>
+                                ) : (
+                                    <button
+                                        onClick={() => handleEdit(user)}
+                                        className="text-blue-500 hover:underline mr-4"
+                                    >
+                                        Edit
+                                    </button>
+                                )}
                                 <button
                                     onClick={() => handleDelete(user.userId)}
                                     className="text-red-500 hover:underline"

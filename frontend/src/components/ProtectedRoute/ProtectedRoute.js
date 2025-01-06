@@ -5,33 +5,32 @@ import { isTokenValid } from '../../utils/jwt-helper';
 
 const ProtectedRoute = ({ children, roles = [] }) => {
   const navigate = useNavigate();
-  const user = useSelector((state) => state.userState.userInfo);
+  const user = useSelector((state) => state?.userState?.userInfo);
 
   useEffect(() => {
-    console.log("ProtectedRoute User Data:", user); // Logowanie danych użytkownika
+    console.log("ProtectedRoute User Data:", user);
 
-    if (!user || Object.keys(user).length === 0) {
-      console.warn("User data not loaded yet. Waiting...");
+    if (!isTokenValid()) {
+      console.warn("Token jest nieprawidłowy lub wygasł. Przekierowanie na stronę logowania...");
+      navigate('/v1/login');
       return;
     }
 
-    if (!isTokenValid()) {
-      console.error('Token is invalid or expired. Redirecting to login...');
-      navigate('/v1/login');
-    } else if (roles.length > 0) {
-      const userRole = user?.roles?.[0] ?? null; // Pobieramy pierwszą rolę
-      console.log("ProtectedRoute User Role:", userRole);
+    if (!user || Object.keys(user).length === 0) {
+      console.warn("Dane użytkownika jeszcze nie załadowane. Oczekiwanie...");
+      return; // Nie rób nic, jeśli dane użytkownika nie zostały jeszcze załadowane
+    }
 
-      if (!roles.includes(userRole)) {
-        console.warn(`User role "${userRole}" does not have access. Redirecting...`);
+    if (roles.length > 0) {
+      const userRoles = user.roles || [];
+      console.log("User roles:", userRoles, "Required roles:", roles);
+
+      if (!roles.some(role => userRoles.includes(role))) {
+        console.warn(`Użytkownik nie ma wymaganej roli: ${roles}. Przekierowanie na stronę główną...`);
         navigate('/');
       }
     }
   }, [navigate, roles, user]);
-
-  if (!user || Object.keys(user).length === 0) {
-    return <div>Loading...</div>; // Obsługa ładowania
-  }
 
   return <>{children}</>;
 };

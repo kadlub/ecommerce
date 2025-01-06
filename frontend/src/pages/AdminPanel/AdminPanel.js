@@ -1,38 +1,25 @@
-import React, { useState } from 'react';
-import CategoryManagement from './CategoryManagement';
-import ProductManagement from './ProductManagement';
-import UserManagement from './UserManagement';
-import OrderManagement from './OrderManagement';
+import React from 'react';
+import { Link, Outlet } from 'react-router-dom';
 
 const AdminPanel = () => {
-    const [activeTab, setActiveTab] = useState('categories'); // Domyślnie kategorie
-    console.log("AdminPanel renderowany");
-
-    const renderContent = () => {
-        switch (activeTab) {
-            case 'categories':
-                return <CategoryManagement />;
-            case 'products':
-                return <ProductManagement />;
-            case 'users':
-                return <UserManagement />;
-            case 'orders':
-                return <OrderManagement />;
-            default:
-                return <CategoryManagement />;
-        }
-    };
-
     return (
         <div className="p-8">
-            <h1 className="text-3xl font-bold mb-6">Panel Administratora</h1>
-            <div className="flex gap-4 mb-6">
-                <button onClick={() => setActiveTab('categories')} className="text-lg underline">Kategorie</button>
-                <button onClick={() => setActiveTab('products')} className="text-lg underline">Produkty</button>
-                <button onClick={() => setActiveTab('users')} className="text-lg underline">Użytkownicy</button>
-                <button onClick={() => setActiveTab('orders')} className="text-lg underline">Zamówienia</button>
-            </div>
-            <div>{renderContent()}</div>
+            <h1 className="text-3xl font-bold mb-6">Panel Admina</h1>
+            <nav className="grid grid-cols-4 gap-4 mb-8">
+                <Link to="/admin/categories" className="bg-blue-500 text-white px-4 py-2 rounded text-center">
+                    Zarządzanie kategoriami
+                </Link>
+                <Link to="/admin/products" className="bg-green-500 text-white px-4 py-2 rounded text-center">
+                    Zarządzanie produktami
+                </Link>
+                <Link to="/admin/users" className="bg-yellow-500 text-white px-4 py-2 rounded text-center">
+                    Zarządzanie użytkownikami
+                </Link>
+                <Link to="/admin/orders" className="bg-red-500 text-white px-4 py-2 rounded text-center">
+                    Zarządzanie zamówieniami
+                </Link>
+            </nav>
+            <Outlet />
         </div>
     );
 };

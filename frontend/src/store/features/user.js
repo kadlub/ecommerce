@@ -15,11 +15,10 @@ export const userSlice = createSlice({
                 ...state,
                 userInfo: {
                     ...action?.payload,
-                    isAdmin: action?.payload?.roles?.includes('ROLE_ADMIN'), // Dodajemy flagę isAdmin
+                    isAdmin: action?.payload?.roles?.includes('ROLE_ADMIN'), // Dodaj flagę isAdmin
                 },
             };
         },
-
         saveAddress: (state, action) => {
             const addresses = [...state?.userInfo?.addressList] ?? [];
             addresses.push(action?.payload);
