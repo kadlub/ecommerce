@@ -38,7 +38,7 @@ const UserManagement = () => {
 
     return (
         <div className="p-8">
-            <h1 className="text-2xl font-bold mb-4">Manage Users</h1>
+            <h1 className="text-2xl font-bold mb-4">Zarządzaj użytkownikami</h1>
             <table className="w-full border-collapse border border-gray-300">
                 <thead>
                     <tr>
