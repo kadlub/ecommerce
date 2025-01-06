@@ -3,6 +3,7 @@ import SvgFavourite from '../../components/common/SvgFavourite';
 import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { addItemToCartAction } from '../../store/actions/cartAction';
+import { CartIcon } from '../../components/common/CartIcon';
 
 const ProductCard = ({ productId, title, description, price, discount, rating, brand, imageUrls, slug }) => {
   const dispatch = useDispatch();
@@ -29,7 +30,7 @@ const ProductCard = ({ productId, title, description, price, discount, rating, b
       {/* Obraz produktu */}
       <Link to={`/products/${slug}`}>
         <img
-          className="h-[320px] w-[280px] border rounded-lg cursor-pointer object-cover block"
+          className="h-[320px] w-[280px] border rounded-lg cursor-pointer object-contain"
           src={thumbnail}
           alt={title}
         />
@@ -62,12 +63,15 @@ const ProductCard = ({ productId, title, description, price, discount, rating, b
       </div>
 
       <div className="absolute top-0 right-0 pt-4 pr-4 flex space-x-2">
+        {/* Ikona koszyka */}
         <button
           onClick={handleAddToCart}
-          className="bg-blue-500 text-white py-1 px-4 rounded-lg text-sm hover:bg-blue-600"
+          className="cursor-pointer text-gray-500 hover:text-gray-800"
         >
-          Dodaj do koszyka
+          <CartIcon />
         </button>
+
+        {/* Ikona ulubionych */}
         <button
           onClick={() => console.log('Dodano do ulubionych')}
           className="cursor-pointer text-gray-500 hover:text-gray-800"
@@ -80,4 +84,3 @@ const ProductCard = ({ productId, title, description, price, discount, rating, b
 };
 
 export default ProductCard;
-

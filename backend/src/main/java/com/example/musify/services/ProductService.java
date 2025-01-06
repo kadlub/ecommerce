@@ -201,23 +201,27 @@ public class ProductService {
     public ProductOutputDto updateProduct(UUID productId, ProductInputDto productInputDto) {
         return productsRepository.findById(productId)
                 .map(product -> {
+                    // Aktualizuj tylko te pola, które są przekazane
                     product.setName(productInputDto.getName());
                     product.setDescription(productInputDto.getDescription());
                     product.setPrice(productInputDto.getPrice());
                     product.setCondition(productInputDto.getCondition());
 
-                    Categories category = categoriesRepository.findById(productInputDto.getCategoryId())
-                            .orElseThrow(() -> new RuntimeException("Category not found"));
-                    product.setCategory(category);
+                    // Znajdź kategorię i ustaw, jeśli jest przekazana
+                    if (productInputDto.getCategoryId() != null) {
+                        Categories category = categoriesRepository.findById(productInputDto.getCategoryId())
+                                .orElseThrow(() -> new RuntimeException("Category not found"));
+                        product.setCategory(category);
+                    }
 
-                    Users seller = usersRepository.findById(productInputDto.getSellerId())
-                            .orElseThrow(() -> new RuntimeException("Seller not found"));
-                    product.setSeller(seller);
+                    // Nie nadpisuj `sellerId`, ponieważ jest to wartość stała
+                    // Jeśli jednak jest ustawione w DTO, zignoruj ją
 
                     return convertToOutputDto(productsRepository.save(product));
                 })
                 .orElseThrow(() -> new RuntimeException("Product not found"));
     }
+
 
     public boolean deleteProduct(UUID productId) {
         Optional<Products> product = productsRepository.findById(productId);
@@ -293,6 +297,8 @@ public class ProductService {
 
         return productsRepository.findBySeller_UserId(user.getUserId())
                 .stream()
+                .sorted(Comparator.comparing(Products::isSold).reversed()
+                        .thenComparing(Products::getCreationDate).reversed())
                 .map(this::convertToOutputDto)
                 .collect(Collectors.toList());
     }

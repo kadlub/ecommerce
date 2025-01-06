@@ -17,3 +17,23 @@ export const createProductAPI = async (formData) => {
         throw error;
     }
 };
+
+export const updateProductAPI = async (productId, data) => {
+    const url = `${API_BASE_URL}/api/products/${productId}`;
+    try {
+        const response = await axios.put(url, data, { headers: getHeaders() });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const deleteProductAPI = async (productId) => {
+    const url = `${API_BASE_URL}/api/products/${productId}`;
+    try {
+        const response = await axios.delete(url, { headers: getHeaders() });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
