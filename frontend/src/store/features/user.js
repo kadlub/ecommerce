@@ -1,66 +1,84 @@
-import { createSlice } from "@reduxjs/toolkit"
+import { createSlice } from "@reduxjs/toolkit";
 
 export const initialState = {
-    userInfo: {},
-    orders:[],
-}
+    userInfo: {}, // Przechowywanie informacji o użytkowniku
+    orders: [], // Lista zamówień użytkownika
+};
 
 export const userSlice = createSlice({
-    name:'userSlice',
+    name: 'userSlice',
     initialState,
-    reducers:{
-        loadUserInfo : (state,action)=>{
+    reducers: {
+        loadUserInfo: (state, action) => {
+            console.log("Redux loadUserInfo Payload:", action?.payload); // Logowanie payload
             return {
                 ...state,
-                userInfo:action?.payload
-            }
+                userInfo: {
+                    ...action?.payload,
+                    isAdmin: action?.payload?.roles?.includes('ROLE_ADMIN'), // Dodajemy flagę isAdmin
+                },
+            };
         },
-        saveAddress : (state,action)=>{
+
+        saveAddress: (state, action) => {
             const addresses = [...state?.userInfo?.addressList] ?? [];
             addresses.push(action?.payload);
             return {
                 ...state,
-                userInfo:{
+                userInfo: {
                     ...state?.userInfo,
-                    addressList:addresses
-                }
-            }
+                    addressList: addresses,
+                },
+            };
         },
-        removeAddress:(state,action)=>{
+        removeAddress: (state, action) => {
             return {
                 ...state,
-                userInfo:{
+                userInfo: {
                     ...state?.userInfo,
-                    addressList: state?.userInfo?.addressList?.filter(address=> address?.id !== action?.payload)
-                }
-            }
+                    addressList: state?.userInfo?.addressList?.filter(
+                        (address) => address?.id !== action?.payload
+                    ),
+                },
+            };
         },
-        loadOrders: (state,action)=>{
+        loadOrders: (state, action) => {
             return {
                 ...state,
-                orders:action?.payload
-            }
+                orders: action?.payload,
+            };
         },
-        cancelOrder: (state,action)=>{
+        cancelOrder: (state, action) => {
             return {
                 ...state,
-                orders:state?.orders?.map(order=>{
-                    if(order?.id === action?.payload){
+                orders: state?.orders?.map((order) => {
+                    if (order?.id === action?.payload) {
                         return {
                             ...order,
-                            orderStatus:'CANCELLED'
-                        }
+                            orderStatus: 'CANCELLED',
+                        };
                     }
                     return order;
-                })
-            }
-        }
-    }
+                }),
+            };
+        },
+    },
 });
 
-export const { loadUserInfo, saveAddress, removeAddress, loadOrders, cancelOrder } = userSlice?.actions;
+export const {
+    loadUserInfo,
+    saveAddress,
+    removeAddress,
+    loadOrders,
+    cancelOrder,
+} = userSlice?.actions;
 
+// Selektory dla różnych części danych
 export const selectUserInfo = (state) => state?.userState?.userInfo ?? {};
 export const selectAllOrders = (state) => state?.userState?.orders ?? [];
-export const selectIsUserAdmin = (state) => state?.userState?.userInfo?.authorityList?.find((authority)=> authority?.roleCode === 'ADMIN')?.authority === 'ADMIN';
+export const selectIsUserAdmin = (state) =>
+    state?.userState?.userInfo?.isAdmin ?? false;
+export const selectUserRole = (state) =>
+    state?.userState?.userInfo?.authorityList?.map((auth) => auth.roleCode) ?? [];
+
 export default userSlice?.reducer;

@@ -83,3 +83,18 @@ export const fetchUserProductsAPI = async () => {
         throw error;
     }
 };
+
+export const fetchUserInfo = async () => {
+    const url = API_BASE_URL + "/api/users/info"; // URL do pobrania informacji o użytkowniku
+    try {
+        const response = await axios(url, {
+            method: "GET",
+            headers: getHeaders(), // Pobranie nagłówków, w tym tokenu JWT
+        });
+        console.log("fetchUserInfo Response:", response?.data); // Logowanie odpowiedzi
+        return response?.data; // Zwracanie danych użytkownika
+    } catch (err) {
+        console.error("Error fetching user info:", err);
+        throw new Error(err); // Rzucenie błędu w razie niepowodzenia
+    }
+};

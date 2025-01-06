@@ -2,14 +2,21 @@ package com.example.musify.controllers;
 
 import com.example.musify.dto.UserInputDto;
 import com.example.musify.dto.UserOutputDto;
+import com.example.musify.entities.Authority;
+import com.example.musify.entities.Users;
 import com.example.musify.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/users")
@@ -62,6 +69,25 @@ public class UserController {
         return userService.findUserByUsername(username)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/info")
+    public ResponseEntity<UserOutputDto> getUserInfo(@AuthenticationPrincipal UserDetails userDetails) {
+        Users user = userService.findUserEntityByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found")); // Wyjątek, jeśli użytkownik nie istnieje
+
+        UserOutputDto userInfo = UserOutputDto.builder()
+                .userId(user.getUserId())
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .isSeller(user.getIsSeller())
+                .createdAt(user.getCreatedAt())
+                .roles(user.getAuthorities().stream()
+                        .map(Authority::getName) // Pobierz nazwy ról
+                        .collect(Collectors.toList())) // Zamień na listę Stringów
+                .build();
+
+        return ResponseEntity.ok(userInfo);
     }
 }
 

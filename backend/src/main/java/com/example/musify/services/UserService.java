@@ -44,9 +44,14 @@ public class UserService {
     }
 
     // Metoda do pobierania użytkownika po nazwie użytkownika
+    public Optional<Users> findUserEntityByUsername(String username) {
+        return usersRepository.findByUsername(username);
+    }
+
+    // Dotychczasowa metoda pozostaje bez zmian
     public Optional<UserOutputDto> findUserByUsername(String username) {
         return usersRepository.findByUsername(username)
-                .map(this::convertToOutputDto);
+                .map(this::convertToOutputDto); // Konwersja do DTO
     }
 
     // Pobranie wszystkich użytkowników

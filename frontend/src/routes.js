@@ -17,12 +17,16 @@ import OrderConfirmed from "./pages/OrderConfirmed/OrderConfirmed";
 import Profile from "./pages/Account/Profile";
 import Orders from "./pages/Account/Orders";
 import Settings from "./pages/Account/Settings";
-import { AdminPanel } from "./pages/AdminPanel/AdminPanel";
+import AdminPanel from "./pages/AdminPanel/AdminPanel";
 import UserCreateProduct from "./pages/UserCreateProduct";
 import Payment from "./pages/Checkout/Payment"; // Upewnij się, że ścieżka do pliku jest poprawna
 import Success from "./pages/Checkout/Success";
 import UserProducts from "./pages/Account/UserProducts";
 import Wishlist from "./store/favourites/Wishlist";
+import CategoryManagement from "./pages/AdminPanel/CategoryManagement";
+import ProductManagement from "./pages/AdminPanel/ProductManagement";
+import UserManagement from "./pages/AdminPanel/UserManagement";
+import OrderManagement from "./pages/AdminPanel/OrderManagement";
 
 export const router = createBrowserRouter([
   {
@@ -117,7 +121,25 @@ export const router = createBrowserRouter([
     element: <ConfirmPayment />,
   },
   {
-    path: "/admin/*",
-    element: <ProtectedRoute><AdminPanel /></ProtectedRoute>,
+    path: "/admin/",
+    element: <ProtectedRoute roles={['ROLE_ADMIN']}><AdminPanel /></ProtectedRoute>, // Ustawienie roli admina
+    children: [
+      {
+        path: "categories",
+        element: <CategoryManagement />,
+      },
+      {
+        path: "products",
+        element: <ProductManagement />,
+      },
+      {
+        path: "users",
+        element: <UserManagement />,
+      },
+      {
+        path: "orders",
+        element: <OrderManagement />,
+      },
+    ],
   },
 ]);
