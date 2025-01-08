@@ -33,8 +33,8 @@ const Account = () => {
       )}
       {userInfo?.email && (
         <>
-          <p className="text-3xl font-bold mb-4">Hello, {userInfo?.firstName}</p>
-          <p className="text-lg text-gray-600 mb-8">Welcome to your account</p>
+          <p className="text-3xl font-bold mb-4">Cześć, {userInfo?.username}</p>
+          <p className="text-lg text-gray-600 mb-8">Witaj na swoim koncie!</p>
 
           {/* Poziome menu z większymi zakładkami */}
           <nav className="flex justify-center space-x-12 border-b pb-4 mb-8">
@@ -46,7 +46,7 @@ const Account = () => {
                   : "text-xl pb-2 text-gray-500 hover:text-black"
               }
             >
-              Profile
+              Moje Konto
             </NavLink>
             <NavLink
               to={"/account-details/orders"}
@@ -56,7 +56,7 @@ const Account = () => {
                   : "text-xl pb-2 text-gray-500 hover:text-black"
               }
             >
-              Orders
+              Moje Zamówienia
             </NavLink>
             <NavLink
               to={"/account-details/products"}
@@ -66,7 +66,7 @@ const Account = () => {
                   : "text-xl pb-2 text-gray-500 hover:text-black"
               }
             >
-              Products
+              Moje Przedmioty
             </NavLink>
             <NavLink
               to={"/account-details/settings"}
@@ -76,7 +76,7 @@ const Account = () => {
                   : "text-xl pb-2 text-gray-500 hover:text-black"
               }
             >
-              Settings
+              Ustawienia
             </NavLink>
           </nav>
 

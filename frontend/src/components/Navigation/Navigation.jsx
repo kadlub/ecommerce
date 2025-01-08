@@ -25,7 +25,7 @@ const Navigation = ({ variant = "default" }) => {
           <ul className='flex gap-14 text-gray-600 hover:text-black'>
             <li><NavLink to='/' className={({ isActive }) => isActive ? 'active-link' : ''}>Strona główna</NavLink></li>
             <li><NavLink to='/categories/Instrumenty' className={({ isActive }) => isActive ? 'active-link' : ''}>Instrumenty</NavLink></li>
-            <li><NavLink to='/categories/Sprzęt' className={({ isActive }) => isActive ? 'active-link' : ''}>Sprzęt</NavLink></li>
+            <li><NavLink to='/categories/Sprzęt' className={({ isActive }) => isActive ? 'active-link' : ''}>Studio</NavLink></li>
             <li><NavLink to='/categories/Inne' className={({ isActive }) => isActive ? 'active-link' : ''}>Inne</NavLink></li>
           </ul>
         </div>

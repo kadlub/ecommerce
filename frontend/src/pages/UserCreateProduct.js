@@ -11,7 +11,7 @@ const UserCreateProduct = () => {
         description: '',
         price: '',
         categoryId: '',
-        images: null,
+        images: [],
         condition: 'Nowa',
     });
 
@@ -39,7 +39,7 @@ const UserCreateProduct = () => {
     };
 
     const handleFileChange = (e) => {
-        setFormData({ ...formData, images: e.target.files[0] });
+        setFormData({ ...formData, images: Array.from(e.target.files) });
     };
 
     const handleSubmit = async (e) => {
@@ -47,7 +47,13 @@ const UserCreateProduct = () => {
         try {
             const formDataToSend = new FormData();
             Object.entries(formData).forEach(([key, value]) => {
-                formDataToSend.append(key, value);
+                if (key === 'images') {
+                    value.forEach((file) => {
+                        formDataToSend.append('images', file);
+                    });
+                } else {
+                    formDataToSend.append(key, value);
+                }
             });
             await createProductAPI(formDataToSend);
             navigate('/'); // Powrót do strony głównej
@@ -69,83 +75,86 @@ const UserCreateProduct = () => {
     }
 
     return (
-        <div className="create-product-container">
-            <h1 className="text-2xl font-bold mb-4">Wystaw Produkt</h1>
-            <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                    <label className="block text-gray-700">Nazwa produktu:</label>
-                    <input
-                        type="text"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        required
-                        className="w-full border px-3 py-2"
-                    />
-                </div>
-                <div>
-                    <label className="block text-gray-700">Opis produktu:</label>
-                    <textarea
-                        name="description"
-                        value={formData.description}
-                        onChange={handleChange}
-                        required
-                        className="w-full border px-3 py-2"
-                    />
-                </div>
-                <div>
-                    <label className="block text-gray-700">Cena (PLN):</label>
-                    <input
-                        type="number"
-                        name="price"
-                        value={formData.price}
-                        onChange={handleChange}
-                        required
-                        className="w-full border px-3 py-2"
-                    />
-                </div>
-                <div>
-                    <label className="block text-gray-700">Kategoria:</label>
-                    <select
-                        name="categoryId"
-                        value={formData.categoryId}
-                        onChange={handleChange}
-                        required
-                        className="w-full border px-3 py-2"
+        <div className="flex justify-center items-center py-10">
+            <div className="w-full max-w-lg bg-white p-6 rounded shadow">
+                <h1 className="text-2xl font-bold mb-4">Wystaw Produkt</h1>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div>
+                        <label className="block text-gray-700">Nazwa produktu:</label>
+                        <input
+                            type="text"
+                            name="name"
+                            value={formData.name}
+                            onChange={handleChange}
+                            required
+                            className="w-full border px-3 py-2"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-gray-700">Opis produktu:</label>
+                        <textarea
+                            name="description"
+                            value={formData.description}
+                            onChange={handleChange}
+                            required
+                            className="w-full border px-3 py-2"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-gray-700">Cena (PLN):</label>
+                        <input
+                            type="number"
+                            name="price"
+                            value={formData.price}
+                            onChange={handleChange}
+                            required
+                            className="w-full border px-3 py-2"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-gray-700">Kategoria:</label>
+                        <select
+                            name="categoryId"
+                            value={formData.categoryId}
+                            onChange={handleChange}
+                            required
+                            className="w-full border px-3 py-2"
+                        >
+                            <option value="">Wybierz kategorię</option>
+                            {renderCategoryOptions(categories)}
+                        </select>
+                    </div>
+                    <div>
+                        <label className="block text-gray-700">Stan produktu:</label>
+                        <select
+                            name="condition"
+                            value={formData.condition}
+                            onChange={handleChange}
+                            className="w-full border px-3 py-2"
+                        >
+                            <option value="Nowa">Nowy</option>
+                            <option value="Używana">Używany</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label className="block text-gray-700">Zdjęcia produktu:</label>
+                        <input
+                            type="file"
+                            name="images"
+                            onChange={handleFileChange}
+                            multiple
+                            required
+                            className="w-full border px-3 py-2"
+                        />
+                    </div>
+                    <button
+                        type="submit"
+                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
                     >
-                        <option value="">Wybierz kategorię</option>
-                        {renderCategoryOptions(categories)}
-                    </select>
-                </div>
-                <div>
-                    <label className="block text-gray-700">Stan produktu:</label>
-                    <select
-                        name="condition"
-                        value={formData.condition}
-                        onChange={handleChange}
-                        className="w-full border px-3 py-2"
-                    >
-                        <option value="Nowa">Nowy</option>
-                        <option value="Używana">Używany</option>
-                    </select>
-                </div>
-                <div>
-                    <label className="block text-gray-700">Zdjęcie główne:</label>
-                    <input
-                        type="file"
-                        name="images"
-                        onChange={handleFileChange}
-                        required
-                        className="w-full border px-3 py-2"
-                    />
-                </div>
-                <button
-                    type="submit"
-                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                >
-                    Dodaj Produkt
-                </button>
-            </form>
+                        Dodaj Produkt
+                    </button>
+                </form>
+            </div>
         </div>
     );
 };

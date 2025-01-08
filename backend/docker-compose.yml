@@ -1,0 +1,86 @@
+version: '3.9'
+services:
+  user-service:
+    build:
+      context: ./user-service
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://192.168.0.53:5432/musify
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: Dudzio1423
+    networks:
+      - app-network
+
+  product-service:
+    build:
+      context: ./product-service
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://192.168.0.53:5432/musify
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: Dudzio1423
+    networks:
+      - app-network
+
+  order-service:
+    build:
+      context: ./order-service
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://192.168.0.53:5432/musify
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: Dudzio1423
+    networks:
+      - app-network
+
+  review-service:
+    build:
+      context: ./review-service
+    ports:
+      - "8084:8084"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://192.168.0.53:5432/musify
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: Dudzio1423
+    networks:
+      - app-network
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_CLOUD_GATEWAY_ROUTES_0_ID: user-service
+      SPRING_CLOUD_GATEWAY_ROUTES_0_URI: http://user-service:8081
+      SPRING_CLOUD_GATEWAY_ROUTES_1_ID: product-service
+      SPRING_CLOUD_GATEWAY_ROUTES_1_URI: http://product-service:8082
+      SPRING_CLOUD_GATEWAY_ROUTES_2_ID: order-service
+      SPRING_CLOUD_GATEWAY_ROUTES_2_URI: http://order-service:8083
+      SPRING_CLOUD_GATEWAY_ROUTES_3_ID: review-service
+      SPRING_CLOUD_GATEWAY_ROUTES_3_URI: http://review-service:8084
+    depends_on:
+      - user-service
+      - product-service
+      - order-service
+      - review-service
+    networks:
+      - app-network
+
+#  database:
+#    image: postgres:latest
+#    environment:
+#      POSTGRES_DB: musify
+#      POSTGRES_USER: postgres
+#      POSTGRES_PASSWORD: Dudzio1423
+#    ports:
+#      - "5432:5432"
+#    networks:
+#      - app-network
+
+networks:
+  app-network:
+    driver: bridge
