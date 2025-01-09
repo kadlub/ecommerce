@@ -16,7 +16,7 @@ import java.util.Map;
 @Component
 public class JwtUtil {
 
-    @Value("${JWT_KEY}")
+    @Value("wLDxR+IUyNhGP11Tlay8Wk1WwVea5tdFOAaCHH6ZWy8=")
     private String SECRET_KEY; // Ustaw to w pliku .properties
 
     @PostConstruct

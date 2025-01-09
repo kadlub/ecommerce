@@ -1,9 +1,9 @@
 server:
-  port: 8082
+  port: 8083
 
 spring:
   application:
-    name: product-service
+    name: order-service
   datasource:
     url: jdbc:postgresql://192.168.0.53:5432/musify
     username: postgres
@@ -14,6 +14,12 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
+jwt:
+  auth:
+    app: authapp
+    secret_key: wLDxR+IUyNhGP11Tlay8Wk1WwVea5tdFOAaCHH6ZWy8=
+    expires_in: 3600
 
 eureka:
   client:

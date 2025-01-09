@@ -1,4 +1,5 @@
 version: '3.9'
+
 services:
   user-service:
     build:
@@ -56,12 +57,16 @@ services:
     environment:
       SPRING_CLOUD_GATEWAY_ROUTES_0_ID: user-service
       SPRING_CLOUD_GATEWAY_ROUTES_0_URI: http://user-service:8081
+      SPRING_CLOUD_GATEWAY_ROUTES_0_PREDICATES_0: Path=/users/**
       SPRING_CLOUD_GATEWAY_ROUTES_1_ID: product-service
       SPRING_CLOUD_GATEWAY_ROUTES_1_URI: http://product-service:8082
+      SPRING_CLOUD_GATEWAY_ROUTES_1_PREDICATES_0: Path=/products/**
       SPRING_CLOUD_GATEWAY_ROUTES_2_ID: order-service
       SPRING_CLOUD_GATEWAY_ROUTES_2_URI: http://order-service:8083
+      SPRING_CLOUD_GATEWAY_ROUTES_2_PREDICATES_0: Path=/orders/**
       SPRING_CLOUD_GATEWAY_ROUTES_3_ID: review-service
       SPRING_CLOUD_GATEWAY_ROUTES_3_URI: http://review-service:8084
+      SPRING_CLOUD_GATEWAY_ROUTES_3_PREDICATES_0: Path=/reviews/**
     depends_on:
       - user-service
       - product-service
