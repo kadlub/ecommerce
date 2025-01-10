@@ -1,4 +1,4 @@
-package com.example.user_service.security;
+package com.example.api_gateway.security;
 
 import com.example.common.security.JwtUtil;
 import jakarta.servlet.FilterChain;
@@ -41,7 +41,8 @@ public class JwtFilter extends OncePerRequestFilter {
         System.out.println("Request path: " + requestPath);
 
         // Pomijanie autoryzacji JWT dla wykluczonych ścieżek
-        if (shouldSkipPath(requestPath)) { // Przekaż request
+        if (shouldSkipPath(requestPath)) {
+            System.out.println("Skipping JWT filter for path: " + requestPath);
             chain.doFilter(request, response);
             return;
         }
@@ -52,7 +53,11 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             jwtToken = authHeader.substring(7);
-            username = jwtUtil.extractUsername(jwtToken);
+            try {
+                username = jwtUtil.extractUsername(jwtToken);
+            } catch (Exception e) {
+                System.err.println("Invalid JWT token: " + e.getMessage());
+            }
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -68,6 +73,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         chain.doFilter(request, response);
     }
+
     /**
      * Sprawdza, czy ścieżka powinna zostać pominięta przez filtr.
      */

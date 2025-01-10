@@ -9,6 +9,7 @@ import com.example.common.security.JwtUtil;
 import com.example.common.repository.AuthorityRepository;
 import com.example.common.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,6 +21,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
+@EnableWebSecurity
 public class UserService {
 
     private final UsersRepository usersRepository;

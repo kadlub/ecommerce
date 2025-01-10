@@ -55,18 +55,23 @@ services:
     ports:
       - "8080:8080"
     environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://192.168.0.53:5432/musify
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: Dudzio1423
       SPRING_CLOUD_GATEWAY_ROUTES_0_ID: user-service
       SPRING_CLOUD_GATEWAY_ROUTES_0_URI: http://user-service:8081
-      SPRING_CLOUD_GATEWAY_ROUTES_0_PREDICATES_0: Path=/users/**
+      SPRING_CLOUD_GATEWAY_ROUTES_0_PREDICATES_0: Path=api/users/**
+      SPRING_CLOUD_GATEWAY_ROUTES_0_PREDICATES_1: Path=api/auth/**
       SPRING_CLOUD_GATEWAY_ROUTES_1_ID: product-service
       SPRING_CLOUD_GATEWAY_ROUTES_1_URI: http://product-service:8082
-      SPRING_CLOUD_GATEWAY_ROUTES_1_PREDICATES_0: Path=/products/**
+      SPRING_CLOUD_GATEWAY_ROUTES_1_PREDICATES_0: Path=api/products/**
+      SPRING_CLOUD_GATEWAY_ROUTES_1_PREDICATES_1: Path=api/categories/**
       SPRING_CLOUD_GATEWAY_ROUTES_2_ID: order-service
       SPRING_CLOUD_GATEWAY_ROUTES_2_URI: http://order-service:8083
-      SPRING_CLOUD_GATEWAY_ROUTES_2_PREDICATES_0: Path=/orders/**
+      SPRING_CLOUD_GATEWAY_ROUTES_2_PREDICATES_0: Path=api/orders/**
       SPRING_CLOUD_GATEWAY_ROUTES_3_ID: review-service
       SPRING_CLOUD_GATEWAY_ROUTES_3_URI: http://review-service:8084
-      SPRING_CLOUD_GATEWAY_ROUTES_3_PREDICATES_0: Path=/reviews/**
+      SPRING_CLOUD_GATEWAY_ROUTES_3_PREDICATES_0: Path=api/reviews/**
     depends_on:
       - user-service
       - product-service
@@ -74,6 +79,7 @@ services:
       - review-service
     networks:
       - app-network
+
 
 #  database:
 #    image: postgres:latest

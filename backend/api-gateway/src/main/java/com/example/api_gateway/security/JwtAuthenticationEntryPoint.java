@@ -1,4 +1,4 @@
-package com.example.user_service.security;
+package com.example.api_gateway.security;
 
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;

@@ -1,4 +1,4 @@
-package com.example.user_service.security;
+package com.example.api_gateway.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -51,7 +51,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                         .requestMatchers("/orders/**","/orders").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/uploads/products/**","/uploads/products/0e732607-1ae9-45c5-978f-ba54e7619cde_c7fff558-ae21-4cea-9b74-d4c5f056afa0").permitAll()
                         .requestMatchers("/error").permitAll()
-                        .anyRequest().authenticated() // Wszystkie inne żądania wymagają autoryzacji
+                        .anyRequest().authenticated() // Wszystkie inne żądania wymagają autoryzacji*/
                         //.anyRequest().permitAll() // Zezwól na wszystkie żądania
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Ustaw stateless session
