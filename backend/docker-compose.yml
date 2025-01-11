@@ -1,51 +1,35 @@
 version: '3.9'
 
 services:
-  user_service:
+  userservice:
     build:
-      context: ./user_service
+      context: ./userService
     ports:
       - "8081:8081"
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://192.168.0.53:5432/musify
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: Dudzio1423
     networks:
       - app-network
 
-  product_service:
+  productservice:
     build:
-      context: ./product_service
+      context: ./productService
     ports:
       - "8082:8082"
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://192.168.0.53:5432/musify
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: Dudzio1423
     networks:
       - app-network
 
-  order_service:
+  orderservice:
     build:
-      context: ./order_service
+      context: ./orderService
     ports:
       - "8083:8083"
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://192.168.0.53:5432/musify
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: Dudzio1423
     networks:
       - app-network
 
-  review_service:
+  reviewservice:
     build:
-      context: ./review_service
+      context: ./reviewService
     ports:
       - "8084:8084"
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://192.168.0.53:5432/musify
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: Dudzio1423
     networks:
       - app-network
 
@@ -55,28 +39,20 @@ services:
     ports:
       - "8080:8080"
     environment:
-      SPRING_CLOUD_GATEWAY_ROUTES_0_ID: user-service
-      SPRING_CLOUD_GATEWAY_ROUTES_0_URI: http://user_service:8081
-      SPRING_CLOUD_GATEWAY_ROUTES_0_PREDICATES_0: Path=/api/users/**
-      SPRING_CLOUD_GATEWAY_ROUTES_0_PREDICATES_1: Path=/api/auth/**
-      SPRING_CLOUD_GATEWAY_ROUTES_1_ID: product-service
-      SPRING_CLOUD_GATEWAY_ROUTES_1_URI: http://product_service:8082
-      SPRING_CLOUD_GATEWAY_ROUTES_1_PREDICATES_0: Path=/api/products/**
-      SPRING_CLOUD_GATEWAY_ROUTES_1_PREDICATES_1: Path=/api/categories/**
-      SPRING_CLOUD_GATEWAY_ROUTES_2_ID: order-service
-      SPRING_CLOUD_GATEWAY_ROUTES_2_URI: http://order_service:8083
-      SPRING_CLOUD_GATEWAY_ROUTES_2_PREDICATES_0: Path=/api/orders/**
-      SPRING_CLOUD_GATEWAY_ROUTES_3_ID: review-service
-      SPRING_CLOUD_GATEWAY_ROUTES_3_URI: http://review_service:8084
-      SPRING_CLOUD_GATEWAY_ROUTES_3_PREDICATES_0: Path=/api/reviews/**
-      SPRING_CLOUD_GATEWAY_GLOBALCORS_ADD_TO_SIMPLE_URL_HANDLER_MAPPING: true
-      SPRING_CLOUD_GATEWAY_GLOBALCORS_CORS_CONFIGURATIONS_["/**"].ALLOWED_ORIGINS: http://localhost:3000
-      SPRING_CLOUD_GATEWAY_GLOBALCORS_CORS_CONFIGURATIONS_["/**"].ALLOWED_METHODS: GET,POST,PUT,DELETE,OPTIONS
+      # Przekazywanie zmiennych środowiskowych do konfiguracji tras
+      PRODUCT_SERVICE_URI: http://productservice:8082
+      USER_SERVICE_URI: http://userservice:8081
+      ORDER_SERVICE_URI: http://orderservice:8083
+      REVIEW_SERVICE_URI: http://reviewservice:8084
+
+      # Konfiguracja CORS
+      #SPRING_CLOUD_GATEWAY_GLOBALCORS_CORS_CONFIGURATIONS_["/**"].ALLOWED_ORIGINS: http://localhost:3000
+      #SPRING_CLOUD_GATEWAY_GLOBALCORS_CORS_CONFIGURATIONS_["/**"].ALLOWED_METHODS: GET,POST,PUT,DELETE,OPTIONS
     depends_on:
-      - user_service
-      - product_service
-      - order_service
-      - review_service
+      - userservice
+      - productservice
+      - orderservice
+      - reviewservice
     networks:
       - app-network
 

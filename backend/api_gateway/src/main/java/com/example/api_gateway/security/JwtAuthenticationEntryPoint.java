@@ -1,4 +1,4 @@
-/*package com.example.api_gateway.security;
+package com.example.api_gateway.security;
 
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -18,4 +18,3 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized: Invalid token or no token provided.");
     }
 }
-*/

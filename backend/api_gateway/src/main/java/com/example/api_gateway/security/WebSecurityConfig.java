@@ -23,7 +23,7 @@ import java.util.Arrays;
 @Configuration
 public class WebSecurityConfig implements WebMvcConfigurer {
 
-    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    /*private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtFilter jwtFilter;
 
     public WebSecurityConfig(JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint, JwtFilter jwtFilter) {
@@ -37,7 +37,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                 .addResourceLocations("file:uploads/products/");
     }
 
-    /*@Bean
+    @Bean
     public SecurityFilterChain configure(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable) // Wyłącz CSRF
@@ -55,9 +55,9 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                 //.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
-    }
+    }*/
 
-    @Bean
+    /*@Bean
     public SecurityFilterChain configure(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable) // Wyłącz CSRF
@@ -68,9 +68,9 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // Stateless session
 
         return http.build();
-    }
+    }*/
 
-    @Bean
+    /*@Bean
     public UrlBasedCorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOriginPatterns(Arrays.asList("*"));

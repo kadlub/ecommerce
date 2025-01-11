@@ -72,8 +72,8 @@ public class JwtFilter extends OncePerRequestFilter {
         chain.doFilter(request, response);
     }
 
-    /**
-     * Sprawdza, czy ścieżka powinna zostać pominięta przez filtr.
+
+     //* Sprawdza, czy ścieżka powinna zostać pominięta przez filtr.
 
     private boolean shouldSkipPath(String path) {
         String normalizedPath = path.startsWith("/api/") ? path : "/api" + path;
