@@ -7,11 +7,11 @@
 	<packaging>pom</packaging>
 	<modules>
 		<module>common</module>
-		<module>user-service</module>
-		<module>product-service</module>
-		<module>order-service</module>
-		<module>review-service</module>
-		<module>api-gateway</module>
+		<module>user_service</module>
+		<module>product_service</module>
+		<module>order_service</module>
+		<module>review_service</module>
+		<module>api_gateway</module>
 	</modules>
 	<dependencyManagement>
 		<dependencies>
