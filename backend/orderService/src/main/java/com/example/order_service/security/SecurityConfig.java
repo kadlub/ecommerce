@@ -33,8 +33,8 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/orders/**").hasAnyRole("USER", "ADMIN")// Publiczne endpointy, np. informacje o zamówieniach
-                        .requestMatchers("/api/orders/user/**").hasAnyRole("USER", "ADMIN") // Tylko użytkownicy
+                        .requestMatchers("/api/orders/**").authenticated()// Publiczne endpointy, np. informacje o zamówieniach
+                        .requestMatchers("/api/orders/user/**").authenticated() // Tylko użytkownicy
                         .requestMatchers("/api/orders/admin/**").hasRole("ADMIN") // Tylko administratorzy
                         .anyRequest().authenticated() // Pozostałe wymagają uwierzytelnienia
                 )

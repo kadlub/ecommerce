@@ -7,6 +7,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -16,43 +20,45 @@ import java.io.IOException;
 public class JwtValidationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
+    private final UserDetailsService userDetailsService; // Poprawnie wstrzyknięta zależność
 
     private static final Logger logger = LoggerFactory.getLogger(JwtValidationFilter.class);
 
-    public JwtValidationFilter(JwtUtil jwtUtil) {
+    public JwtValidationFilter(JwtUtil jwtUtil, UserDetailsService userDetailsService) {
         this.jwtUtil = jwtUtil;
+        this.userDetailsService = userDetailsService; // Wstrzyknięcie UserDetailsService
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-        String path = request.getServletPath();
-        logger.info("Incoming request to path: {}", path);
-
-        // Pomiń walidację JWT dla publicznych endpointów
-        if (path.startsWith("/api/categories/") || path.startsWith("/api/products/") || path.startsWith("/api/uploads/products")) {
-            logger.info("Skipping JWT validation for public endpoint: {}", path);
-            chain.doFilter(request, response);
-            return;
-        }
-
         String authHeader = request.getHeader("Authorization");
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
             try {
-                jwtUtil.extractUsername(token); // Weryfikacja poprawności JWT
-                logger.info("JWT validation successful for token: {}", token);
+                // Wyciągnij nazwę użytkownika z tokena
+                String username = jwtUtil.extractUsername(token);
+
+                // Załaduj szczegóły użytkownika
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+                // Utwórz obiekt Authentication i ustaw w SecurityContext
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                logger.info("User authenticated: {}", username);
+
             } catch (Exception e) {
                 logger.error("JWT validation failed: {}", e.getMessage());
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.getWriter().write("Unauthorized: Invalid token.");
                 return;
             }
-        } else {
-            logger.warn("Authorization header missing or invalid for request to: {}", path);
         }
 
         chain.doFilter(request, response);
     }
 }
+

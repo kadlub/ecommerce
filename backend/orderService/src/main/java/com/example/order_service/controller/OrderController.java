@@ -16,7 +16,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/orders")
-@CrossOrigin
+//@CrossOrigin
 public class OrderController {
 
     private final OrderService orderService;
