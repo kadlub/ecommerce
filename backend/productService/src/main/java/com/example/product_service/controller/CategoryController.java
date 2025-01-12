@@ -14,7 +14,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/categories")
-@CrossOrigin
+//@CrossOrigin
 public class CategoryController {
 
     private final CategoryService categoryService;

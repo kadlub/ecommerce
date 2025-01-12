@@ -26,7 +26,8 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/products")
+@RequestMapping("/api/products")
+//@CrossOrigin
 public class ProductController {
 
     private final ProductService productService;
@@ -194,6 +195,7 @@ public class ProductController {
 
     // Pobieranie produktu po slug
     @GetMapping("/slug/{slug}")
+    //@CrossOrigin
     public ResponseEntity<ProductOutputDto> getProductBySlug(@PathVariable String slug) {
         logger.info("Fetching product by slug: {}", slug);
 

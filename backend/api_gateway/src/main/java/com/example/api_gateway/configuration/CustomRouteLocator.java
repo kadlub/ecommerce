@@ -4,6 +4,10 @@ import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
@@ -17,13 +21,17 @@ public class CustomRouteLocator {
     @Bean("customRouteLocatorBean")
     public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
         return builder.routes()
-                .route("productservice", r -> r.path("/api/categories/**", "/api/products/**")
+                .route("productservice", r -> r.path("/api/categories/**", "/api/products/**", "/api/uploads/**")
+                        .filters(f -> f.removeRequestHeader("Access-Control-Allow-Origin"))
                         .uri("http://productservice:8082"))
                 .route("userservice", r -> r.path("/api/auth/**", "/api/users/**")
+                        .filters(f -> f.removeRequestHeader("Access-Control-Allow-Origin"))
                         .uri("http://userservice:8081"))
                 .route("orderservice", r -> r.path("/api/orders/**")
+                        .filters(f -> f.removeRequestHeader("Access-Control-Allow-Origin"))
                         .uri("http://orderservice:8083"))
                 .route("reviewservice", r -> r.path("/api/reviews/**")
+                        .filters(f -> f.removeRequestHeader("Access-Control-Allow-Origin"))
                         .uri("http://reviewservice:8084"))
                 .build();
     }
@@ -52,19 +60,5 @@ public class CustomRouteLocator {
     private String logUri(String uri) {
         System.out.println("Configuring route with URI: " + uri);
         return uri;
-    }
-
-    @Bean
-    public UrlBasedCorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOriginPatterns(Arrays.asList("*"));
-        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Cache-Control"));
-        config.setExposedHeaders(Arrays.asList("Authorization"));
-        config.setAllowCredentials(true);
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
-        return source;
     }
 }

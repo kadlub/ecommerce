@@ -23,10 +23,10 @@ import java.util.Arrays;
 @Configuration
 public class WebSecurityConfig implements WebMvcConfigurer {
 
-    /*private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-    private final JwtFilter jwtFilter;
+    //private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    //private final JwtFilter jwtFilter;
 
-    public WebSecurityConfig(JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint, JwtFilter jwtFilter) {
+    /*public WebSecurityConfig(JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint, JwtFilter jwtFilter) {
         this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
         this.jwtFilter = jwtFilter;
     }
@@ -51,7 +51,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Stateless session
                 .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint(jwtAuthenticationEntryPoint)); // Własny entry point dla błędów autoryzacji
+                .authenticationEntryPoint(jwtAuthenticationEntryPoint)); // Własny entry point dla błędów autoryzacji
                 //.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -68,9 +68,9 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // Stateless session
 
         return http.build();
-    }*/
+    }
 
-    /*@Bean
+    @Bean
     public UrlBasedCorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOriginPatterns(Arrays.asList("*"));
@@ -93,5 +93,4 @@ public class WebSecurityConfig implements WebMvcConfigurer {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
-}
-*/
+}*/
