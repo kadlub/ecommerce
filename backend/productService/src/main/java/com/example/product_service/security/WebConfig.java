@@ -9,7 +9,7 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("../uploads/products/**")
+        registry.addResourceHandler("/api/uploads/products/**")
                 .addResourceLocations("file:uploads/products/");
     }
 }

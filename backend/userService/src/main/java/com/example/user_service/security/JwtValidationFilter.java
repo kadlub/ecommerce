@@ -5,6 +5,10 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -14,9 +18,12 @@ import java.io.IOException;
 public class JwtValidationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
+    private final UserDetailsService userDetailsService; // Dodaj to
 
-    public JwtValidationFilter(JwtUtil jwtUtil) {
+    // Konstruktor z wstrzykiwaniem zależności
+    public JwtValidationFilter(JwtUtil jwtUtil, UserDetailsService userDetailsService) {
         this.jwtUtil = jwtUtil;
+        this.userDetailsService = userDetailsService; // Przypisz do pola
     }
 
     @Override
@@ -27,7 +34,14 @@ public class JwtValidationFilter extends OncePerRequestFilter {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);
             try {
-                jwtUtil.extractUsername(token); // Weryfikacja poprawności JWT
+                String username = jwtUtil.extractUsername(token); // Wyciągnij nazwę użytkownika z tokena
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username); // Pobierz dane użytkownika
+
+                // Ustawienie kontekstu bezpieczeństwa Spring Security
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+
             } catch (Exception e) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.getWriter().write("Unauthorized: Invalid token.");
@@ -38,3 +52,4 @@ public class JwtValidationFilter extends OncePerRequestFilter {
         chain.doFilter(request, response);
     }
 }
+

@@ -1,5 +1,7 @@
 package com.example.user_service.security;
 
+import com.example.user_service.service.CustomUserDetailsService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,6 +23,10 @@ import java.util.Arrays;
 public class SecurityConfig {
 
     private final JwtValidationFilter jwtValidationFilter;
+
+    @Autowired
+    private CustomUserDetailsService userDetailsService;
+
 
     public SecurityConfig(JwtValidationFilter jwtValidationFilter) {
         this.jwtValidationFilter = jwtValidationFilter;

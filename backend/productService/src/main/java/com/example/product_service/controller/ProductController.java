@@ -20,8 +20,12 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
 
@@ -224,8 +228,19 @@ public class ProductController {
         }
         return ResponseEntity.ok(filteredProducts);
     }
-}
 
+    @PostMapping("/api/uploads/products")
+    public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
+        try {
+            Path uploadPath = Paths.get("/uploads/products");
+            Files.copy(file.getInputStream(), uploadPath.resolve(file.getOriginalFilename()));
+            return ResponseEntity.ok("File uploaded successfully");
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File upload failed");
+        }
+    }
+
+}
 // Endpoint dla filtrowania po nazwach kategorii
     /*@GetMapping("/filter-by-name")
     public ResponseEntity<List<ProductOutputDto>> getFilteredProductsByName(

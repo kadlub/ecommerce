@@ -30,7 +30,7 @@ public class JwtValidationFilter extends OncePerRequestFilter {
         logger.info("Incoming request to path: {}", path);
 
         // Pomiń walidację JWT dla publicznych endpointów
-        if (path.startsWith("/api/categories/") || path.startsWith("/api/products/")) {
+        if (path.startsWith("/api/categories/") || path.startsWith("/api/products/") || path.startsWith("/api/uploads/products")) {
             logger.info("Skipping JWT validation for public endpoint: {}", path);
             chain.doFilter(request, response);
             return;
