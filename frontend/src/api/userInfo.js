@@ -104,3 +104,17 @@ export const fetchUserInfo = async () => {
         throw err;
     }
 };
+
+export const submitReviewAPI = async (reviewData) => {
+    const url = `${API_BASE_URL}/api/reviews`; // Endpoint do dodawania opinii
+    try {
+        const response = await axios.post(url, reviewData, {
+            headers: getHeaders(), // Korzystamy z funkcji getHeaders do uwierzytelnienia
+        });
+        return response?.data; // Zwracamy odpowiedź
+    } catch (err) {
+        console.error("Błąd podczas dodawania opinii:", err.response?.data || err.message);
+        throw err;
+    }
+};
+

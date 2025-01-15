@@ -25,13 +25,15 @@ const Shop = () => {
     <>
       <HeroSection />
       <NewArrivals />
+      {/* 
       {categories.map((category) => (
         <Category
           key={category.categoryId}
           name={category.name}
           subcategories={category.subcategories} // Zagnieżdżone podkategorie
         />
-      ))}
+      ))} 
+      */}
       <Footer content={{ copyright: '© 2024 YourCompany' }} />
     </>
   );

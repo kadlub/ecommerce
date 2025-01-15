@@ -1,32 +1,73 @@
-import React from 'react'
-import FbIcon from '../common/FbIcon'
-import InstaIcon from '../common/InstaIcon'
+import React from 'react';
+import FbIcon from '../common/FbIcon';
+import InstaIcon from '../common/InstaIcon';
 
+// Obiekt content definiujący dane do stopki
+const content = {
+  items: [
+    {
+      title: 'Informacje',
+      list: [
+        { label: 'O nas', path: '/about' },
+        { label: 'Kontakt', path: '/contact' },
+      ],
+    },
+    {
+      title: 'Pomoc',
+      list: [
+        { label: 'FAQ', path: '/faq' },
+        { label: 'Wsparcie', path: '/support' },
+      ],
+    },
+  ],
+  copyright: '© 2025 Musify', // Nazwa sklepu z rokiem
+};
 
-const Footer = ({content}) => {
+// Komponent Footer
+const Footer = () => {
   return (
-    <div className='bg-black text-white py-8'>
-        <div className='flex justify-around'>
-            {content?.items && content?.items?.map((item,index)=>{
-                return (
-                    <div className='flex flex-col'>
-                    <p className='text-[16px] pb-[10px]'>{item?.title}</p>
-                    {item?.list && item?.list?.map((listItem,index)=><a className='flex flex-col text-[12px] py-2'
-                     href={listItem?.path}>{listItem?.label}</a>)}
-                     {item?.description && <p>{item?.description}</p>}
-                    </div>
-                )
-            })}
-        </div>
-        <div className='flex gap-2 items-center justify-center py-4'>
-          <a href='/fb'><FbIcon /></a>
-          <a href='/insta'><InstaIcon /></a>  
-        </div>
-        <p className='text-sm text-white text-center content-center'>{content?.copyright}</p>
+    <footer className="bg-black text-white py-8">
+      {/* Sekcja linków */}
+      <div className="flex justify-around">
+        {content?.items?.map((item, index) => (
+          <div className="flex flex-col" key={index}>
+            <p className="text-lg font-bold pb-2">{item?.title}</p>
+            {item?.list?.map((listItem, idx) => (
+              <a
+                className="text-sm text-gray-300 py-1 hover:underline"
+                href={listItem?.path}
+                key={idx}
+              >
+                {listItem?.label}
+              </a>
+            ))}
+          </div>
+        ))}
+      </div>
 
-    </div>
-  )
-}
+      {/* Sekcja ikon mediów społecznościowych */}
+      <div className="flex gap-4 items-center justify-center py-4">
+        <a href="https://facebook.com" target="_blank" rel="noopener noreferrer">
+          <FbIcon />
+        </a>
+        <a href="https://instagram.com" target="_blank" rel="noopener noreferrer">
+          <InstaIcon />
+        </a>
+      </div>
 
+      {/* Sekcja regulaminu */}
+      <div className="text-center">
+        <a href="/terms" className="text-sm text-gray-300 underline py-2 block">
+          Regulamin
+        </a>
+      </div>
 
-export default Footer
+      {/* Sekcja praw autorskich */}
+      <p className="text-sm text-center text-gray-400 mt-4">
+        {content?.copyright || `© ${new Date().getFullYear()} Nazwa Sklepu`}
+      </p>
+    </footer>
+  );
+};
+
+export default Footer;

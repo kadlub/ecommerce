@@ -194,7 +194,7 @@ public class ProductService {
     }
 
     public Optional<ProductOutputDto> findProductBySlug(String slug) {
-        return productsRepository.findBySlug(slug) // Musisz dodać odpowiednią metodę w repository
+        return productsRepository.findBySlug(slug)
                 .map(this::convertToOutputDto);
     }
 

@@ -199,7 +199,6 @@ public class ProductController {
 
     // Pobieranie produktu po slug
     @GetMapping("/slug/{slug}")
-    //@CrossOrigin
     public ResponseEntity<ProductOutputDto> getProductBySlug(@PathVariable String slug) {
         logger.info("Fetching product by slug: {}", slug);
 

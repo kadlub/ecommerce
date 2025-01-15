@@ -41,7 +41,7 @@ public class UserService {
     // Metoda do wyciągania nazwy użytkownika z tokena JWT
     public String getUsernameFromToken(String token) {
         if (token.startsWith("Bearer ")) {
-            token = token.substring(7); // Usuń prefix "Bearer " z tokena
+            token = token.substring(7); // Usuwanie prefixu "Bearer " z tokena
         }
         return jwtUtil.extractUsername(token);
     }

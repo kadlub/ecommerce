@@ -1,15 +1,48 @@
 import React from 'react'
 import SectionHeading from './SectionsHeading/SectionHeading'
 import Card from '../Card/Card';
-import Guitars from '../../assets/img/guitar-category.png'
+import Guitars from '../../assets/img/guitar.jpg'
+import vinyl from '../../assets/img/vinyl.png'
 import Carousel from 'react-multi-carousel';
+import asap from '../../assets/img/asap.jpg'
+import cable from '../../assets/img/kabel.jpg'
+import dj from '../../assets/img/dj.jpg'
+import microphone from '../../assets/img/microphone.jpg'
+import monitors from '../../assets/img/monitory.jpg'
 import { responsive } from '../../utils/Section.constants';
 import './NewArrivals.css';
 
-const items = [{
-  'title': 'Guitars',
-  imagePath: Guitars
-}];
+const items = [
+  {
+    title: 'Gitary Elektryczne',
+    imagePath: Guitars,
+  },
+  {
+    title: 'Płyty Winylowe',
+    imagePath: vinyl,
+  },
+  {
+    title: 'Merch Artystów',
+    imagePath: asap,
+  },
+  {
+    title: 'Kontrolery DJ-skie',
+    imagePath: dj,
+  },
+  {
+    title: 'Mikrofony',
+    imagePath: microphone,
+  },
+  {
+    title: 'Kable XLR',
+    imagePath: cable,
+  },
+  {
+    title: 'Monitory studyjne',
+    imagePath: monitors,
+  },
+];
+
 
 const NewArrivals = () => {
   return (

@@ -14,7 +14,7 @@ const Navigation = ({ variant = "default" }) => {
   const navigate = useNavigate();
 
   return (
-    <nav className='flex items-center py-6 px-16 justify-between gap-20 custom-nav'>
+    <nav className='flex items-center py-6 px-16 justify-between gap-20 custom-nav bg-#284b63'>
       <div className='flex items-center gap-6'>
         {/* Logo */}
         <a className='text-3xl text-black font-bold gap-8' href='/'>Musify</a>
@@ -57,12 +57,7 @@ const Navigation = ({ variant = "default" }) => {
                 </div>
               )}
             </li>
-            {/* Ikona Profilu */}
-            <li>
-              <button onClick={() => navigate('/account-details/profile')}>
-                <AccountIcon />
-              </button>
-            </li>
+
             {/* Ikona Koszyka */}
             <li>
               <Link to='/cart-items' className='flex flex-wrap'>
@@ -74,11 +69,19 @@ const Navigation = ({ variant = "default" }) => {
                 )}
               </Link>
             </li>
+            {/* Ikona Profilu */}
+            <li>
+              <button onClick={() => navigate('/account-details/profile')}>
+                <AccountIcon />
+              </button>
+            </li>
             {/* Nowy przycisk do wystawiania produktów */}
             <li>
               <button
                 onClick={() => navigate('/create-product')}
-                className="bg-blue-500 text-white py-2 px-4 rounded-lg shadow-md hover:bg-blue-600"
+                className="text-white py-2 px-4 rounded-lg shadow-md"
+                style={{ backgroundColor: '#123456' }}
+
               >
                 Wystaw produkt
               </button>

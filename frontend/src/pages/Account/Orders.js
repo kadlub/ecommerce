@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setLoading } from '../../store/features/common';
-import { cancelOrderAPI, fetchOrderAPI } from '../../api/userInfo';
+import { cancelOrderAPI, fetchOrderAPI, submitReviewAPI } from '../../api/userInfo';
 import { cancelOrder, loadOrders, selectAllOrders } from '../../store/features/user';
 import moment from 'moment';
 
@@ -10,16 +10,18 @@ const Orders = () => {
   const allOrders = useSelector(selectAllOrders);
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState('');
+  const [ratingVisible, setRatingVisible] = useState(null);
+  const [rating, setRating] = useState('');
+  const [comment, setComment] = useState('');
 
   useEffect(() => {
     dispatch(setLoading(true));
     fetchOrderAPI()
       .then((res) => {
-        console.log('Fetched orders from API:', res); // Debugging API response
         dispatch(loadOrders(res));
       })
       .catch((err) => {
-        console.error('Error fetching orders:', err);
+        console.error('Błąd podczas pobierania zamówień:', err);
       })
       .finally(() => {
         dispatch(setLoading(false));
@@ -39,59 +41,54 @@ const Orders = () => {
           quantity: orderItem?.quantity,
         })),
         totalAmount: order?.totalPrice,
+        sellerId: order?.items[0]?.sellerId,
+        sellerName: order?.items[0]?.sellerName,
       }));
-
-      console.log('Processed orders for display:', displayOrders); // Debugging processed orders
       setOrders(displayOrders);
     }
   }, [allOrders]);
 
-  const onCancelOrder = useCallback((id) => {
-    dispatch(setLoading(true));
-    cancelOrderAPI(id)
+  const handleAddRating = (sellerId) => {
+    const reviewData = {
+      reviewedUserId: sellerId, // ID sprzedawcy
+      rating: rating,          // Ocena użytkownika
+      comment: comment,        // Komentarz użytkownika
+    };
+
+    dispatch(setLoading(true)); // Pokazanie loadera
+    submitReviewAPI(reviewData)
       .then(() => {
-        dispatch(cancelOrder(id));
-        console.log('Order cancelled:', id); // Debugging cancellation
+        console.log("Opinia została dodana pomyślnie.");
+        setRatingVisible(null); // Ukryj formularz po dodaniu opinii
+        setRating("");          // Wyzeruj ocenę
+        setComment("");         // Wyzeruj komentarz
       })
       .catch((err) => {
-        console.error('Error cancelling order:', err);
+        console.error("Błąd podczas dodawania opinii:", err);
       })
       .finally(() => {
-        dispatch(setLoading(false));
+        dispatch(setLoading(false)); // Ukrycie loadera
       });
-  }, [dispatch]);
+  };
+
 
   const getStatusClass = (status) => {
-    switch (status) {
-      case 'PENDING':
-        return 'bg-yellow-500 text-white';
-      case 'IN_PROGRESS':
-        return 'bg-blue-500 text-white';
-      case 'SHIPPED':
-        return 'bg-purple-500 text-white';
-      case 'DELIVERED':
-        return 'bg-green-500 text-white';
-      case 'CANCELLED':
-        return 'bg-red-500 text-white';
-      default:
-        return 'bg-gray-500 text-white';
-    }
+    return 'bg-gray-300 text-gray-800'; // Stonowany kolor dla wszystkich statusów
   };
 
   return (
     <div>
       {orders?.length > 0 ? (
         <div className='md:w-[70%] w-full'>
-          <h1 className='text-2xl mb-4'>My Orders</h1>
+          <h1 className='text-2xl mb-4'>Moje Zamówienia</h1>
           {orders.map((order, index) => {
-            console.log('Rendering order:', order); // Debugging orders being rendered
             return (
               <div key={index} className='bg-gray-200 p-4 mb-8'>
-                <p className='text-lg font-bold'>Order no. #{order?.id}</p>
+                <p className='text-lg font-bold'>Zamówienie nr #{order?.id}</p>
                 <div className='flex justify-between mt-2'>
                   <div className='flex flex-col text-gray-500 text-sm'>
-                    <p>Order Date: {moment(order?.orderDate).format('MMMM DD YYYY')}</p>
-                    <p>Total Amount: ${order?.totalAmount}</p>
+                    <p>Data zamówienia: {moment(order?.orderDate).format('DD MMMM YYYY')}</p>
+                    <p>Łączna kwota: {order?.totalAmount} zł</p>
                   </div>
                   <div className='flex items-center'>
                     <span
@@ -103,7 +100,7 @@ const Orders = () => {
                       onClick={() => setSelectedOrder(order?.id)}
                       className='ml-4 text-blue-900 text-right rounded underline cursor-pointer'
                     >
-                      {selectedOrder === order?.id ? 'Hide Details' : 'View Details'}
+                      {selectedOrder === order?.id ? 'Ukryj szczegóły' : 'Pokaż szczegóły'}
                     </button>
                   </div>
                 </div>
@@ -113,13 +110,60 @@ const Orders = () => {
                     {order?.items?.map((item, idx) => (
                       <div key={idx} className='flex gap-4 mb-2'>
                         <div className='flex flex-col text-sm text-gray-600'>
-                          <p>{item?.name || 'Product Name'}</p>
-                          <p>Quantity: {item?.quantity}</p>
-                          <p>Price: ${item?.price}</p>
+                          <p>{item?.name || 'Nazwa produktu'}</p>
+                          <p>Ilość: {item?.quantity}</p>
+                          <p>Cena: {item?.price} zł</p>
                         </div>
                       </div>
                     ))}
-
+                    {ratingVisible === order?.id ? (
+                      <div className='mt-4'>
+                        <label className='block text-sm font-medium mb-2'>Oceń sprzedawcę:</label>
+                        <select
+                          className='border border-gray-300 rounded p-2 mb-2'
+                          value={rating}
+                          onChange={(e) => setRating(e.target.value)}
+                        >
+                          <option value=''>Wybierz ocenę</option>
+                          <option value='1'>1 - Bardzo źle</option>
+                          <option value='2'>2 - Źle</option>
+                          <option value='3'>3 - Średnio</option>
+                          <option value='4'>4 - Dobrze</option>
+                          <option value='5'>5 - Bardzo dobrze</option>
+                        </select>
+                        <textarea
+                          className='border border-gray-300 rounded p-2 w-full mb-2'
+                          placeholder='Dodaj komentarz (opcjonalne)'
+                          value={comment}
+                          onChange={(e) => setComment(e.target.value)}
+                        />
+                        <div className='flex gap-2'>
+                          <button
+                            onClick={() => handleAddRating(order?.sellerId)}
+                            className='px-4 py-2 bg-blue-500 text-white rounded'
+                          >
+                            Zatwierdź
+                          </button>
+                          <button
+                            onClick={() => {
+                              setRatingVisible(null);
+                              setRating('');
+                              setComment('');
+                            }}
+                            className='px-4 py-2 bg-gray-300 rounded text-gray-800'
+                          >
+                            Anuluj
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setRatingVisible(order?.id)}
+                        className='mt-4 px-4 py-2 bg-blue-500 text-white rounded'
+                      >
+                        Wystaw opinię
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
@@ -127,7 +171,7 @@ const Orders = () => {
           })}
         </div>
       ) : (
-        <p>No orders found</p>
+        <p>Nie znaleziono zamówień</p>
       )}
     </div>
   );
