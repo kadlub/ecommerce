@@ -1,0 +1,16 @@
+version: '3.9'
+
+services:
+  frontend:
+    build:
+      context: ./ # Ścieżka do projektu React
+    ports:
+      - "3000:80" # Frontend będzie dostępny pod localhost:3000
+    networks:
+      - app-network
+    environment:
+      - REACT_APP_API_BASE_URL=http://api_gateway:8080 # Adres API Gateway zdefiniowany w backendowym docker-compose
+
+networks:
+  app-network:
+    external: true
