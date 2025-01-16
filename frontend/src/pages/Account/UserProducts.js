@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 import { setLoading } from "../../store/features/common";
 import EditProductForm from "../ProductListPage/EditProductForm";
 import { deleteProductAPI } from "../../api/productAPI";
+import { API_BASE_URL } from "../../api/constant";
 
 const UserProducts = () => {
     const [products, setProducts] = useState([]);
@@ -95,7 +96,7 @@ const UserProducts = () => {
 
                             <img
                                 className="h-[200px] w-[200px] border rounded-lg object-contain"
-                                src={`http://localhost:8080/api/uploads/products/${product.imageUrls[0]}`}
+                                src={`http://${API_BASE_URL}/api/uploads/products/${product.imageUrls[0]}`}
                                 alt={product.name}
                             />
                             <div className="mt-4 w-full">

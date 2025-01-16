@@ -2,10 +2,11 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { selectFavouritesItems } from './favourites';
 import ProductCard from '../../pages/ProductListPage/ProductCard';
+import { API_BASE_URL } from '../../api/constant';
 
 const Wishlist = () => {
     const favourites = useSelector(selectFavouritesItems);
-    const imageBaseUrl = "http://localhost:8080/api/uploads/products/";
+    const imageBaseUrl = `http://${API_BASE_URL}/api/uploads/products/`;
 
     return (
         <div className="p-8">

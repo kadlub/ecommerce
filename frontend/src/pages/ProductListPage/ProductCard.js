@@ -7,11 +7,12 @@ import { addItemToFavouritesAction, removeItemFromFavouritesAction } from '../..
 import { selectFavouritesItems } from '../../store/favourites/favourites';
 import { CartIcon } from '../../components/common/CartIcon';
 import { Wishlist } from '../../components/common/Wishlist';
+import { API_BASE_URL } from '../../api/constant';
 
 const ProductCard = ({ productId, title, description, price, discount, rating, brand, imageUrls, slug }) => {
   const dispatch = useDispatch();
   const favourites = useSelector(selectFavouritesItems);
-  const imageBaseUrl = "http://localhost:8080/api/uploads/products/";
+  const imageBaseUrl = `http://${API_BASE_URL}/api/uploads/products/`;
 
   const thumbnail = imageUrls?.length > 0 ? `${imageBaseUrl}${imageUrls[0]}` : '/placeholder-image.png';
 

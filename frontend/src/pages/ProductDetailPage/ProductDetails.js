@@ -6,13 +6,14 @@ import SectionHeading from '../../components/Sections/SectionsHeading/SectionHea
 import ProductCard from '../ProductListPage/ProductCard';
 import Rating from '../../components/Rating/Rating';
 import { getAllProducts } from '../../api/fetchProducts';
-import { addItemToCartAction } from '../../store/actions/cartAction';
+import { addItemToCartAction } from '../../store/actions/cartAction'
+import { API_BASE_URL } from '../../api/constant';
 
 const ProductDetails = () => {
   const { product } = useLoaderData() || {}; // Ładowanie danych z react-router loadera
   const dispatch = useDispatch();
 
-  const imageBaseUrl = "http://localhost:8080/api/uploads/products/";
+  const imageBaseUrl = `http://${API_BASE_URL}/api/uploads/products/`;
   const fullImageUrls = product?.imageUrls?.map((url) => imageBaseUrl + url);
 
   const [selectedImage, setSelectedImage] = useState(

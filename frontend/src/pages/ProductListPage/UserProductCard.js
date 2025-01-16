@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import EditProductForm from "./EditProductForm";
+import { API_BASE_URL } from "../../api/constant";
 
 const UserProductCard = ({ productId, title, description, price, imageUrls, slug, onDelete }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
-    const imageBaseUrl = "http://localhost:8080/api/uploads/products/";
+    const imageBaseUrl = `http://${API_BASE_URL}/api/uploads/products/`;
     const thumbnail = imageUrls?.length > 0 ? `${imageBaseUrl}${imageUrls[0]}` : "/placeholder-image.png";
 
     const handleEdit = () => {
