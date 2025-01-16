@@ -71,7 +71,7 @@ const Navigation = ({ variant = "default" }) => {
             </li>
             {/* Ikona Profilu */}
             <li>
-              <button onClick={() => navigate('/account-details/profile')}>
+              <button onClick={() => navigate('/account-details')}>
                 <AccountIcon />
               </button>
             </li>

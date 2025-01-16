@@ -26,16 +26,16 @@ const items = [
     imagePath: asap,
   },
   {
-    title: 'Kontrolery DJ-skie',
-    imagePath: dj,
-  },
-  {
     title: 'Mikrofony',
     imagePath: microphone,
   },
   {
     title: 'Kable XLR',
     imagePath: cable,
+  },
+  {
+    title: 'Kontrolery DJ-skie',
+    imagePath: dj,
   },
   {
     title: 'Monitory studyjne',

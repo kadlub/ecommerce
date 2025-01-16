@@ -55,15 +55,12 @@ export const router = createBrowserRouter([
         element: <ProtectedRoute><Account /></ProtectedRoute>,
         children: [
           {
-            path: "profile",
-            element: <ProtectedRoute><Profile /></ProtectedRoute>,
-          },
-          {
             path: "orders",
             element: <ProtectedRoute><Orders /></ProtectedRoute>,
           },
           {
-            path: "products", // Zakładka Products
+            path: "products", // Domyślna zakładka
+            index: true, // Ustawiona jako domyślna
             element: <ProtectedRoute><UserProducts /></ProtectedRoute>,
           },
           {
@@ -73,7 +70,7 @@ export const router = createBrowserRouter([
         ],
       },
       {
-        path: "/wishlist", // Dodana ścieżka dla ulubionych
+        path: "/wishlist",
         element: <ProtectedRoute><Wishlist /></ProtectedRoute>,
       },
       {
@@ -82,7 +79,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "/payment",
-        element: <ProtectedRoute><Payment /></ProtectedRoute>, // Dodanie strony płatności
+        element: <ProtectedRoute><Payment /></ProtectedRoute>,
       },
       {
         path: "/success",
@@ -122,7 +119,7 @@ export const router = createBrowserRouter([
   },
   {
     path: "/admin/",
-    element: <ProtectedRoute roles={['ROLE_ADMIN']}><AdminPanel /></ProtectedRoute>, // Ustawienie roli admina
+    element: <ProtectedRoute roles={['ROLE_ADMIN']}><AdminPanel /></ProtectedRoute>,
     children: [
       {
         path: "categories",

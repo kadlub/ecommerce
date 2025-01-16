@@ -8,6 +8,10 @@ services:
       - "8081:8081"
     networks:
       - app-network
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/musify
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: Dudzio1423
 
   productservice:
     build:
@@ -16,6 +20,10 @@ services:
       - "8082:8082"
     networks:
       - app-network
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/musify
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: Dudzio1423
     volumes:
       - ./uploads/products:/uploads/products # Mapowanie katalogu hosta do kontenera
 
@@ -26,6 +34,10 @@ services:
       - "8083:8083"
     networks:
       - app-network
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/musify
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: Dudzio1423
 
   reviewservice:
     build:
@@ -34,6 +46,10 @@ services:
       - "8084:8084"
     networks:
       - app-network
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/musify
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: Dudzio1423
 
   api_gateway:
     build:
@@ -41,15 +57,10 @@ services:
     ports:
       - "8080:8080"
     environment:
-      # Przekazywanie zmiennych środowiskowych do konfiguracji tras
       PRODUCT_SERVICE_URI: http://productservice:8082
       USER_SERVICE_URI: http://userservice:8081
       ORDER_SERVICE_URI: http://orderservice:8083
       REVIEW_SERVICE_URI: http://reviewservice:8084
-
-      # Konfiguracja CORS
-      #SPRING_CLOUD_GATEWAY_GLOBALCORS_CORS_CONFIGURATIONS_["/**"].ALLOWED_ORIGINS: http://localhost:3000
-      #SPRING_CLOUD_GATEWAY_GLOBALCORS_CORS_CONFIGURATIONS_["/**"].ALLOWED_METHODS: GET,POST,PUT,DELETE,OPTIONS
     depends_on:
       - userservice
       - productservice
@@ -58,6 +69,23 @@ services:
     networks:
       - app-network
 
+  database:
+    image: postgres:13
+    container_name: musify-database
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Dudzio1423
+      POSTGRES_DB: musify
+    volumes:
+      - db-data:/var/lib/postgresql/data # Trwałe przechowywanie danych
+    networks:
+      - app-network
+
 networks:
   app-network:
     driver: bridge
+
+volumes:
+  db-data:

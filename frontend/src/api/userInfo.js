@@ -118,3 +118,29 @@ export const submitReviewAPI = async (reviewData) => {
     }
 };
 
+export const fetchUserReviewsAPI = async () => {
+    const url = API_BASE_URL + "/api/reviews/me";
+    try {
+        const response = await axios.get(url, {
+            headers: getHeaders(),
+        });
+        return response?.data;
+    } catch (error) {
+        console.error("Error fetching user products:", error);
+        throw error;
+    }
+};
+
+export const updateUserDetailsAPI = async (data) => {
+    const url = API_BASE_URL + '/api/users/update';
+    try {
+        const response = await axios.put(url, data, {
+            headers: getHeaders(),
+        });
+        return response?.data;
+    } catch (err) {
+        console.error("Error updating user details:", err.response?.data || err.message);
+        throw err;
+    }
+};
+

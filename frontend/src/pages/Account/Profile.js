@@ -1,84 +1,90 @@
 import React, { useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { removeAddress, selectUserInfo } from "../../store/features/user";
+import { removeAddress, selectUserInfo, updateUserInfo } from "../../store/features/user";
 import AddAddress from "./AddAddress";
 import { setLoading } from "../../store/features/common";
-import { deleteAddressAPI } from "../../api/userInfo";
+import { deleteAddressAPI, updateUserDetailsAPI } from "../../api/userInfo";
 
 const Profile = () => {
   const userInfo = useSelector(selectUserInfo);
-  const [addAddress, setAddAddress] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [editedUsername, setEditedUsername] = useState(userInfo?.username || "");
+  const [editedEmail, setEditedEmail] = useState(userInfo?.email || "");
   const dispatch = useDispatch();
 
-  const onDeleteAddress = useCallback((id) => {
+  const handleSave = () => {
     dispatch(setLoading(true));
-    deleteAddressAPI(id)
-      .then(() => {
-        dispatch(removeAddress(id));
+    const updatedData = {
+      username: editedUsername,
+      email: editedEmail,
+    };
+
+    updateUserDetailsAPI(updatedData)
+      .then((updatedUser) => {
+        dispatch(updateUserInfo(updatedUser));
+        setEditing(false);
       })
       .catch((err) => {
-        console.error("Error deleting address:", err);
+        console.error("Error updating user details:", err);
       })
       .finally(() => {
         dispatch(setLoading(false));
       });
-  }, [dispatch]);
+  };
 
   return (
-    <div>
-      {!addAddress ? (
-        <div>
-          <div className="flex gap-2">
-            <h2 className="text-xl pt-4">Contact Details</h2>
-            <button className="underline text-blue-900 mt-4">Edit</button>
-          </div>
-          <div className="pt-4">
-            <p className="text-gray-700 py-2 font-bold">Full Name</p>
-            <p>
-              {userInfo?.firstName} {userInfo?.lastName}
-            </p>
-            <p className="text-gray-700 py-2 font-bold">Phone Number</p>
-            <p>{userInfo?.phoneNumber ?? "None"}</p>
-            <p className="text-gray-700 py-2 font-bold">Email</p>
-            <p>{userInfo?.email}</p>
-          </div>
-          {/* Addresses */}
-          <div className="pt-4">
-            <div className="flex gap-12">
-              <h3 className="text-lg font-bold">Address</h3>
+    <div className="p-8">
+      <div className="text-center mb-8">
+        {!editing ? (
+          <>
+            <p className="text-xl font-semibold">Nazwa użytkownika: {userInfo?.username}</p>
+            <p className="text-xl font-semibold">Email: {userInfo?.email}</p>
+            <button
+              className="text-blue-900 underline mt-4"
+              onClick={() => setEditing(true)}
+            >
+              Edytuj
+            </button>
+          </>
+        ) : (
+          <div className="flex flex-col items-center">
+            <div className="mb-4">
+              <label className="block text-gray-700 font-semibold mb-2">
+                Nazwa użytkownika:
+              </label>
+              <input
+                type="text"
+                value={editedUsername}
+                onChange={(e) => setEditedUsername(e.target.value)}
+                className="border rounded p-2 w-64"
+              />
+            </div>
+            <div className="mb-4">
+              <label className="block text-gray-700 font-semibold mb-2">Email:</label>
+              <input
+                type="email"
+                value={editedEmail}
+                onChange={(e) => setEditedEmail(e.target.value)}
+                className="border rounded p-2 w-64"
+              />
+            </div>
+            <div className="flex gap-4">
               <button
-                className="underline text-blue-900"
-                onClick={() => setAddAddress(true)}
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                onClick={handleSave}
               >
-                Add New
+                Zapisz
+              </button>
+              <button
+                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                onClick={() => setEditing(false)}
+              >
+                Anuluj
               </button>
             </div>
-            <div className="pt-4 grid grid-cols-1 lg:grid-cols-4 md:grid-cols-3 gap-8 pb-10 mb-8">
-              {userInfo?.addressList?.map((address, index) => (
-                <div key={index} className="bg-gray-200 border rounded-lg p-4">
-                  <p className="py-2 font-bold">{address?.name}</p>
-                  <p className="pb-2">{address?.phoneNumber}</p>
-                  <p className="pb-2">
-                    {address?.street},{address?.city},{address?.state}
-                  </p>
-                  <p>{address?.zipCode}</p>
-                  <div className="flex gap-2">
-                    <button className="underline text-blue-900">Edit</button>
-                    <button
-                      onClick={() => onDeleteAddress(address?.id)}
-                      className="underline text-blue-900"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
-        </div>
-      ) : (
-        <AddAddress onCancel={() => setAddAddress(false)} />
-      )}
+        )}
+      </div>
     </div>
   );
 };

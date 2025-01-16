@@ -61,6 +61,16 @@ export const userSlice = createSlice({
                 }),
             };
         },
+        updateUserInfo: (state, action) => {
+            // Aktualizacja danych użytkownika
+            return {
+                ...state,
+                userInfo: {
+                    ...state?.userInfo,
+                    ...action?.payload, // Nadpisz tylko zmienione pola
+                },
+            };
+        },
     },
 });
 
@@ -70,6 +80,7 @@ export const {
     removeAddress,
     loadOrders,
     cancelOrder,
+    updateUserInfo, // Eksport nowej akcji
 } = userSlice?.actions;
 
 // Selektory dla różnych części danych
