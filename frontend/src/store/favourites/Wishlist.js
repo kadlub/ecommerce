@@ -6,7 +6,7 @@ import { API_BASE_URL } from '../../api/constant';
 
 const Wishlist = () => {
     const favourites = useSelector(selectFavouritesItems);
-    const imageBaseUrl = `http://${API_BASE_URL}/api/uploads/products/`;
+    const imageBaseUrl = `${API_BASE_URL}/api/uploads/products/`;
 
     return (
         <div className="p-8">

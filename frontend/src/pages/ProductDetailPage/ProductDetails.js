@@ -13,7 +13,7 @@ const ProductDetails = () => {
   const { product } = useLoaderData() || {}; // Ładowanie danych z react-router loadera
   const dispatch = useDispatch();
 
-  const imageBaseUrl = `http://${API_BASE_URL}/api/uploads/products/`;
+  const imageBaseUrl = `${API_BASE_URL}/api/uploads/products/`;
   const fullImageUrls = product?.imageUrls?.map((url) => imageBaseUrl + url);
 
   const [selectedImage, setSelectedImage] = useState(

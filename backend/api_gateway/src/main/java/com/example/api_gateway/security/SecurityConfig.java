@@ -18,11 +18,11 @@ public class SecurityConfig {
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         http
-                .csrf(ServerHttpSecurity.CsrfSpec::disable) // Wyłącz CSRF
-                .cors().configurationSource(corsConfigurationSource()) // Obsługa CORS
+                .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                .cors().configurationSource(corsConfigurationSource())
                 .and()
                 .authorizeExchange(exchange -> exchange
-                        .anyExchange().permitAll() // Zezwól na wszystkie żądania
+                        .anyExchange().permitAll()
                 );
         return http.build();
     }
@@ -30,11 +30,11 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(Arrays.asList("http://localhost:3000")); // Wybierz frontendowy adres (unikaj "*")
+        config.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Cache-Control"));
         config.setExposedHeaders(Arrays.asList("Authorization"));
-        config.setAllowCredentials(true); // Obsługa ciasteczek (jeśli używasz)
+        config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);

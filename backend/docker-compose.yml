@@ -71,7 +71,7 @@ services:
 
   database:
     image: postgres:13
-    container_name: musify-database
+    container_name: musiffy-database
     ports:
       - "5432:5432"
     environment:

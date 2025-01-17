@@ -96,7 +96,7 @@ const UserProducts = () => {
 
                             <img
                                 className="h-[200px] w-[200px] border rounded-lg object-contain"
-                                src={`http://${API_BASE_URL}/api/uploads/products/${product.imageUrls[0]}`}
+                                src={`${API_BASE_URL}/api/uploads/products/${product.imageUrls[0]}`}
                                 alt={product.name}
                             />
                             <div className="mt-4 w-full">

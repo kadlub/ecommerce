@@ -12,7 +12,7 @@ import { API_BASE_URL } from '../../api/constant';
 const ProductCard = ({ productId, title, description, price, discount, rating, brand, imageUrls, slug }) => {
   const dispatch = useDispatch();
   const favourites = useSelector(selectFavouritesItems);
-  const imageBaseUrl = `http://${API_BASE_URL}/api/uploads/products/`;
+  const imageBaseUrl = `${API_BASE_URL}/api/uploads/products/`;
 
   const thumbnail = imageUrls?.length > 0 ? `${imageBaseUrl}${imageUrls[0]}` : '/placeholder-image.png';
 
