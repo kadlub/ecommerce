@@ -87,13 +87,14 @@ const ProductDetails = () => {
           <Breadcrumb links={breadCrumbLinks} />
           <p className="text-3xl pt-4">{product?.name || 'Nazwa produktu'}</p>
           <Rating rating={product?.rating || 0} />
-          <p className="text-xl bold py-2">${product?.price || 'Cena niedostępna'}</p>
+          <p className="text-xl bold py-2">{product?.price || 'Cena niedostępna'} zł</p>
           <p className="text-sm py-1 text-gray-600">Stan: {product?.condition || 'Nieznany'}</p>
           <p className="text-sm py-1 text-gray-600">Sprzedawca: {product?.sellerName || 'Nieznany'}</p>
-          <p className="py-4">{product?.description || 'Brak opisu produktu.'}</p>
+          {/*<p className="py-4">{product?.description || 'Brak opisu produktu.'}</p>*/}
           <button
             onClick={handleAddToCart}
-            className="bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600"
+            className="text-white py-2 px-4 rounded-lg shadow-md"
+            style={{ backgroundColor: '#123456' }}
           >
             Dodaj do koszyka
           </button>

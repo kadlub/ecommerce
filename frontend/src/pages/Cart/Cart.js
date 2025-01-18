@@ -11,7 +11,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import EmptyCart from '../../assets/img/empty.png';
 
 const headers = [
-    "Product Details", "Price", "Quantity", "Shipping", "SubTotal", "Action"
+    "Produkty", "Cena", "Ilość", "Dostawa", "Cena z dostawą", ""
 ];
 
 
@@ -56,7 +56,7 @@ const Cart = () => {
     const subTotal = useMemo(() => {
         let value = 0;
         cartItems?.forEach(element => {
-            value += element?.subTotal
+            value += element?.subTotal + 15
         });
         return value?.toFixed(2);
     }, [cartItems]);
@@ -93,26 +93,24 @@ const Cart = () => {
                                                     <div className='flex p-4'>
                                                         <img src={item?.thumbnail} alt={'product-' + index} className='w-[120px] h-[120px] object-cover' />
                                                         <div className='flex flex-col text-sm px-2 text-gray-600'>
-                                                            <p>{item?.name || 'Name'}</p>
-                                                            <p>Size {item?.variant?.size}</p>
-                                                            <p>Color {item?.variant?.color}</p>
+                                                            <p>{item?.name || 'Nazwa'}</p>
                                                         </div>
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <p className='text-center text-sm text-gray-600'>${item?.price}</p>
+                                                    <p className='text-center text-sm text-gray-600'>{item?.price}zł</p>
                                                 </td>
 
                                                 <td>
-                                                    <NumberInput max={2} quantity={item?.quantity} onChangeQuantity={(value) => onChangeQuantity(value, item?.productId, item?.variant?.id)} />
+                                                    <p className='text-center text-sm text-gray-600'>1</p>
                                                 </td>
 
                                                 <td>
-                                                    <p className='text-center text-sm text-gray-600'>FREE</p>
+                                                    <p className='text-center text-sm text-gray-600'>15 zł</p>
                                                 </td>
 
                                                 <td>
-                                                    <p className='text-center text-sm text-gray-600'>${item?.subTotal}</p>
+                                                    <p className='text-center text-sm text-gray-600'>{item?.subTotal + 15}zł</p>
                                                 </td>
 
                                                 <td>
@@ -130,17 +128,17 @@ const Cart = () => {
                                 <p className='text-lg font-bold'>Kod zniżkowy</p>
                                 <p className='text-sm text-gray-600'>Tutaj wprowadź swój kod</p>
                                 <form>
-                                    <input type='text' className='w-[150px] h-[48px] mt-2 border-gray-500 p-2 hover:outline-none' placeholder='Enter code' />
+                                    <input type='text' className='w-[150px] h-[48px] mt-2 border-gray-500 p-2 hover:outline-none' placeholder='Kod zniżkowy' />
                                     <button className='w-[80px] h-[48px] bg-black text-white'>Zatwierdź</button>
                                 </form>
                             </div>
                             <div className='mr-20 pr-8'>
-                                <div className='flex gap-8 text-lg'><p className='w-[120px]'>Suma za przedmioty</p> <p>${subTotal}</p></div>
-                                <div className='flex gap-8 text-lg mt-2'><p className='w-[120px]'>Dostawa</p> <p>${15}</p></div>
-                                <div className='flex gap-8 text-lg mt-2 font-bold'><p className='w-[120px]'>Suma</p> <p>${subTotal}</p></div>
+                                <div className='flex gap-8 text-lg'><p className='w-[120px]'>Suma za przedmioty</p> <p>{subTotal}zł</p></div>
+                                <div className='flex gap-8 text-lg mt-2'><p className='w-[120px]'>Dostawa</p> <p>{15}zł</p></div>
+                                <div className='flex gap-8 text-lg mt-2 font-bold'><p className='w-[120px]'>Suma</p> <p>{subTotal}zł</p></div>
                                 <hr className='h-[2px] bg-slate-400 mt-2'></hr>
-                                {isLoggedIn && <button className='w-full items-center h-[48px] bg-black border rounded-lg mt-2 text-white hover:bg-gray-800' onClick={() => navigate("/checkout")}>Checkout</button>}
-                                {!isLoggedIn && <div className='p-4'><Link to={"/v1/login"} className='w-full p-2 items-center h-[48px] bg-black border rounded-lg mt-2 text-white hover:bg-gray-800'>Login to Checkout</Link></div>}
+                                {isLoggedIn && <button className='w-full items-center h-[48px] bg-black border rounded-lg mt-2 text-white hover:bg-gray-800' onClick={() => navigate("/checkout")}>Podsumowanie</button>}
+                                {!isLoggedIn && <div className='p-4'><Link to={"/v1/login"} className='w-full p-2 items-center h-[48px] bg-black border rounded-lg mt-2 text-white hover:bg-gray-800'>Zaloguj się!</Link></div>}
                             </div>
                         </div>
                     </>}
@@ -157,12 +155,12 @@ const Cart = () => {
                 isOpen={modalIsOpen}
                 onRequestClose={onCloseModal}
                 style={customStyles}
-                contentLabel="Remove Item"
+                contentLabel="Usuń przedmiot"
             >
                 <p>Na pewno chcesz usunąć ten przedmiot?</p>
                 <div className='flex justify-between p-4'>
-                    <button className='h-[48px]' onClick={onCloseModal}>Cancel</button>
-                    <button className='bg-black text-white w-[80px] h-[48px] border rounded-lg' onClick={onDeleteItem}>Remove</button>
+                    <button className='h-[48px]' onClick={onCloseModal}>Anuluj</button>
+                    <button className='bg-black text-white w-[80px] h-[48px] border rounded-lg' onClick={onDeleteItem}>Usuń</button>
                 </div>
             </Modal>
         </>

@@ -10,7 +10,7 @@ import dj from '../../assets/img/dj.jpg'
 import microphone from '../../assets/img/microphone.jpg'
 import monitors from '../../assets/img/monitory.jpg'
 import { responsive } from '../../utils/Section.constants';
-import './NewArrivals.css';
+import './Bestsellers.css';
 
 const items = [
   {
@@ -44,7 +44,7 @@ const items = [
 ];
 
 
-const NewArrivals = () => {
+const Bestsellers = () => {
   return (
     <>
       <SectionHeading title={'Najciekawsze'} />
@@ -66,4 +66,4 @@ const NewArrivals = () => {
   )
 }
 
-export default NewArrivals
+export default Bestsellers;

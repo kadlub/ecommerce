@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import HeroSection from './components/Carousel/Carousel';
-import NewArrivals from './components/Sections/NewArrivals';
+import Bestsellers from './components/Sections/Bestsellers';
 import Category from './components/Sections/Categories/Category';
 import Footer from './components/Footer/Footer';
 import { fetchCategoriesTree } from './api/fetchCategories'; // Użycie nowego endpointu
@@ -24,7 +24,7 @@ const Shop = () => {
   return (
     <>
       <HeroSection />
-      <NewArrivals />
+      <Bestsellers />
       {/* 
       {categories.map((category) => (
         <Category

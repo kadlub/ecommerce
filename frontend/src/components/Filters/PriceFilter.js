@@ -48,7 +48,7 @@ const PriceFilter = ({ onPriceChange }) => {
             />
             <div className="flex justify-between">
                 <div className="border rounded-lg h-8 mt-4 max-w-[50%] w-[40%] flex items-center">
-                    <p className="pl-4 text-gray-600">$</p>
+                    <p className="pl-4 text-gray-600">zł</p>
                     <input
                         type="number"
                         value={range?.min}
@@ -60,7 +60,7 @@ const PriceFilter = ({ onPriceChange }) => {
                     />
                 </div>
                 <div className="border rounded-lg h-8 mt-4 max-w-[50%] w-[40%] flex items-center">
-                    <p className="pl-4 text-gray-600">$</p>
+                    <p className="pl-4 text-gray-600">zł</p>
                     <input
                         type="number"
                         value={range?.max}

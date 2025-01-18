@@ -96,12 +96,12 @@ const ProductListPage = () => {
         {/* Panel filtrów */}
         <div className="w-[20%] p-[10px] border rounded-lg m-[20px]">
           <div className="flex justify-between">
-            <p className="text-[16px] text-gray-600">Filters</p>
+            <p className="text-[16px] text-gray-600">Filtry</p>
             <FilterIcon />
           </div>
           {/* Podkategorie */}
           <div>
-            <p className="text-[16px] text-black mt-5">Subcategories</p>
+            <p className="text-[16px] text-black mt-5">Kategorie</p>
             <Categories types={subcategories} onCategoryClick={handleCategoryChange} />
             <hr />
           </div>
@@ -152,7 +152,8 @@ const ProductListPage = () => {
           <div className="mt-4">
             <button
               onClick={handleApplyFilters}
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+              className="text-white py-2 px-4 rounded-lg shadow-md"
+              style={{ backgroundColor: '#123456' }}
             >
               Zatwierdź
             </button>

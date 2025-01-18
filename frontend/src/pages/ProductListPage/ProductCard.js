@@ -64,11 +64,11 @@ const ProductCard = ({ productId, title, description, price, discount, rating, b
         <div>
           {discount ? (
             <div>
-              <p className="text-red-500 line-through text-sm">${price}</p>
-              <p className="text-green-500 font-bold">${(price - price * (discount / 100)).toFixed(2)}</p>
+              <p className="text-red-500 line-through text-sm">{price}zł</p>
+              <p className="text-green-500 font-bold">{(price - price * (discount / 100)).toFixed(2)}zł</p>
             </div>
           ) : (
-            <p className="text-lg font-bold">${price}</p>
+            <p className="text-lg font-bold">{price} zł</p>
           )}
         </div>
       </div>
