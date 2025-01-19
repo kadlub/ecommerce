@@ -30,7 +30,11 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
+
+        // Pobieranie adresu z zmiennej środowiskowej
+        String frontendUrl = System.getenv("FRONTEND_URL");
+        config.setAllowedOrigins(Arrays.asList(frontendUrl != null ? frontendUrl : "http://localhost:3000"));
+
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Cache-Control"));
         config.setExposedHeaders(Arrays.asList("Authorization"));

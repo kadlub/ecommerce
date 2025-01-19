@@ -9,8 +9,7 @@ export const API_URLS = {
     REGISTER: '/api/auth/register', // Endpoint rejestracji
 }
 
-export const API_BASE_URL = 'http://localhost:8080';
-
+export const API_BASE_URL = '/api';
 
 export const getHeaders = () => {
     const token = getToken();
