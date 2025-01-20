@@ -12,6 +12,7 @@
 		<module>orderService</module>
 		<module>reviewService</module>
 		<module>api_gateway</module>
+		<module>notificationService</module>
 	</modules>
 	<dependencyManagement>
 		<dependencies>

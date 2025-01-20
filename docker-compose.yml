@@ -39,6 +39,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/musify
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: Dudzio1423
+      NOTIFICATION_SERVICE_URI: http://notificationservice:8085 # Dodano URI do NotificationService
 
   reviewservice:
     build:
@@ -52,6 +53,22 @@ services:
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: Dudzio1423
 
+  notificationservice:
+    build:
+      context: ./backend/notificationService
+    ports:
+      - "8085:8085"
+    networks:
+      - app-network
+    environment:
+      SPRING_MAIL_HOST: smtp.gmail.com
+      SPRING_MAIL_PORT: 587
+      SPRING_MAIL_USERNAME: your-email@gmail.com
+      SPRING_MAIL_PASSWORD: your-email-password
+      SPRING_MAIL_PROTOCOL: smtp
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: true
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: true
+
   api_gateway:
     build:
       context: ./backend/api_gateway
@@ -64,11 +81,13 @@ services:
       USER_SERVICE_URI: http://userservice:8081
       ORDER_SERVICE_URI: http://orderservice:8083
       REVIEW_SERVICE_URI: http://reviewservice:8084
+      NOTIFICATION_SERVICE_URI: http://notificationservice:8085 # Dodano URI do NotificationService
     depends_on:
       - userservice
       - productservice
       - orderservice
       - reviewservice
+      - notificationservice
 
   # Baza danych PostgreSQL
   database:
