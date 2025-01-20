@@ -16,7 +16,7 @@ public class MailConfig {
         mailSender.setHost("smtp.gmail.com");
         mailSender.setPort(587);
         mailSender.setUsername("kuba.kadlubowski@gmail.com");
-        mailSender.setPassword("qvct etnd hfzl qxug");
+        mailSender.setPassword("qvct etnd hfzl qxug"); // Upewnij się, że to jest prawidłowe hasło aplikacji
 
         Properties props = mailSender.getJavaMailProperties();
         props.put("mail.transport.protocol", "smtp");
@@ -25,6 +25,9 @@ public class MailConfig {
         props.put("mail.debug", "true");
         props.put("mail.mime.allowutf8", "true");
         props.put("mail.smtp.allow8bitmime", "true");
+        props.put("mail.smtp.ssl.trust", "smtp.gmail.com");
+        props.put("mail.smtp.socketFactory.fallback", "false");
+        props.put("mail.smtp.socketFactory.port", "587");
 
         return mailSender;
     }

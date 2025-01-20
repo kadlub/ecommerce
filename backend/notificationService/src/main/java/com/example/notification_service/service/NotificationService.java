@@ -24,11 +24,21 @@ public class NotificationService {
 
     public void sendOrderConfirmationEmail(OrderNotificationRequest request) {
         String subject = "Potwierdzenie zakupu";
-        String message = String.format("Drogi kliencie,\n\nDziękujemy za zakup %s.\nSzczegóły dostawy:\n%s\n\nCena: %s\n",
+        String buyerMessage = String.format("Drogi kliencie,\n\nDziękujemy za zakup %s.\nSzczegóły dostawy:\n%s\n\nCena: %s\n",
                 request.getProductName(),
                 request.getDeliveryDetails(),
                 request.getTotalPrice());
-        sendEmail(request.getBuyerEmail(), subject, message);
+
+        String sellerMessage = String.format("Drogi sprzedawco,\n\nTwój produkt %s został sprzedany!\nSzczegóły dostawy do klienta:\n%s\n\nCena: %s\n",
+                request.getProductName(),
+                request.getDeliveryDetails(),
+                request.getTotalPrice());
+
+        // Wysyłanie wiadomości do kupującego
+        sendEmail(request.getBuyerEmail(), subject, buyerMessage);
+
+        // Wysyłanie wiadomości do sprzedającego
+        sendEmail(request.getSellerEmail(), subject, sellerMessage);
     }
 
     public void sendOrderSoldNotification(OrderNotificationRequest request) {
@@ -48,7 +58,7 @@ public class NotificationService {
             // Konfiguracja wiadomości e-mail
             helper.setTo(to);
             helper.setSubject(subject);
-            helper.setText(content, false); // false -> wiadomość tekstowa (nie HTML)
+            helper.setText(content, false); // false -> wiadomość jako tekst zwykły (nie HTML)
 
             // Wysłanie wiadomości
             mailSender.send(message);

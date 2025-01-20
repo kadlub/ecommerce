@@ -40,10 +40,11 @@ public class NotificationController {
     @PostMapping("/test-polish-email")
     public String testPolishEmail() {
         try {
+            String content = "Wiadomość testowa z polskimi znakami: ąęśćółżźń";
             notificationService.sendEmail(
                     "kuba.kadlubowski@gmail.com",
                     "Test polskich znaków",
-                    "Wiadomość testowa z polskimi znakami: ąęśćółżźń"
+                    content
             );
             return "Email with Polish characters sent successfully!";
         } catch (Exception e) {
@@ -51,6 +52,4 @@ public class NotificationController {
             return "Error: " + e.getMessage();
         }
     }
-
-
 }
