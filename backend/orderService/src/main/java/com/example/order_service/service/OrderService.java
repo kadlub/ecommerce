@@ -1,6 +1,7 @@
 package com.example.order_service.service;
 
 import com.example.common.dto.OrderInputDto;
+import com.example.common.dto.OrderNotificationRequest;
 import com.example.common.dto.OrderOutputDto;
 import com.example.common.entity.Orders;
 import com.example.common.entity.OrderItems;
@@ -9,8 +10,14 @@ import com.example.common.entity.Users;
 import com.example.common.repository.OrdersRepository;
 import com.example.common.repository.ProductsRepository;
 import com.example.common.repository.UsersRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -26,14 +33,16 @@ public class OrderService {
     private final OrdersRepository ordersRepository;
     private final ProductsRepository productsRepository;
     private final UsersRepository usersRepository;
+    private final RestTemplate restTemplate;
 
     @Autowired
-    public OrderService(OrdersRepository ordersRepository, UsersRepository usersRepository, ProductsRepository productsRepository) {
+    public OrderService(OrdersRepository ordersRepository, UsersRepository usersRepository,
+                        ProductsRepository productsRepository, RestTemplate restTemplate) {
         this.ordersRepository = ordersRepository;
         this.usersRepository = usersRepository;
         this.productsRepository = productsRepository;
+        this.restTemplate = restTemplate;
     }
-
     // Pobierz wszystkie zamówienia
     public List<OrderOutputDto> findAllOrders() {
         return ordersRepository.findAll()
@@ -58,13 +67,8 @@ public class OrderService {
     }
 
     // Utwórz nowe zamówienie
+    @Transactional
     public OrderOutputDto createOrder(OrderInputDto orderInputDto) {
-        // Znajdź użytkownika na podstawie username
-
-        System.out.println(usersRepository.findByUsername(orderInputDto.getUsername()));
-
-        System.out.println("Order payload: " + orderInputDto);
-
         Users buyer = usersRepository.findByUsername(orderInputDto.getUsername())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -90,11 +94,8 @@ public class OrderService {
                 throw new RuntimeException("Product is already sold");
             }
 
-            // Oznacz produkt jako sprzedany
             product.setSold(true);
-            System.out.println("Marking product as sold: " + product.getProductId());
             productsRepository.save(product);
-            System.out.println("Product marked as sold");
 
             return OrderItems.builder()
                     .product(product)
@@ -110,8 +111,42 @@ public class OrderService {
 
         Orders savedOrder = ordersRepository.save(order);
 
+        // Wyślij powiadomienia e-mail
+        sendNotifications(savedOrder);
+
         return convertToOutputDto(savedOrder);
     }
+
+    private void sendNotifications(Orders order) {
+        // Pobierz token z aktualnego kontekstu HTTP
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        String jwtToken = attributes.getRequest().getHeader("Authorization");
+
+        order.getOrderItems().forEach(item -> {
+            Products product = item.getProduct();
+            Users seller = product.getSeller();
+
+            OrderNotificationRequest notificationRequest = OrderNotificationRequest.builder()
+                    .buyerEmail(order.getUser().getEmail())
+                    .sellerEmail(seller.getEmail())
+                    .productName(product.getName())
+                    .deliveryDetails(order.getCity() + ", " + order.getStreet() + " " + order.getBuildingNumber())
+                    .totalPrice(order.getTotalPrice().toString())
+                    .build();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", jwtToken); // Dodaj token do nagłówka
+
+            HttpEntity<OrderNotificationRequest> requestEntity = new HttpEntity<>(notificationRequest, headers);
+
+            restTemplate.postForObject(
+                    "http://notificationservice.musify.svc.cluster.local:8085/api/notifications/order-confirmation",
+                    requestEntity,
+                    Void.class
+            );
+        });
+    }
+
 
     // Usuń zamówienie
     public void deleteOrder(UUID orderId) {

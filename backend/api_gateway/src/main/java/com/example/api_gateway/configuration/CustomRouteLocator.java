@@ -35,6 +35,9 @@ public class CustomRouteLocator {
                         .uri("http://reviewservice:8084"))
                 .route("productservice-images", r -> r.path("/uploads/products/**")
                         .uri("http://productservice:8082"))
+                .route("notificationservice", r -> r.path("/api/notifications/**")
+                        .filters(f -> f.removeRequestHeader("Access-Control-Allow-Origin"))
+                        .uri("http://notificationservice:8085"))
                 .build();
     }
 

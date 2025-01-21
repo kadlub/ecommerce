@@ -1,0 +1,243 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: musify
+
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: product-uploads-pv
+  namespace: musify
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: /mnt/data/uploads/products
+
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: product-uploads-pvc
+  namespace: musify
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: database
+  namespace: musify
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: database
+  template:
+    metadata:
+      labels:
+        app: database
+    spec:
+      containers:
+      - name: database
+        image: postgres:13
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_USER
+          value: postgres
+        - name: POSTGRES_PASSWORD
+          value: Dudzio1423
+        - name: POSTGRES_DB
+          value: musify
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data
+          name: db-data
+      volumes:
+      - name: db-data
+        persistentVolumeClaim:
+          claimName: db-data
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: database
+  namespace: musify
+spec:
+  selector:
+    app: database
+  ports:
+  - protocol: TCP
+    port: 5432
+    targetPort: 5432
+  type: ClusterIP
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: productservice
+  namespace: musify
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: productservice
+  template:
+    metadata:
+      labels:
+        app: productservice
+    spec:
+      containers:
+      - name: productservice
+        image: 654654313356.dkr.ecr.eu-north-1.amazonaws.com/musify:productservice-with-uploads
+        ports:
+        - containerPort: 8082
+        env:
+        - name: SPRING_DATASOURCE_URL
+          value: "jdbc:postgresql://database.musify.svc.cluster.local:5432/musify"
+        - name: SPRING_DATASOURCE_USERNAME
+          value: "postgres"
+        - name: SPRING_DATASOURCE_PASSWORD
+          value: "Dudzio1423"
+        volumeMounts:
+        - mountPath: /uploads/products
+          name: product-uploads
+      volumes:
+      - name: product-uploads
+        persistentVolumeClaim:
+          claimName: product-uploads-pvc
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: productservice
+  namespace: musify
+spec:
+  selector:
+    app: productservice
+  ports:
+    - protocol: TCP
+      port: 8082
+      targetPort: 8082
+  type: ClusterIP
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: userservice
+  namespace: musify
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: userservice
+  template:
+    metadata:
+      labels:
+        app: userservice
+    spec:
+      containers:
+      - name: userservice
+        image: 654654313356.dkr.ecr.eu-north-1.amazonaws.com/musify:userservice-latest
+        ports:
+        - containerPort: 8081
+        env:
+        - name: SPRING_DATASOURCE_URL
+          value: "jdbc:postgresql://database.musify.svc.cluster.local:5432/musify"
+        - name: SPRING_DATASOURCE_USERNAME
+          value: "postgres"
+        - name: SPRING_DATASOURCE_PASSWORD
+          value: "Dudzio1423"
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: userservice
+  namespace: musify
+spec:
+  selector:
+    app: userservice
+  ports:
+  - protocol: TCP
+    port: 8081
+    targetPort: 8081
+  type: ClusterIP
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: notificationservice
+  namespace: musify
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: notificationservice
+  template:
+    metadata:
+      labels:
+        app: notificationservice
+    spec:
+      containers:
+      - name: notificationservice
+        image: 654654313356.dkr.ecr.eu-north-1.amazonaws.com/musify:notificationservice-latest
+        ports:
+        - containerPort: 8085
+        env:
+        - name: SPRING_DATASOURCE_URL
+          value: "jdbc:postgresql://database.musify.svc.cluster.local:5432/musify"
+        - name: SPRING_DATASOURCE_USERNAME
+          value: "postgres"
+        - name: SPRING_DATASOURCE_PASSWORD
+          value: "Dudzio1423"
+        - name: MAIL_HOST
+          value: "smtp.gmail.com"
+        - name: MAIL_PORT
+          value: "587"
+        - name: MAIL_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: mail-secret
+              key: username
+        - name: MAIL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mail-secret
+              key: password
+        - name: MAIL_PROTOCOL
+          value: "smtp"
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mail-secret
+  namespace: musify
+type: Opaque
+data:
+  username: bXlAZ21haWwuY29t # Twój adres email zakodowany Base64
+  password: cGFzc3dvcmQ= # Twoje hasło zakodowane Base64
