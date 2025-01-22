@@ -404,6 +404,13 @@ spec:
         image: 654654313356.dkr.ecr.eu-north-1.amazonaws.com/musify:frontend-latest
         ports:
         - containerPort: 80
+        env:
+        - name: REACT_APP_API_GATEWAY_URL
+          valueFrom:
+            configMapKeyRef:
+              name: frontend-config
+              key: API_GATEWAY_URL
+
 
 ---
 
@@ -413,11 +420,27 @@ kind: Service
 metadata:
   name: frontend
   namespace: musify
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "external" # Użyj ALB
+    alb.ingress.kubernetes.io/scheme: internet-facing # Publiczny dostęp
+    alb.ingress.kubernetes.io/target-type: ip # Podstawowe targety dla ALB
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+    alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:eu-north-1:654654313356:certificate/63d90519-8f2c-464c-9000-914b70f74ffd" # Twój certyfikat
 spec:
   selector:
     app: frontend
   ports:
-  - protocol: TCP
-    port: 443
-    targetPort: 80
+    - protocol: TCP
+      port: 443
+      targetPort: 80
   type: LoadBalancer
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-config
+  namespace: musify
+data:
+  API_GATEWAY_URL: "https://musifyshop.click/api"
