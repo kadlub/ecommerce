@@ -37,7 +37,7 @@ const PriceFilter = ({ onPriceChange }) => {
             <RangeSlider
                 className="custom-range-slider"
                 min={0}
-                max={2000}
+                max={5000}
                 defaultValue={[range.min, range.max]}
                 onInput={(values) =>
                     setRange({
@@ -47,29 +47,11 @@ const PriceFilter = ({ onPriceChange }) => {
                 }
             />
             <div className="flex justify-between">
-                <div className="border rounded-lg h-8 mt-4 max-w-[50%] w-[40%] flex items-center">
-                    <p className="pl-4 text-gray-600">zł</p>
-                    <input
-                        type="number"
-                        value={range?.min}
-                        className="outline-none px-4 text-gray-600"
-                        min={0}
-                        max="4999"
-                        disabled
-                        placeholder="min"
-                    />
+                <div className="border rounded-lg h-8 mt-4 max-w-[50%] w-[40%] flex items-center justify-center">
+                    <p className="text-gray-600">{range?.min} zł</p>
                 </div>
-                <div className="border rounded-lg h-8 mt-4 max-w-[50%] w-[40%] flex items-center">
-                    <p className="pl-4 text-gray-600">zł</p>
-                    <input
-                        type="number"
-                        value={range?.max}
-                        className="outline-none px-4 text-gray-600"
-                        min={0}
-                        max="5000"
-                        disabled
-                        placeholder="max"
-                    />
+                <div className="border rounded-lg h-8 mt-4 max-w-[50%] w-[40%] flex items-center justify-center">
+                    <p className="text-gray-600">{range?.max} zł</p>
                 </div>
             </div>
         </div>

@@ -2,6 +2,8 @@
 FROM node:18 AS build
 WORKDIR /app
 COPY . .
+RUN npm cache clean --force
+RUN npm config set strict-ssl false
 RUN npm install && npm run build
 
 # Etap serwowania plików za pomocą Nginx

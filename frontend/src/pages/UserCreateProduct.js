@@ -149,7 +149,8 @@ const UserCreateProduct = () => {
                     </div>
                     <button
                         type="submit"
-                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                        className="text-white py-2 px-4 rounded-lg shadow-md"
+                        style={{ backgroundColor: '#123456' }}
                     >
                         Dodaj Produkt
                     </button>

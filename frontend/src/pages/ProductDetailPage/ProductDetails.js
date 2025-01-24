@@ -6,7 +6,8 @@ import SectionHeading from '../../components/Sections/SectionsHeading/SectionHea
 import ProductCard from '../ProductListPage/ProductCard';
 import Rating from '../../components/Rating/Rating';
 import { getAllProducts } from '../../api/fetchProducts';
-import { addItemToCartAction } from '../../store/actions/cartAction'
+import { fetchUserReviewsAPI } from '../../api/userInfo';
+import { addItemToCartAction } from '../../store/actions/cartAction';
 import { API_BASE_URL } from '../../api/constant';
 
 const ProductDetails = () => {
@@ -22,6 +23,7 @@ const ProductDetails = () => {
   const [isModalOpen, setIsModalOpen] = useState(false); // Modal dla powiększenia obrazu
   const [breadCrumbLinks, setBreadCrumbLinks] = useState([]);
   const [similarProducts, setSimilarProducts] = useState([]);
+  const [averageRating, setAverageRating] = useState(0); // Średnia ocena sprzedawcy
 
   // Breadcrumbs
   useEffect(() => {
@@ -43,6 +45,19 @@ const ProductDetails = () => {
       });
     }
   }, [product?.categoryId, product?.productId]);
+
+  // Pobieranie ocen sprzedawcy
+  useEffect(() => {
+    if (product?.sellerId) {
+      fetchUserReviewsAPI(product.sellerId) // Zakładam, że masz ID sprzedawcy w product.sellerId
+        .then((reviews) => {
+          const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+          const avgRating = reviews.length ? totalRating / reviews.length : 0;
+          setAverageRating(avgRating.toFixed(1)); // Zaokrąglenie do 1 miejsca po przecinku
+        })
+        .catch((error) => console.error('Błąd podczas pobierania ocen:', error));
+    }
+  }, [product?.sellerId]);
 
   // Obsługa dodawania do koszyka
   const handleAddToCart = () => {
@@ -86,11 +101,10 @@ const ProductDetails = () => {
         <div className="w-[60%] px-10">
           <Breadcrumb links={breadCrumbLinks} />
           <p className="text-3xl pt-4">{product?.name || 'Nazwa produktu'}</p>
-          <Rating rating={product?.rating || 0} />
+          <p className="text-xl bold py-2">Ocena sprzedawcy: {averageRating} ★</p> {/* Średnia ocena */}
           <p className="text-xl bold py-2">{product?.price || 'Cena niedostępna'} zł</p>
           <p className="text-sm py-1 text-gray-600">Stan: {product?.condition || 'Nieznany'}</p>
           <p className="text-sm py-1 text-gray-600">Sprzedawca: {product?.sellerName || 'Nieznany'}</p>
-          {/*<p className="py-4">{product?.description || 'Brak opisu produktu.'}</p>*/}
           <button
             onClick={handleAddToCart}
             className="text-white py-2 px-4 rounded-lg shadow-md"

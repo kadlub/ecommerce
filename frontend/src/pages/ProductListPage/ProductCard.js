@@ -73,14 +73,6 @@ const ProductCard = ({ productId, title, description, price, discount, rating, b
         </div>
       </div>
 
-      <div className="flex items-center mt-2">
-        {rating ? (
-          <p className="text-yellow-500 text-sm">{'⭐'.repeat(Math.round(rating))}</p>
-        ) : (
-          <p className="text-gray-400 text-sm">Brak ocen</p>
-        )}
-      </div>
-
       <div className="absolute top-0 right-0 pt-4 pr-4 flex space-x-2">
         <button
           onClick={handleAddToCart}

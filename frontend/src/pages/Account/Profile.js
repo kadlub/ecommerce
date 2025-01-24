@@ -1,7 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { removeAddress, selectUserInfo, updateUserInfo } from "../../store/features/user";
-import AddAddress from "./AddAddress";
 import { setLoading } from "../../store/features/common";
 import { deleteAddressAPI, updateUserDetailsAPI } from "../../api/userInfo";
 

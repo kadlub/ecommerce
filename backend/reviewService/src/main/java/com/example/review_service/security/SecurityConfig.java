@@ -33,9 +33,9 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/reviews/me").authenticated()
-                        .requestMatchers("/reviews/user/**").permitAll()
-                        .requestMatchers("/reviews/reviewer/**").authenticated()
+                        .requestMatchers("/api/reviews/me").authenticated()
+                        .requestMatchers("/api/reviews/user/**").permitAll()
+                        .requestMatchers("/api/reviews/reviewer/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
