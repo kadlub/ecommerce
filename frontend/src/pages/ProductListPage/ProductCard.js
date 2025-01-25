@@ -47,7 +47,7 @@ const ProductCard = ({ productId, title, description, price, discount, rating, b
   };
 
   return (
-    <div className="flex flex-col hover:scale-105 relative border rounded-lg shadow-lg p-4">
+    <div className="flex flex-col hover:scale-105 relative border border-black rounded-lg shadow-lg p-4">
       <Link to={`/products/${slug}`}>
         <img
           className="h-[320px] w-[280px] border rounded-lg cursor-pointer object-contain"
@@ -72,8 +72,7 @@ const ProductCard = ({ productId, title, description, price, discount, rating, b
           )}
         </div>
       </div>
-
-      <div className="absolute top-0 right-0 pt-4 pr-4 flex space-x-2">
+      <div className="absolute top-0 right-0 pt-4 pr-4 flex flex-col space-y-2">
         <button
           onClick={handleAddToCart}
           className="cursor-pointer text-gray-500 hover:text-gray-800"
