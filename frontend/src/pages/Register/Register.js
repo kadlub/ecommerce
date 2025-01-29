@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import { setLoading } from '../../store/features/common';
 import { useDispatch } from 'react-redux';
 import { registerAPI } from '../../api/authentication';
-import VerifyCode from './VerifyCode';
 
 const Register = () => {
   const [values, setValues] = useState({
@@ -64,7 +63,6 @@ const Register = () => {
           <Link to={"/v1/login"} className='underline text-gray-500 hover:text-black'>Masz już konto? Zaloguj się!</Link>
         </>
       }
-      {enableVerify && <VerifyCode email={values?.email} />}
     </div>
   )
 }

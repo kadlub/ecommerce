@@ -5,8 +5,8 @@ const Categories = ({ types, onCategoryClick }) => {
 
   const handleCheckboxChange = (categoryName) => {
     const updatedCategories = selectedCategories.includes(categoryName)
-      ? selectedCategories.filter((name) => name !== categoryName) // Usuń kategorię
-      : [...selectedCategories, categoryName]; // Dodaj kategorię
+      ? selectedCategories.filter((name) => name !== categoryName)
+      : [...selectedCategories, categoryName];
 
     setSelectedCategories(updatedCategories);
     onCategoryClick(updatedCategories); // Przekaż zaktualizowaną listę do rodzica

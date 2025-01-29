@@ -7,19 +7,15 @@ import { loadProductBySlug } from "./routes/products";
 import AuthenticationWrapper from "./pages/AuthenticationWrapper";
 import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
-import OAuth2LoginCallback from "./pages/OAuth2LoginCallback";
 import Cart from "./pages/Cart/Cart";
 import Account from "./pages/Account/Account";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 import Checkout from "./pages/Checkout/Checkout";
-import ConfirmPayment from "./pages/ConfirmPayment/ConfirmPayment";
 import OrderConfirmed from "./pages/OrderConfirmed/OrderConfirmed";
-import Profile from "./pages/Account/Profile";
 import Orders from "./pages/Account/Orders";
-import Settings from "./pages/Account/Settings";
 import AdminPanel from "./pages/AdminPanel/AdminPanel";
 import UserCreateProduct from "./pages/UserCreateProduct";
-import Payment from "./pages/Checkout/Payment"; // Upewnij się, że ścieżka do pliku jest poprawna
+import Payment from "./pages/Checkout/Payment";
 import Success from "./pages/Checkout/Success";
 import UserProducts from "./pages/Account/UserProducts";
 import Wishlist from "./store/favourites/Wishlist";
@@ -60,12 +56,8 @@ export const router = createBrowserRouter([
           },
           {
             path: "products", // Domyślna zakładka
-            index: true, // Ustawiona jako domyślna
+            index: true,
             element: <ProtectedRoute><UserProducts /></ProtectedRoute>,
-          },
-          {
-            path: "settings",
-            element: <ProtectedRoute><Settings /></ProtectedRoute>,
           },
         ],
       },
@@ -108,14 +100,6 @@ export const router = createBrowserRouter([
         element: <Register />,
       },
     ],
-  },
-  {
-    path: "/oauth2/callback",
-    element: <OAuth2LoginCallback />,
-  },
-  {
-    path: "/confirmPayment",
-    element: <ConfirmPayment />,
   },
   {
     path: "/admin/",
