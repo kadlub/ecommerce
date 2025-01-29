@@ -22,7 +22,7 @@ public class CustomRouteLocator {
     public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
         return builder.routes()
                 .route("productservice", r -> r.path("/api/categories/**", "/api/products/**", "/api/uploads/**")
-                        .filters(f -> f.removeRequestHeader("Access-Control-Allow-Origin"))
+                        .filters(f -> f.removeRequestHeader("Access-Control-Allow-Ometodarigin"))
                         .uri("http://productservice:8082"))
                 .route("userservice", r -> r.path("/api/auth/**", "/api/users/**")
                         .filters(f -> f.removeRequestHeader("Access-Control-Allow-Origin"))

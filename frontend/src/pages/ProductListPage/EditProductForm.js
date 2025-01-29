@@ -37,7 +37,7 @@ const EditProductForm = ({ product, onClose }) => {
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white p-8 rounded-lg shadow-lg w-[90%] max-w-lg relative">
-                <h2 className="text-xl font-bold mb-4">Edit Product</h2>
+                <h2 className="text-xl font-bold mb-4">Edytuj produkt</h2>
                 <button
                     onClick={onClose}
                     className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-xl font-bold"
@@ -46,7 +46,7 @@ const EditProductForm = ({ product, onClose }) => {
                 </button>
                 <form onSubmit={handleSubmit}>
                     <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700">Name</label>
+                        <label className="block text-sm font-medium text-gray-700">Nazwa</label>
                         <input
                             type="text"
                             name="name"
@@ -57,7 +57,7 @@ const EditProductForm = ({ product, onClose }) => {
                         />
                     </div>
                     <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700">Description</label>
+                        <label className="block text-sm font-medium text-gray-700">Opis</label>
                         <textarea
                             name="description"
                             value={formData.description}
@@ -67,7 +67,7 @@ const EditProductForm = ({ product, onClose }) => {
                         />
                     </div>
                     <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700">Price</label>
+                        <label className="block text-sm font-medium text-gray-700">Cena</label>
                         <input
                             type="number"
                             name="price"
@@ -78,7 +78,7 @@ const EditProductForm = ({ product, onClose }) => {
                         />
                     </div>
                     <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700">Condition</label>
+                        <label className="block text-sm font-medium text-gray-700">Stan</label>
                         <select
                             name="condition"
                             value={formData.condition}
@@ -86,9 +86,9 @@ const EditProductForm = ({ product, onClose }) => {
                             className="border rounded-lg px-4 py-2 w-full"
                             required
                         >
-                            <option value="">Select Condition</option>
-                            <option value="new">New</option>
-                            <option value="used">Used</option>
+                            <option value="">Stan</option>
+                            <option value="Nowy">Nowy</option>
+                            <option value="Używany">Używany</option>
                         </select>
                     </div>
                     <div className="flex justify-end gap-4">
@@ -97,13 +97,13 @@ const EditProductForm = ({ product, onClose }) => {
                             onClick={onClose}
                             className="bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600"
                         >
-                            Cancel
+                            Anuluj
                         </button>
                         <button
                             type="submit"
                             className="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600"
                         >
-                            Save
+                            Zapisz
                         </button>
                     </div>
                 </form>

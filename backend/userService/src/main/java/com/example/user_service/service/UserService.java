@@ -76,6 +76,9 @@ public class UserService {
         if (usersRepository.existsByEmail(userInputDto.getEmail())) {
             throw new IllegalArgumentException("Email already exists.");
         }
+        if (usersRepository.existsByUsername(userInputDto.getUsername())) {
+            throw new IllegalArgumentException("Username already exists.");
+        }
         System.out.println("Creating user: " + userInputDto);
         try {
             Users user = convertToEntity(userInputDto);

@@ -181,6 +181,7 @@ public class ProductService {
                 .condition(productInputDto.getCondition())
                 .category(category)
                 .seller(seller)
+                .slug(generateUniqueSlug(productInputDto.getName()))
                 .build();
 
         Products savedProduct = productsRepository.save(product);
@@ -198,10 +199,29 @@ public class ProductService {
                 .map(this::convertToOutputDto);
     }
 
+    private String generateUniqueSlug(String name) {
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("Product name cannot be empty");
+        }
+
+        String baseSlug = name.toLowerCase()
+                .replaceAll("[^a-z0-9\\s-]", "")
+                .replaceAll("\\s+", "-");
+
+        String uniqueSlug = baseSlug;
+        int counter = 1;
+
+        while (productsRepository.existsBySlug(uniqueSlug)) {
+            uniqueSlug = baseSlug + "-" + counter;
+            counter++;
+        }
+
+        return uniqueSlug;
+    }
+
     public ProductOutputDto updateProduct(UUID productId, ProductInputDto productInputDto) {
         return productsRepository.findById(productId)
                 .map(product -> {
-                    // Aktualizuj tylko te pola, które są przekazane
                     product.setName(productInputDto.getName());
                     product.setDescription(productInputDto.getDescription());
                     product.setPrice(productInputDto.getPrice());
@@ -214,14 +234,15 @@ public class ProductService {
                         product.setCategory(category);
                     }
 
-                    // Nie nadpisuj `sellerId`, ponieważ jest to wartość stała
-                    // Jeśli jednak jest ustawione w DTO, zignoruj ją
+                    // Aktualizacja sluga jeśli nazwa produktu została zmieniona
+                    if (!product.getName().equals(productInputDto.getName())) {
+                        product.setSlug(generateUniqueSlug(productInputDto.getName()));
+                    }
 
                     return convertToOutputDto(productsRepository.save(product));
                 })
                 .orElseThrow(() -> new RuntimeException("Product not found"));
     }
-
 
     public boolean deleteProduct(UUID productId) {
         Optional<Products> product = productsRepository.findById(productId);
@@ -231,7 +252,6 @@ public class ProductService {
         }
         return false; // Produkt nie istnieje
     }
-
 
     public List<ProductOutputDto> findProductsByCategory(UUID categoryId) {
         List<UUID> categoryIds = getAllSubcategoryIds(categoryId);
@@ -281,7 +301,7 @@ public class ProductService {
                     criteriaBuilder.equal(root.get("condition"), condition));
         }
 
-        // Dodaj warunek wykluczający sprzedane produkty
+        // Warunek wykluczający sprzedane produkty
         spec = spec.and((root, query, criteriaBuilder) ->
                 criteriaBuilder.isFalse(root.get("isSold")));
 
@@ -312,7 +332,7 @@ public class ProductService {
                 : Collections.emptyList();
 
         return ProductOutputDto.builder()
-                .productId(product.getProductId()) // Zakładam, że getter jest poprawny
+                .productId(product.getProductId())
                 .name(product.getName())
                 .price(product.getPrice())
                 .description(product.getDescription())
@@ -320,12 +340,12 @@ public class ProductService {
                 .creationDate(product.getCreationDate())
                 .imageUrl(imageUrls.isEmpty() ? null : imageUrls.get(0)) // Pierwszy obraz jako domyślny, null jeśli brak
                 .imageUrls(imageUrls) // Pełna lista obrazów
-                .categoryId(product.getCategory() != null ? product.getCategory().getCategoryId() : null) // Sprawdzenie null dla kategorii
-                .categoryName(product.getCategory() != null ? product.getCategory().getName() : null) // Sprawdzenie null dla nazwy kategorii
-                .sellerId(product.getSeller() != null ? product.getSeller().getUserId() : null) // Sprawdzenie null dla sprzedawcy
-                .sellerName(product.getSeller() != null ? product.getSeller().getUsername() : null) // Sprawdzenie null dla nazwy sprzedawcy
+                .categoryId(product.getCategory() != null ? product.getCategory().getCategoryId() : null)
+                .categoryName(product.getCategory() != null ? product.getCategory().getName() : null)
+                .sellerId(product.getSeller() != null ? product.getSeller().getUserId() : null)
+                .sellerName(product.getSeller() != null ? product.getSeller().getUsername() : null)
                 .slug(product.getSlug())
-                .isSold(product.isSold()) // Dodano pole `isSold`
+                .isSold(product.isSold())
                 .build();
     }
 }

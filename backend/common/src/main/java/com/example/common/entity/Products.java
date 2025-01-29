@@ -68,9 +68,6 @@ public class Products {
     public void onPrePersist() {
         this.creationDate = LocalDateTime.now();
         this.updateDate = LocalDateTime.now();
-        if (this.slug == null || this.slug.isEmpty()) {
-            this.slug = this.name.toLowerCase().replaceAll("\\s+", "-");
-        }
     }
 
     @PreUpdate

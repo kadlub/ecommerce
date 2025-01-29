@@ -64,6 +64,19 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<List<UserOutputDto>> getAllUsersForAdmin(@AuthenticationPrincipal UserDetails userDetails) {
+        // Sprawdzenie, czy użytkownik ma rolę ADMIN
+        if (userDetails.getAuthorities().stream()
+                .map(authority -> authority.getAuthority())
+                .noneMatch(role -> role.equals("ROLE_ADMIN"))) {
+            return ResponseEntity.status(403).build(); // Zwróć 403, jeśli użytkownik nie ma roli ADMIN
+        }
+
+        List<UserOutputDto> users = userService.findAllUsers();
+        return ResponseEntity.ok(users);
+    }
+
     // Pobranie profilu użytkownika
     @GetMapping("/profile")
     public ResponseEntity<UserOutputDto> getUserProfile(@RequestHeader("Authorization") String token) {

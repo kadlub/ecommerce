@@ -38,7 +38,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/register", "/api/auth/login").permitAll() // Publiczne endpointy
-                        .requestMatchers("/api/users/**").authenticated() // Inne wymagają uwierzytelnienia
+                        .requestMatchers("/api/users/**").hasAnyRole("USER", "ADMIN") // Inne wymagają uwierzytelnienia
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtValidationFilter, UsernamePasswordAuthenticationFilter.class);

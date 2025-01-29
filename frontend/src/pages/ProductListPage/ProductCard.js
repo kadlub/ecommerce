@@ -56,22 +56,20 @@ const ProductCard = ({ productId, title, description, price, discount, rating, b
         />
       </Link>
 
-      <div className="flex justify-between items-center mt-4">
-        <div className="flex flex-col">
-          <p className="text-[16px] font-semibold">{title}</p>
-          {description && <p className="text-[12px] text-gray-600">{brand}</p>}
-        </div>
-        <div>
-          {discount ? (
-            <div>
-              <p className="text-red-500 line-through text-sm">{price}zł</p>
-              <p className="text-green-500 font-bold">{(price - price * (discount / 100)).toFixed(2)}zł</p>
-            </div>
-          ) : (
-            <p className="text-lg font-bold">{price} zł</p>
-          )}
-        </div>
+      <div className="flex flex-col mt-4">
+        <p className="text-[16px] font-semibold max-w-[380px] break-words">{title}</p>
+        {discount ? (
+          <div>
+            <p className="text-red-500 line-through text-sm">{price}zł</p>
+            <p className="text-green-500 font-bold">{(price - price * (discount / 100)).toFixed(2)}zł</p>
+          </div>
+        ) : (
+          <p className="text-lg font-bold">{price} zł</p>
+        )}
       </div>
+
+      {description && <p className="text-[12px] text-gray-600 mt-2">{brand}</p>}
+
       <div className="absolute top-0 right-0 pt-4 pr-4 flex flex-col space-y-2">
         <button
           onClick={handleAddToCart}

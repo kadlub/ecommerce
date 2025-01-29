@@ -14,6 +14,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -43,6 +44,7 @@ public class OrderService {
         this.productsRepository = productsRepository;
         this.restTemplate = restTemplate;
     }
+
     // Pobierz wszystkie zamówienia
     public List<OrderOutputDto> findAllOrders() {
         return ordersRepository.findAll()
@@ -74,7 +76,7 @@ public class OrderService {
 
         Orders order = new Orders();
         order.setUser(buyer);
-        order.setStatus("Pending");
+        order.setStatus("W realizacji"); // Ustawienie początkowego statusu
         order.setPaymentMethod(orderInputDto.getPaymentMethod());
 
         LocalDateTime deliveryDate = LocalDateTime.parse(orderInputDto.getDeliveryDate(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
@@ -111,7 +113,6 @@ public class OrderService {
 
         Orders savedOrder = ordersRepository.save(order);
 
-        // Wyślij powiadomienia e-mail
         sendNotifications(savedOrder);
 
         return convertToOutputDto(savedOrder);
@@ -147,7 +148,6 @@ public class OrderService {
         });
     }
 
-
     // Usuń zamówienie
     public void deleteOrder(UUID orderId) {
         if (!ordersRepository.existsById(orderId)) {
@@ -172,33 +172,38 @@ public class OrderService {
         return convertToOutputDto(updatedOrder);
     }
 
-    // Pobierz zamówienia kupującego
-    public List<OrderOutputDto> findOrdersByUser(String username) {
-        Users user = usersRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    // Automatyczna zmiana statusów zamówień
+    @Scheduled(fixedRate = 60000) // Co 1 minutę
+    @Transactional
+    public void updateOrderStatuses() {
+        LocalDateTime now = LocalDateTime.now();
 
-        return ordersRepository.findByUser_UserId(user.getUserId()).stream()
-                .map(this::convertToOutputDto)
-                .collect(Collectors.toList());
-    }
+        // Zamówienia "Przyjęte" zmieniają się na "W dostawie" po 1 godzinie
+        ordersRepository.findByStatus("W realizacji").forEach(order -> {
+            if (order.getCreatedAt().plusHours(1).isBefore(now)) {
+                order.setStatus("W dostawie");
+                ordersRepository.save(order);
+            }
+        });
 
-    // Pobierz zamówienia sprzedawcy
-    public List<OrderOutputDto> findOrdersBySeller(UUID sellerId) {
-        return ordersRepository.findByItems_Product_Seller_UserId(sellerId).stream()
-                .map(this::convertToOutputDto)
-                .collect(Collectors.toList());
+        // Zamówienia "W dostawie" zmieniają się na "Dostarczone" w dniu dostawy
+        ordersRepository.findByStatus("W dostawie").forEach(order -> {
+            if (order.getDeliveryDate().toLocalDate().isEqual(now.toLocalDate())) {
+                order.setStatus("Dostarczone");
+                ordersRepository.save(order);
+            }
+        });
     }
 
     // Walidacja statusu zamówienia
     private boolean isValidStatus(String status) {
-        return List.of("Pending", "Completed", "Cancelled")
+        return List.of("W realizacji", "W dostawie", "Dostarczone")
                 .stream()
                 .anyMatch(validStatus -> validStatus.equalsIgnoreCase(status));
     }
 
     // Konwersja encji na DTO
     private OrderOutputDto convertToOutputDto(Orders order) {
-        // Formatter for converting LocalDateTime to String
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
         return OrderOutputDto.builder()
@@ -207,7 +212,7 @@ public class OrderService {
                 .buyerName(order.getUser().getUsername())
                 .totalPrice(order.getTotalPrice())
                 .status(order.getStatus())
-                .deliveryDate(order.getDeliveryDate().format(formatter)) // Convert LocalDateTime to String
+                .deliveryDate(order.getDeliveryDate().format(formatter))
                 .paymentMethod(order.getPaymentMethod())
                 .deliveryAddress(OrderOutputDto.DeliveryAddressDto.builder()
                         .city(order.getCity())
@@ -225,5 +230,4 @@ public class OrderService {
                         .build()).collect(Collectors.toList()))
                 .build();
     }
-
 }

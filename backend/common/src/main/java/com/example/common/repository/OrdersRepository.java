@@ -23,4 +23,6 @@ public interface OrdersRepository extends JpaRepository<Orders, UUID> {
     // Pobierz zamówienia dla sprzedawcy
     @Query("SELECT DISTINCT o FROM Orders o JOIN o.orderItems oi WHERE oi.product.seller.userId = :sellerId")
     List<Orders> findByItems_Product_Seller_UserId(@Param("sellerId") UUID sellerId);
+
+    List<Orders> findByStatus(String status);
 }

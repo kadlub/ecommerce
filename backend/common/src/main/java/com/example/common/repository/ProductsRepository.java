@@ -18,6 +18,7 @@ public interface ProductsRepository extends JpaRepository<Products, UUID>, JpaSp
     List<Products> findByCategory_CategoryIdIn(List<UUID> categoryIds);
     Optional<Products> findBySlug(String slug);
     List<Products> findBySeller_UserId(UUID userId);
+    boolean existsBySlug(String slug);
 
     @Query("SELECT p FROM Products p WHERE p.isSold = false")
     List<Products> findAllAvailableProducts();

@@ -144,3 +144,15 @@ export const updateUserDetailsAPI = async (data) => {
     }
 };
 
+export const fetchAllUsersForAdmin = async () => {
+    const url = API_BASE_URL + '/api/users/all';
+    try {
+        const response = await axios.get(url, {
+            headers: getHeaders(), // Nagłówki zawierające token JWT
+        });
+        return response?.data;
+    } catch (err) {
+        console.error("Error fetching all users for admin:", err);
+        throw err;
+    }
+};
