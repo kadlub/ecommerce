@@ -24,13 +24,12 @@ public class CustomUserDetailsService implements UserDetailsService {
         Users user = usersRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
 
-        // Tworzymy UserDetails na podstawie użytkownika z bazy danych
         return User.builder()
                 .username(user.getUsername())
-                .password(user.getPasswordHash()) // Używamy zaszyfrowanego hasła
+                .password(user.getPasswordHash())
                 .authorities(user.getAuthorities().stream()
-                        .map(role -> role.getName()) // Mapujemy role na String
-                        .toArray(String[]::new)) // Konwertujemy na tablicę
+                        .map(role -> role.getName())
+                        .toArray(String[]::new))
                 .build();
     }
 }
