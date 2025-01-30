@@ -93,12 +93,12 @@ spec:
         - name: POSTGRES_USER
           value: postgres
         - name: POSTGRES_PASSWORD
-          value: Dudzio1423
+          value: password
         - name: POSTGRES_DB
           value: musify
         volumeMounts:
-        - mountPath: /var/lib/postgresql/data
-          name: db-data
+        - name: db-data
+          mountPath: /var/lib/postgresql/data
       volumes:
       - name: db-data
         persistentVolumeClaim:
@@ -149,9 +149,9 @@ spec:
         - name: SPRING_DATASOURCE_URL
           value: "jdbc:postgresql://database.musify.svc.cluster.local:5432/musify"
         - name: SPRING_DATASOURCE_USERNAME
-          value: "postgres"
+          value: postgres
         - name: SPRING_DATASOURCE_PASSWORD
-          value: "Dudzio1423"
+          value: password
 
 ---
 
@@ -198,9 +198,9 @@ spec:
         - name: SPRING_DATASOURCE_URL
           value: "jdbc:postgresql://database.musify.svc.cluster.local:5432/musify"
         - name: SPRING_DATASOURCE_USERNAME
-          value: "postgres"
+          value: postgres
         - name: SPRING_DATASOURCE_PASSWORD
-          value: "Dudzio1423"
+          value: password
 
 ---
 
@@ -247,9 +247,9 @@ spec:
         - name: SPRING_DATASOURCE_URL
           value: "jdbc:postgresql://database.musify.svc.cluster.local:5432/musify"
         - name: SPRING_DATASOURCE_USERNAME
-          value: "postgres"
+          value: postgres
         - name: SPRING_DATASOURCE_PASSWORD
-          value: "Dudzio1423"
+          value: password
 
 ---
 
@@ -296,9 +296,9 @@ spec:
         - name: SPRING_DATASOURCE_URL
           value: "jdbc:postgresql://database.musify.svc.cluster.local:5432/musify"
         - name: SPRING_DATASOURCE_USERNAME
-          value: "postgres"
+          value: postgres
         - name: SPRING_DATASOURCE_PASSWORD
-          value: "Dudzio1423"
+          value: password
 
 ---
 
@@ -395,9 +395,9 @@ spec:
         - name: SPRING_DATASOURCE_URL
           value: "jdbc:postgresql://database.musify.svc.cluster.local:5432/musify"
         - name: SPRING_DATASOURCE_USERNAME
-          value: "postgres"
+          value: postgres
         - name: SPRING_DATASOURCE_PASSWORD
-          value: "Dudzio1423"
+          value: password
         - name: MAIL_HOST
           value: "smtp.gmail.com"
         - name: MAIL_PORT
@@ -481,5 +481,5 @@ metadata:
   namespace: musify
 type: Opaque
 data:
-  username: a3ViYS5rYWRsdWJvd3NraUBnbWFpbC5jb20=  # Base64 zakodowany email: kuba.kadlubowski@gmail.com
-  password: cXZjdCBldG5kIGhmemwgcXh1Zw==  # Base64 zakodowane hasło: qvct etnd hfzl qxug
+  username: # Base64 zakodowany email
+  password: # Base64 zakodowane hasło
